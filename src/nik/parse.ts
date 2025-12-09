@@ -66,7 +66,7 @@ export function parseNIK(nik: string): NIKInfo | null {
 
   let day = parseInt(dayStr, 10);
   const month = parseInt(monthStr, 10);
-  let year = parseInt(yearStr, 10);
+  const year = parseInt(yearStr, 10);
 
   let gender: 'male' | 'female' | null = null;
   if (day > 40) {
