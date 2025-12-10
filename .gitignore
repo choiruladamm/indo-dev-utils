@@ -39,7 +39,4 @@ pnpm-debug.log*
 .tmp/
 
 # guide
-SETUP_GUIDE.md
-PROJECT_DOCS.md
-DOCS_STYLE_GUIDE.md
-CURRENCY_TDD_GUIDE.md
+guide/
