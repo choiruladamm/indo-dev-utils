@@ -1,0 +1,329 @@
+import { PhoneFormat, MaskOptions } from './types';
+
+/**
+ * Formats an Indonesian phone number to the specified format.
+ *
+ * Accepts various input formats and converts to the desired output format.
+ * Automatically adds appropriate separators for readability.
+ *
+ * @param phone - The phone number to format
+ * @param format - Target format ('international', 'national', 'e164', 'display')
+ * @returns Formatted phone number, or original string if invalid
+ *
+ * @example
+ * International format:
+ * ```typescript
+ * formatPhoneNumber('081234567890', 'international');
+ * // '+62 812-3456-7890'
+ * ```
+ *
+ * @example
+ * National format:
+ * ```typescript
+ * formatPhoneNumber('+6281234567890', 'national');
+ * // '0812-3456-7890'
+ * ```
+ *
+ * @example
+ * E.164 format (no spaces/dashes):
+ * ```typescript
+ * formatPhoneNumber('0812-3456-7890', 'e164');
+ * // '6281234567890'
+ * ```
+ *
+ * @public
+ */
+export function formatPhoneNumber(
+  phone: string,
+  format: PhoneFormat = 'national'
+): string {
+  const cleaned = cleanPhoneNumber(phone);
+  if (!cleaned) {
+    return phone;
+  }
+
+  // Normalize to 08xx format first
+  const normalized = normalizeToNational(cleaned);
+  if (!normalized || normalized.length < 10) {
+    return phone;
+  }
+
+  switch (format) {
+    case 'international':
+      return toInternational(normalized);
+    case 'national':
+    case 'display':
+      return toNational(normalized);
+    case 'e164':
+      return toE164(normalized);
+    default:
+      return phone;
+  }
+}
+
+/**
+ * Converts a phone number to international format (+62 xxx-xxxx-xxxx).
+ *
+ * @param phone - The phone number to convert
+ * @returns Phone number in international format with separators
+ *
+ * @example
+ * ```typescript
+ * toInternational('081234567890');
+ * // '+62 812-3456-7890'
+ * ```
+ *
+ * @example
+ * Already international:
+ * ```typescript
+ * toInternational('+6281234567890');
+ * // '+62 812-3456-7890'
+ * ```
+ *
+ * @public
+ */
+export function toInternational(phone: string): string {
+  const cleaned = cleanPhoneNumber(phone);
+  if (!cleaned) {
+    return phone;
+  }
+
+  const normalized = normalizeToNational(cleaned);
+  if (!normalized) {
+    return phone;
+  }
+
+  // Remove leading 0 and add country code
+  const withoutZero = normalized.substring(1);
+
+  // Format: +62 8xx-xxxx-xxxx
+  if (withoutZero.length === 11) {
+    return `+62 ${withoutZero.substring(0, 3)}-${withoutZero.substring(
+      3,
+      7
+    )}-${withoutZero.substring(7)}`;
+  } else if (withoutZero.length === 10) {
+    return `+62 ${withoutZero.substring(0, 3)}-${withoutZero.substring(
+      3,
+      6
+    )}-${withoutZero.substring(6)}`;
+  } else {
+    // Fallback for other lengths
+    return `+62 ${withoutZero}`;
+  }
+}
+
+/**
+ * Converts a phone number to national format (08xx-xxxx-xxxx).
+ *
+ * @param phone - The phone number to convert
+ * @returns Phone number in national format with dashes
+ *
+ * @example
+ * ```typescript
+ * toNational('+6281234567890');
+ * // '0812-3456-7890'
+ * ```
+ *
+ * @example
+ * Already national:
+ * ```typescript
+ * toNational('081234567890');
+ * // '0812-3456-7890'
+ * ```
+ *
+ * @public
+ */
+export function toNational(phone: string): string {
+  const cleaned = cleanPhoneNumber(phone);
+  if (!cleaned) {
+    return phone;
+  }
+
+  const normalized = normalizeToNational(cleaned);
+  if (!normalized) {
+    return phone;
+  }
+
+  // Format: 08xx-xxxx-xxxx (or 08xx-xxx-xxxx for 11-digit numbers)
+  if (normalized.length === 12) {
+    return `${normalized.substring(0, 4)}-${normalized.substring(
+      4,
+      8
+    )}-${normalized.substring(8)}`;
+  } else if (normalized.length === 11) {
+    return `${normalized.substring(0, 4)}-${normalized.substring(
+      4,
+      7
+    )}-${normalized.substring(7)}`;
+  } else if (normalized.length === 10) {
+    return `${normalized.substring(0, 4)}-${normalized.substring(
+      4,
+      7
+    )}-${normalized.substring(7)}`;
+  } else {
+    // Fallback: add dash after 4th digit
+    return `${normalized.substring(0, 4)}-${normalized.substring(4)}`;
+  }
+}
+
+/**
+ * Converts a phone number to E.164 format (6281234567890).
+ *
+ * E.164 is the international standard format without spaces or dashes.
+ * Suitable for API calls and database storage.
+ *
+ * @param phone - The phone number to convert
+ * @returns Phone number in E.164 format
+ *
+ * @example
+ * ```typescript
+ * toE164('0812-3456-7890');
+ * // '6281234567890'
+ * ```
+ *
+ * @example
+ * From international format:
+ * ```typescript
+ * toE164('+62 812-3456-7890');
+ * // '6281234567890'
+ * ```
+ *
+ * @public
+ */
+export function toE164(phone: string): string {
+  const cleaned = cleanPhoneNumber(phone);
+  if (!cleaned) {
+    return phone;
+  }
+
+  const normalized = normalizeToNational(cleaned);
+  if (!normalized) {
+    return phone;
+  }
+
+  // Remove leading 0 and prepend country code
+  return '62' + normalized.substring(1);
+}
+
+/**
+ * Removes all non-digit characters from a phone number, preserving leading +.
+ *
+ * @param phone - The phone number to clean
+ * @returns Cleaned phone number with only digits (and optional leading +)
+ *
+ * @example
+ * ```typescript
+ * cleanPhoneNumber('0812-3456-7890');
+ * // '081234567890'
+ * ```
+ *
+ * @example
+ * ```typescript
+ * cleanPhoneNumber('+62 812 3456 7890');
+ * // '+6281234567890'
+ * ```
+ *
+ * @public
+ */
+export function cleanPhoneNumber(phone: string): string {
+  if (!phone || typeof phone !== 'string') {
+    return '';
+  }
+
+  return phone.replace(/[^\d+]/g, '');
+}
+
+/**
+ * Normalizes a phone number to national format (08xx).
+ *
+ * @param phone - Cleaned phone number
+ * @returns Phone number in 08xx format
+ * @internal
+ */
+function normalizeToNational(phone: string): string {
+  if (phone.startsWith('+62')) {
+    return '0' + phone.substring(3);
+  } else if (phone.startsWith('62')) {
+    return '0' + phone.substring(2);
+  } else if (phone.startsWith('0')) {
+    return phone;
+  }
+  return '';
+}
+
+/**
+ * Masks a phone number for privacy protection.
+ *
+ * By default, shows the first 4 and last 4 digits, masking the middle digits.
+ * Optionally formats with separators.
+ *
+ * @param phone - The phone number to mask
+ * @param options - Masking configuration options
+ * @returns Masked phone number, or original string if invalid
+ *
+ * @example
+ * Default masking:
+ * ```typescript
+ * maskPhoneNumber('081234567890');
+ * // '0812****7890'
+ * ```
+ *
+ * @example
+ * Custom mask character:
+ * ```typescript
+ * maskPhoneNumber('081234567890', { char: 'X' });
+ * // '0812XXXX7890'
+ * ```
+ *
+ * @example
+ * With separator:
+ * ```typescript
+ * maskPhoneNumber('081234567890', { separator: '-' });
+ * // '0812-****-7890'
+ * ```
+ *
+ * @public
+ */
+export function maskPhoneNumber(
+  phone: string,
+  options: MaskOptions = {}
+): string {
+  const cleaned = cleanPhoneNumber(phone);
+  if (!cleaned) {
+    return phone;
+  }
+
+  const normalized = normalizeToNational(cleaned);
+  if (!normalized) {
+    return phone;
+  }
+
+  const { start = 4, end = 4, char = '*', separator } = options;
+
+  if (start + end >= normalized.length) {
+    return normalized;
+  }
+
+  const startPart = normalized.substring(0, start);
+  const endPart = normalized.substring(normalized.length - end);
+  const maskLength = normalized.length - start - end;
+  const masked = startPart + char.repeat(maskLength) + endPart;
+
+  if (separator) {
+    // Apply same formatting logic as toNational but with masked string
+    if (masked.length === 12) {
+      return `${masked.substring(0, 4)}${separator}${masked.substring(
+        4,
+        8
+      )}${separator}${masked.substring(8)}`;
+    } else if (masked.length >= 10) {
+      return `${masked.substring(0, 4)}${separator}${masked.substring(
+        4,
+        masked.length - 4
+      )}${separator}${masked.substring(masked.length - 4)}`;
+    }
+  }
+
+  return masked;
+}
