@@ -55,31 +55,29 @@ export function validatePhoneNumber(phone: string): boolean {
     return false;
   }
 
-  // Remove all non-digit characters except leading +
-  const cleaned = phone.replace(/[^\d+]/g, '');
+  // Only allow digits, +, -, space, parentheses, dot
+  if (!/^[\d\s\-+().]+$/.test(phone)) {
+    return false;
+  }
 
-  // Check for valid formats
+  const cleaned = phone.replace(/[\s\-().]/g, '');
+
   let normalized: string;
 
   if (cleaned.startsWith('+62')) {
-    // International format with +
     normalized = '0' + cleaned.substring(3);
-  } else if (cleaned.startsWith('62')) {
-    // International format without +
+  } else if (cleaned.startsWith('62') && !cleaned.startsWith('620')) {
     normalized = '0' + cleaned.substring(2);
   } else if (cleaned.startsWith('0')) {
-    // National format
     normalized = cleaned;
   } else {
     return false;
   }
 
-  // Check if it's a mobile number (starts with 08)
   if (normalized.startsWith('08')) {
     return validateMobileNumber(normalized);
   }
 
-  // Check if it's a landline number
   if (normalized.startsWith('0')) {
     return validateLandlineNumber(normalized);
   }
