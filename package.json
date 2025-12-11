@@ -6,26 +6,47 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./nik": {
-      "types": "./dist/nik/index.d.ts",
-      "import": "./dist/nik/index.js",
-      "require": "./dist/nik/index.cjs"
+      "import": {
+        "types": "./dist/nik/index.d.ts",
+        "default": "./dist/nik/index.js"
+      },
+      "require": {
+        "types": "./dist/nik/index.d.cts",
+        "default": "./dist/nik/index.cjs"
+      }
     },
     "./phone": {
-      "types": "./dist/phone/index.d.ts",
-      "import": "./dist/phone/index.js",
-      "require": "./dist/phone/index.cjs"
+      "import": {
+        "types": "./dist/phone/index.d.ts",
+        "default": "./dist/phone/index.js"
+      },
+      "require": {
+        "types": "./dist/phone/index.d.cts",
+        "default": "./dist/phone/index.cjs"
+      }
     },
     "./currency": {
-      "types": "./dist/currency/index.d.ts",
-      "import": "./dist/currency/index.js",
-      "require": "./dist/currency/index.cjs"
+      "import": {
+        "types": "./dist/currency/index.d.ts",
+        "default": "./dist/currency/index.js"
+      },
+      "require": {
+        "types": "./dist/currency/index.d.cts",
+        "default": "./dist/currency/index.cjs"
+      }
     }
   },
   "files": [
@@ -33,6 +54,10 @@
     "README.md",
     "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup",
@@ -64,7 +89,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/choiruladamm/indo-dev-utils"
+    "url": "git+https://github.com/choiruladamm/indo-dev-utils.git"
   },
   "bugs": {
     "url": "https://github.com/choiruladamm/indo-dev-utils/issues"
