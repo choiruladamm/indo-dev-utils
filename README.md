@@ -1,22 +1,24 @@
 # @indodev/toolkit
 
-**Production-ready utilities for Indonesian developers.** Stop rewriting the same validation logic - use battle-tested functions that just work.
+TypeScript utilities for Indonesian data validation and formatting.
 
 [![npm version](https://badge.fury.io/js/@indodev%2Ftoolkit.svg)](https://www.npmjs.com/package/@indodev/toolkit)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Why This Exists
+## Why?
 
-Building apps for Indonesia? You need NIK validation, phone formatting, and Rupiah display. Instead of copy-pasting regex from StackOverflow, use this.
+Building apps for Indonesia means dealing with NIK validation, phone number formatting, and Rupiah display. Instead of rewriting the same logic across projects, use battle-tested utilities that just work.
 
-**What you get:**
-- NIK validation that actually works (province codes, birth dates, gender)
-- Phone numbers formatted correctly (Telkomsel, XL, Indosat, etc)
-- Rupiah with proper grammar ("1,5 juta" not "1,0 juta")
-- Terbilang converter (1500000 → "satu juta lima ratus ribu rupiah")
-- TypeScript types that make sense
-- 150+ tests so you can ship with confidence
+## Features
+
+- **NIK validation** - Verify Indonesian National Identity Numbers with province, date, and gender checks
+- **Phone formatting** - Support for all major operators (Telkomsel, XL, Indosat, Smartfren, Axis) and 200+ area codes
+- **Rupiah formatting** - Display currency with proper grammar rules (1,5 juta, not 1,0 juta)
+- **Terbilang converter** - Numbers to Indonesian words (1500000 → "satu juta lima ratus ribu rupiah")
+- **Type-safe** - Full TypeScript support with proper type inference
+- **Well-tested** - 470+ test cases with 95%+ coverage
+- **Zero dependencies** - Lightweight and tree-shakeable
 
 ## Install
 ```bash
