@@ -1,4 +1,6 @@
+import { AREA_CODES } from './constants';
 import { PhoneFormat, MaskOptions } from './types';
+import { validatePhoneNumber } from './validate';
 
 /**
  * Formats an Indonesian phone number to the specified format.
@@ -37,15 +39,19 @@ export function formatPhoneNumber(
   phone: string,
   format: PhoneFormat = 'national'
 ): string {
-  const cleaned = cleanPhoneNumber(phone);
-  if (!cleaned) {
+  if (!validatePhoneNumber(phone)) {
     return phone;
   }
 
-  // Normalize to 08xx format first
-  const normalized = normalizeToNational(cleaned);
-  if (!normalized || normalized.length < 10) {
-    return phone;
+  const cleaned = cleanPhoneNumber(phone);
+
+  let normalized: string;
+  if (cleaned.startsWith('+62')) {
+    normalized = '0' + cleaned.substring(3);
+  } else if (cleaned.startsWith('62') && !cleaned.startsWith('620')) {
+    normalized = '0' + cleaned.substring(2);
+  } else {
+    normalized = cleaned;
   }
 
   switch (format) {
@@ -93,24 +99,25 @@ export function toInternational(phone: string): string {
     return phone;
   }
 
-  // Remove leading 0 and add country code
   const withoutZero = normalized.substring(1);
 
-  // Format: +62 8xx-xxxx-xxxx
-  if (withoutZero.length === 11) {
-    return `+62 ${withoutZero.substring(0, 3)}-${withoutZero.substring(
-      3,
-      7
-    )}-${withoutZero.substring(7)}`;
-  } else if (withoutZero.length === 10) {
-    return `+62 ${withoutZero.substring(0, 3)}-${withoutZero.substring(
-      3,
-      6
-    )}-${withoutZero.substring(6)}`;
-  } else {
-    // Fallback for other lengths
-    return `+62 ${withoutZero}`;
+  if (normalized.startsWith('08')) {
+    if (withoutZero.length === 11) {
+      return `+62 ${withoutZero.substring(0, 3)}-${withoutZero.substring(3, 7)}-${withoutZero.substring(7)}`;
+    } else if (withoutZero.length === 10) {
+      return `+62 ${withoutZero.substring(0, 3)}-${withoutZero.substring(3, 6)}-${withoutZero.substring(6)}`;
+    } else if (withoutZero.length === 9) {
+      return `+62 ${withoutZero.substring(0, 3)}-${withoutZero.substring(3)}`;
+    } else if (withoutZero.length === 12) {
+      return `+62 ${withoutZero.substring(0, 3)}-${withoutZero.substring(3, 7)}-${withoutZero.substring(7)}`;
+    }
   }
+
+  const areaCodeLength = getAreaCodeLength(normalized);
+  const areaCode = normalized.substring(1, areaCodeLength + 1);
+  const localNumber = normalized.substring(areaCodeLength + 1);
+
+  return `+62 ${areaCode}-${localNumber}`;
 }
 
 /**
@@ -145,26 +152,23 @@ export function toNational(phone: string): string {
     return phone;
   }
 
-  // Format: 08xx-xxxx-xxxx (or 08xx-xxx-xxxx for 11-digit numbers)
-  if (normalized.length === 12) {
-    return `${normalized.substring(0, 4)}-${normalized.substring(
-      4,
-      8
-    )}-${normalized.substring(8)}`;
-  } else if (normalized.length === 11) {
-    return `${normalized.substring(0, 4)}-${normalized.substring(
-      4,
-      7
-    )}-${normalized.substring(7)}`;
-  } else if (normalized.length === 10) {
-    return `${normalized.substring(0, 4)}-${normalized.substring(
-      4,
-      7
-    )}-${normalized.substring(7)}`;
-  } else {
-    // Fallback: add dash after 4th digit
-    return `${normalized.substring(0, 4)}-${normalized.substring(4)}`;
+  if (normalized.startsWith('08')) {
+    if (normalized.length === 12) {
+      return `${normalized.substring(0, 4)}-${normalized.substring(4, 8)}-${normalized.substring(8)}`;
+    } else if (normalized.length === 11) {
+      return `${normalized.substring(0, 4)}-${normalized.substring(4, 7)}-${normalized.substring(7)}`;
+    } else if (normalized.length === 10) {
+      return `${normalized.substring(0, 4)}-${normalized.substring(4)}`;
+    } else if (normalized.length === 13) {
+      return `${normalized.substring(0, 4)}-${normalized.substring(4, 8)}-${normalized.substring(8)}`;
+    }
   }
+
+  const areaCodeLength = getAreaCodeLength(normalized);
+  const areaCodeWithZero = normalized.substring(0, areaCodeLength + 1);
+  const localNumber = normalized.substring(areaCodeLength + 1);
+
+  return `${areaCodeWithZero}-${localNumber}`;
 }
 
 /**
@@ -202,7 +206,6 @@ export function toE164(phone: string): string {
     return phone;
   }
 
-  // Remove leading 0 and prepend country code
   return '62' + normalized.substring(1);
 }
 
@@ -244,12 +247,41 @@ export function cleanPhoneNumber(phone: string): string {
 function normalizeToNational(phone: string): string {
   if (phone.startsWith('+62')) {
     return '0' + phone.substring(3);
-  } else if (phone.startsWith('62')) {
+  } else if (phone.startsWith('62') && !phone.startsWith('620')) {
     return '0' + phone.substring(2);
   } else if (phone.startsWith('0')) {
     return phone;
   }
   return '';
+}
+
+/**
+ * Determines area code length for landline numbers.
+ *
+ * @param normalized - Phone number in national format (0xxx)
+ * @returns Area code length (digits after leading 0)
+ * @internal
+ */
+function getAreaCodeLength(normalized: string): number {
+  // Check 4-digit area codes ('0xxxx')
+  const fourDigitCode = normalized.substring(0, 5);
+  if (AREA_CODES[fourDigitCode]) {
+    return 4;
+  }
+
+  // Check 3-digit area codes ('0xxx')
+  const threeDigitCode = normalized.substring(0, 4);
+  if (AREA_CODES[threeDigitCode]) {
+    return 3;
+  }
+
+  // Check 2-digit area codes ('0xx')
+  const twoDigitCode = normalized.substring(0, 3);
+  if (AREA_CODES[twoDigitCode]) {
+    return 2;
+  }
+
+  return 2;
 }
 
 /**
@@ -294,35 +326,47 @@ export function maskPhoneNumber(
     return phone;
   }
 
-  const normalized = normalizeToNational(cleaned);
-  if (!normalized) {
+  const isInternational = cleaned.startsWith('+');
+  let toMask: string;
+
+  if (isInternational) {
+    toMask = cleaned;
+  } else {
+    const normalized = normalizeToNational(cleaned);
+    toMask = normalized || cleaned;
+  }
+
+  if (toMask.length < 4) {
     return phone;
   }
 
-  const { start = 4, end = 4, char = '*', separator } = options;
+  const { char = '*', separator } = options;
+  let { start = 4, end = 4 } = options;
 
-  if (start + end >= normalized.length) {
-    return normalized;
+  if (start + end >= toMask.length) {
+    // Auto-adjust for short numbers to ensure masking happens
+    if (toMask.length < 10) {
+      const minMaskLength = 1;
+      const availableForVisible = toMask.length - minMaskLength;
+
+      if (availableForVisible >= 2) {
+        start = Math.floor(availableForVisible / 2);
+        end = availableForVisible - start;
+      } else {
+        return toMask;
+      }
+    } else {
+      return toMask;
+    }
   }
 
-  const startPart = normalized.substring(0, start);
-  const endPart = normalized.substring(normalized.length - end);
-  const maskLength = normalized.length - start - end;
+  const startPart = toMask.substring(0, start);
+  const endPart = toMask.substring(toMask.length - end);
+  const maskLength = toMask.length - start - end;
   const masked = startPart + char.repeat(maskLength) + endPart;
 
   if (separator) {
-    // Apply same formatting logic as toNational but with masked string
-    if (masked.length === 12) {
-      return `${masked.substring(0, 4)}${separator}${masked.substring(
-        4,
-        8
-      )}${separator}${masked.substring(8)}`;
-    } else if (masked.length >= 10) {
-      return `${masked.substring(0, 4)}${separator}${masked.substring(
-        4,
-        masked.length - 4
-      )}${separator}${masked.substring(masked.length - 4)}`;
-    }
+    return `${masked.substring(0, start)}${separator}${masked.substring(start, masked.length - end)}${separator}${masked.substring(masked.length - end)}`;
   }
 
   return masked;
