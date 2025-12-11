@@ -216,8 +216,6 @@ export default {
 | `formatNIK(nik, separator?)` | Format with separators |
 | `maskNIK(nik, options?)` | Mask for privacy |
 
-[Full NIK docs →](#)
-
 ### Phone Module
 
 | Function | Description |
@@ -226,8 +224,6 @@ export default {
 | `formatPhoneNumber(phone, format)` | Format to international/national/e164 |
 | `getOperator(phone)` | Detect operator (Telkomsel, XL, etc) |
 | `parsePhoneNumber(phone)` | Get all phone info |
-
-[Full Phone docs →](#)
 
 ### Currency Module
 
@@ -238,8 +234,6 @@ export default {
 | `parseRupiah(formatted)` | Parse formatted string to number |
 | `toWords(amount, options?)` | Convert to Indonesian words |
 | `roundToClean(amount, unit?)` | Round to clean amounts |
-
-[Full Currency docs →](#)
 
 ## Bundle Size
 
@@ -266,8 +260,6 @@ Found a bug? Want to add more Indonesian utilities?
 3. Make changes and add tests
 4. Submit a PR
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
 ## Roadmap
 
 - [x] NIK validation & parsing
@@ -287,7 +279,6 @@ MIT © [choiruladamm](https://github.com/choiruladamm)
 
 - 📖 [Documentation](#) (coming soon)
 - 🐛 [Report Issues](https://github.com/yourusername/indo-dev-utils/issues)
-- 💬 [Discussions](https://github.com/yourusername/indo-dev-utils/discussions)
 
 ---
 
