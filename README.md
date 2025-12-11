@@ -2,8 +2,8 @@
 
 TypeScript utilities for Indonesian data validation and formatting.
 
-[![npm version](https://badge.fury.io/js/@indodev%2Ftoolkit.svg)](https://www.npmjs.com/package/@indodev/toolkit)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
+[![npm version](https://badge.fury.io/js/@indodev%2Ftoolkit.svg)](https://npmjs.com/package/@indodev/toolkit)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Why?
