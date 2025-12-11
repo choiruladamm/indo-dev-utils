@@ -1,6 +1,6 @@
 {
   "name": "@indodev/toolkit",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Indonesian developer utilities for validation, formatting, and more",
   "type": "module",
   "main": "./dist/index.cjs",
