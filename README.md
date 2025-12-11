@@ -1,9 +1,22 @@
+<!-- # @indodev/toolkit
+
+TypeScript utilities for Indonesian data validation and formatting.
+
+<div align="center">
+
+[![CI](https://github.com/choiruladamm/indo-dev-utils/actions/workflows/ci.yml/badge.svg)](https://github.com/choiruladamm/indo-dev-utils/actions) [![npm version](https://img.shields.io/npm/v/@indodev/toolkit.svg)](https://npmjs.com/package/@indodev/toolkit) [![bundle size](https://img.shields.io/bundlephobia/minzip/@indodev/toolkit)](https://bundlephobia.com/package/@indodev/toolkit) [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://typescriptlang.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+</div> -->
+
+<div align="center">
+
 # @indodev/toolkit
 
 TypeScript utilities for Indonesian data validation and formatting.
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://typescriptlang.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/choiruladamm/indo-dev-utils/actions/workflows/ci.yml/badge.svg)](https://github.com/choiruladamm/indo-dev-utils/actions) [![npm version](https://img.shields.io/npm/v/@indodev/toolkit.svg)](https://npmjs.com/package/@indodev/toolkit) [![bundle size](https://img.shields.io/bundlephobia/minzip/@indodev/toolkit)](https://bundlephobia.com/package/@indodev/toolkit) [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://typescriptlang.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+</div>
 
 ## Why?
 

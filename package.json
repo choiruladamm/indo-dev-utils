@@ -77,13 +77,17 @@
   "keywords": [
     "indonesia",
     "indonesian",
-    "validation",
     "nik",
-    "npwp",
-    "phone",
+    "validation",
+    "phone-number",
+    "currency",
     "rupiah",
+    "terbilang",
+    "typescript",
     "utilities",
-    "typescript"
+    "formatting",
+    "e-commerce",
+    "indonesia-utilities"
   ],
   "author": "Choirul Adam <choiruladamm@gmail.com>",
   "license": "MIT",
