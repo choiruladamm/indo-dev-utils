@@ -12,8 +12,11 @@ export default defineConfig({
         'dist/',
         '**/*.test.ts',
         '**/*.spec.ts',
-        '**/*.config.ts',
+        '**/*.config.{ts,js,mjs,cjs}',
         '**/types.ts',
+        '**/index.ts',
+        'coverage/**',
+        'eslint.config.js',
       ],
       thresholds: {
         lines: 80,
