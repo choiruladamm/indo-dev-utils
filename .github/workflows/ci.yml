@@ -1,37 +1,55 @@
+# @format
+
 name: CI
 
 on:
   push:
     branches: [main]
+    paths:
+      - 'packages/toolkit/**'
+      - '.github/workflows/ci.yml'
+      - 'pnpm-lock.yaml'
   pull_request:
     branches: [main]
+    paths:
+      - 'packages/toolkit/**'
+      - '.github/workflows/ci.yml'
+      - 'pnpm-lock.yaml'
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 9
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Type check
-        run: pnpm run typecheck
-      
+        run: pnpm --filter @indodev/toolkit typecheck
+
       - name: Lint
-        run: pnpm run lint
-      
+        run: pnpm --filter @indodev/toolkit lint
+
+      - name: Run tests
+        run: pnpm --filter @indodev/toolkit test:run
+
       - name: Build
-        run: pnpm run build
+        run: pnpm --filter @indodev/toolkit build
+
+      - name: Check bundle size
+        run: |
+          cd packages/toolkit
+          ls -lh dist/
