@@ -5,6 +5,8 @@ node_modules/
 # Build outputs
 dist/
 *.tsbuildinfo
+.next/
+out/
 
 # Environment variables
 .env
@@ -25,6 +27,7 @@ Thumbs.db
 # Testing
 coverage/
 .nyc_output/
+.vitest/
 
 # Logs
 *.log
@@ -38,5 +41,35 @@ pnpm-debug.log*
 .temp/
 .tmp/
 
-# guide
+# Guide (internal docs)
 guide/
+
+# ===================================
+# Monorepo Specific
+# ===================================
+
+# Package build outputs
+packages/*/dist/
+packages/*/build/
+packages/*/.next/
+packages/*/out/
+
+# Package node_modules
+packages/*/node_modules/
+
+# Package specific
+packages/*/coverage/
+packages/*/*.tsbuildinfo
+
+# Docs specific
+docs/.next/
+docs/out/
+docs/.turbo/
+docs/public/_pagefind/
+docs/node_modules/
+
+# Vercel
+.vercel
+
+# Turbopack
+.turbo/
