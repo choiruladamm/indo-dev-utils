@@ -1,112 +1,345 @@
-import { Steps } from 'nextra/components'
+---
+title: Getting Started
+description: Get up and running with @indodev/toolkit in minutes
+---
 
-# Get Started
+import { Callout, Tabs, Steps } from 'nextra/components'
 
-## Quick start with Vercel
+# Getting Started
 
-You can start by creating your own Nextra site and deploying to Vercel by
-clicking the link:
+Welcome to @indodev/toolkit! This guide will help you get up and running in minutes.
 
-[![](https://vercel.com/button)](https://vercel.com/new/clone?demo-description=Markdown%20powered%20docs%20site.%20Built%20with%20Next.js.&demo-image=https%3A%2F%2Fnextra.vercel.app%2Fdemo.png&demo-title=Documentation%20Starter%20Kit&demo-url=https%3A%2F%2Fnextra.vercel.app%2F&project-name=nextjs-docs&repository-name=nextjs-docs&s=https%3A%2F%2Fgithub.com%2Fshuding%2Fnextra&from=templates)
+## What is @indodev/toolkit?
 
-Vercel will create the Nextra repository and deploy the site for you with just a
-few clicks. Once done, every change in the repository will be deployed
-automatically.
+@indodev/toolkit is a TypeScript library that provides utilities for Indonesian-specific data validation and formatting. It's designed to solve common challenges when building applications that handle Indonesian data like national IDs (NIK), phone numbers, and currency.
 
-## Create manually
+### Why Use This Library?
 
-Nextra works like a Next.js plugin, and it accepts a theme config (layout) to
-render the page. To start: [^3]
+- **🎯 Indonesian-First** - Built specifically for Indonesian data formats and standards
+- **📦 Zero Dependencies** - Lightweight with no external dependencies (~30KB)
+- **🔒 Type-Safe** - Full TypeScript support with complete type definitions
+- **🧪 Battle-Tested** - 95%+ test coverage with 470+ test cases
+- **🌳 Tree-Shakeable** - Import only what you need for optimal bundle size
+- **⚡ Framework-Agnostic** - Works with React, Vue, Svelte, or vanilla JavaScript
 
-<Steps>
-### Install Next.js, Nextra and React [^1]
+### Key Features
 
-```sh npm2yarn
-npm i react react-dom next nextra
+- **NIK Module**: Validate, parse, format, and mask Indonesian National Identity Numbers
+- **Phone Module**: Validate, format, and detect operators for Indonesian phone numbers
+- **Currency Module**: Format Rupiah, convert to words (terbilang), and parse amounts
+
+## Installation
+
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+  <Tabs.Tab>
+    ```bash
+    npm install @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    pnpm add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    yarn add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    bun add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+<Callout type="info">
+**Requirements:** Node.js 16+ or any modern browser. Works with TypeScript 4.5+ or JavaScript.
+</Callout>
+
+## Quick Start
+
+### Import Syntax
+
+The library uses subpath imports for optimal tree-shaking. Import only the modules you need:
+
+```typescript
+// ✅ Recommended: Import from specific modules
+import { validateNIK, parseNIK } from '@indodev/toolkit/nik'
+import { formatPhoneNumber } from '@indodev/toolkit/phone'
+import { formatRupiah } from '@indodev/toolkit/currency'
+
+// ❌ Avoid: Importing from root (imports everything)
+import { validateNIK } from '@indodev/toolkit'
 ```
 
-### Install the docs theme [^2]
+### NIK (National Identity Number)
 
-```sh npm2yarn
-npm i nextra-theme-docs
+Validate and extract information from Indonesian NIK:
+
+```typescript
+import { validateNIK, parseNIK, formatNIK, maskNIK } from '@indodev/toolkit/nik'
+
+// Validate NIK format
+const isValid = validateNIK('3201234567890123')
+console.log(isValid) // true
+
+// Parse and extract information
+const info = parseNIK('3201018901310123')
+console.log(info)
+// {
+//   province: { code: '32', name: 'Jawa Barat' },
+//   regency: { code: '01', name: 'Kab. Bogor' },
+//   district: { code: '01', name: null },
+//   birthDate: Date(1989-01-31),
+//   gender: 'male',
+//   serialNumber: '0123',
+//   isValid: true
+// }
+
+// Format with separators
+const formatted = formatNIK('3201234567890123')
+console.log(formatted) // '32-01-23-45-67-89-0123'
+
+// Mask for privacy
+const masked = maskNIK('3201234567890123')
+console.log(masked) // '3201********0123'
 ```
 
-### Create the following Next.js config and theme config under the root directory
+**Learn more:** [NIK Module Documentation →](/docs/api/nik)
 
-```js filename="next.config.mjs"
-import nextra from 'nextra'
+---
 
-const withNextra = nextra({
-  theme: 'nextra-theme-blog',
-  themeConfig: './theme.config.js'
-})
-export default withNextra()
+### Phone Numbers
+
+Validate, format, and detect operators for Indonesian phone numbers:
+
+```typescript
+import { 
+  validatePhoneNumber, 
+  formatPhoneNumber, 
+  parsePhoneNumber,
+  getOperator 
+} from '@indodev/toolkit/phone'
+
+// Validate phone number
+const isValid = validatePhoneNumber('081234567890')
+console.log(isValid) // true
+
+// Format to different styles
+const international = formatPhoneNumber('081234567890', 'international')
+console.log(international) // '+62 812-3456-7890'
+
+const national = formatPhoneNumber('081234567890', 'national')
+console.log(national) // '0812-3456-7890'
+
+const e164 = formatPhoneNumber('081234567890', 'e164')
+console.log(e164) // '6281234567890'
+
+// Detect operator
+const operator = getOperator('081234567890')
+console.log(operator) // 'Telkomsel'
+
+// Parse all information
+const info = parsePhoneNumber('081234567890')
+console.log(info)
+// {
+//   countryCode: '62',
+//   operator: 'Telkomsel',
+//   number: '81234567890',
+//   formatted: {
+//     international: '+62 812-3456-7890',
+//     national: '0812-3456-7890',
+//     e164: '6281234567890'
+//   },
+//   isMobile: true,
+//   isLandline: false
+// }
 ```
 
-### Create a `theme.config.js` file for the docs theme
+**Learn more:** [Phone Module Documentation →](/docs/api/phone)
 
-```js filename="theme.config.js"
-export default {
-  project: {
-    link: 'https://github.com/shuding/nextra' // GitHub link in the navbar
-  },
-  docsRepositoryBase: 'https://github.com/shuding/nextra/blob/master', // base URL for the docs repository
-  getNextSeoProps: () => ({ titleTemplate: '%s – Nextra' }),
-  navigation: true,
-  darkMode: true,
-  footer: {
-    text: `MIT ${new Date().getFullYear()} © Shu Ding.`
-  },
-  editLink: {
-    text: 'Edit this page on GitHub'
-  },
-  logo: (
-    <>
-      <svg>...</svg>
-      <span>Next.js Static Site Generator</span>
-    </>
-  ),
-  head: (
-    <>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta name="description" content="Nextra: the next docs builder" />
-      <meta name="og:title" content="Nextra: the next docs builder" />
-    </>
-  ),
-  primaryHue: {
-    dark: 204,
-    light: 212
+---
+
+### Currency (Rupiah)
+
+Format Indonesian Rupiah and convert numbers to words (terbilang):
+
+```typescript
+import { 
+  formatRupiah, 
+  formatCompact,
+  parseRupiah,
+  toWords 
+} from '@indodev/toolkit/currency'
+
+// Format as Rupiah
+const formatted = formatRupiah(1500000)
+console.log(formatted) // 'Rp 1.500.000'
+
+// With decimals
+const withDecimals = formatRupiah(1500000.50, { decimal: true })
+console.log(withDecimals) // 'Rp 1.500.000,50'
+
+// Compact format (Indonesian style)
+const compact = formatCompact(1500000)
+console.log(compact) // 'Rp 1,5 juta'
+
+// Parse formatted string back to number
+const amount = parseRupiah('Rp 1.500.000')
+console.log(amount) // 1500000
+
+// Convert to Indonesian words (terbilang)
+const words = toWords(1500000)
+console.log(words) // 'satu juta lima ratus ribu rupiah'
+
+// With options
+const capitalizedWords = toWords(1500000, { uppercase: true })
+console.log(capitalizedWords) // 'Satu juta lima ratus ribu rupiah'
+```
+
+**Learn more:** [Currency Module Documentation →](/docs/api/currency)
+
+---
+
+## TypeScript Configuration
+
+For the best TypeScript experience, ensure your `tsconfig.json` includes:
+
+```json
+{
+  "compilerOptions": {
+    "moduleResolution": "bundler", // or "node16" / "nodenext"
+    "resolvePackageJsonExports": true,
+    "resolvePackageJsonImports": true
   }
 }
 ```
 
-> [!NOTE]
->
-> More configuration options for the docs theme can be found
-> [here](/themes/docs/configuration).
+This enables proper resolution of subpath imports (`@indodev/toolkit/nik`, etc.).
 
-### You are good to go! Run `next dev` to start
+## Framework Integration
+
+### React / Next.js
+
+```tsx
+import { validateNIK, parseNIK } from '@indodev/toolkit/nik'
+import { useState } from 'react'
+
+function NIKValidator() {
+  const [nik, setNIK] = useState('')
+  const info = nik ? parseNIK(nik) : null
+  
+  return (
+    <div>
+      <input
+        value={nik}
+        onChange={e => setNIK(e.target.value)}
+        placeholder="Enter NIK"
+        className={info ? 'valid' : 'invalid'}
+      />
+      {info && (
+        <div>
+          <p>Province: {info.province.name}</p>
+          <p>Gender: {info.gender}</p>
+          <p>Birth Date: {info.birthDate?.toLocaleDateString('id-ID')}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+```
+
+### Vue
+
+```vue
+<script setup>
+import { ref, computed } from 'vue'
+import { validatePhoneNumber, formatPhoneNumber } from '@indodev/toolkit/phone'
+
+const phone = ref('')
+const isValid = computed(() => validatePhoneNumber(phone.value))
+const formatted = computed(() => 
+  isValid.value ? formatPhoneNumber(phone.value, 'national') : ''
+)
+</script>
+
+<template>
+  <div>
+    <input v-model="phone" placeholder="Phone number" />
+    <p v-if="formatted">Formatted: {{ formatted }}</p>
+  </div>
+</template>
+```
+
+### Svelte
+
+```svelte
+<script>
+  import { formatRupiah, parseRupiah } from '@indodev/toolkit/currency'
+  
+  let amount = ''
+  $: formatted = parseRupiah(amount) 
+    ? formatRupiah(parseRupiah(amount))
+    : ''
+</script>
+
+<input bind:value={amount} placeholder="Amount" />
+{#if formatted}
+  <p>Formatted: {formatted}</p>
+{/if}
+```
+
+## Bundle Size
+
+The library is optimized for minimal bundle impact:
+
+| Module | Size (minified + gzipped) |
+|--------|--------------------------|
+| NIK | ~8KB |
+| Phone | ~12KB |
+| Currency | ~10KB |
+| Full library | ~30KB |
+
+Thanks to tree-shaking, you only pay for what you use!
+
+## Browser Compatibility
+
+Works in all modern browsers and Node.js:
+
+- ✅ Chrome/Edge 90+
+- ✅ Firefox 88+
+- ✅ Safari 14+
+- ✅ Node.js 16+
+- ✅ Deno
+- ✅ Bun
+
+<Callout type="info">
+No polyfills needed for modern environments. For older browsers, ensure your bundler includes necessary polyfills.
+</Callout>
+
+## Next Steps
+
+<Steps>
+
+### Explore the Modules
+
+Dive deep into each module's capabilities:
+- [NIK](/docs/api/nik) - National ID validation and parsing
+- [Phone](/docs/api/phone) - Phone number utilities
+- [Currency](/docs/api/currency) - Rupiah formatting and terbilang
+
+### Check Examples (Coming Soon)
+
+See real-world implementations:
+- Form validation patterns
+- Invoice generation
+- Data processing workflows
+
+### Join the Community
+
+- 🐛 [Report Issues](https://github.com/choiruladamm/indo-dev-utils/issues)
+- 💡 [Request Features](https://github.com/choiruladamm/indo-dev-utils/issues/new)
+- ⭐ [Star on GitHub](https://github.com/choiruladamm/indo-dev-utils)
 
 </Steps>
-
----
-
-<span id="sidebar-and-anchor-links" />
-
-> [!NOTE]
->
-> Any `.md` or `.mdx` file will turn into a doc page and be displayed in
-> sidebar. You can also create a `_meta.js` file to customize the page order and
-> title. <br /> Check the source code: https://github.com/shuding/nextra for
-> more information.
-
-> [!TIP]
->
-> You can also use [`<style jsx>`](https://nextjs.org/docs/app/guides/css-in-js)
-> to style elements inside `theme.config.js`.
-
-[^1]: Install Next.js, Nextra and React.
-
-[^2]: Install the docs theme.
-
-[^3]: To start.

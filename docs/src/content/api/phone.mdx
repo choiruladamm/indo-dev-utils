@@ -1,0 +1,1556 @@
+---
+title: Phone
+description: Indonesian phone number validation, formatting, and operator detection
+---
+
+import { Callout, Tabs, Steps } from 'nextra/components'
+
+# Phone
+
+Comprehensive utilities for working with Indonesian phone numbers.
+
+## Overview
+
+The Phone module provides type-safe utilities for validating, formatting, parsing, and masking Indonesian phone numbers. It includes comprehensive operator detection for mobile numbers and area code mapping for landlines across all Indonesian provinces.
+
+### Features
+
+- **Validation**: Check if phone numbers are valid Indonesian numbers
+- **Formatting**: Convert between national (08xx), international (+62), and E.164 formats
+- **Operator Detection**: Identify mobile operators (Telkomsel, XL, Indosat, Smartfren, Axis)
+- **Area Code Mapping**: Recognize 200+ Indonesian area codes for landlines
+- **Parsing**: Extract all information from phone numbers in a single call
+- **Masking**: Protect privacy while maintaining partial visibility
+- **Flexible Input**: Accepts multiple formats with or without separators
+
+### Supported Operators
+
+| Operator | Prefixes | Notes |
+|----------|----------|-------|
+| **Telkomsel** | 0811, 0812, 0813, 0821, 0822, 0823, 0851, 0852, 0853 | Halo, Simpati, by.U |
+| **XL** | 0817, 0818, 0819, 0859, 0877, 0878, 0879 | XL Prepaid, Prioritas, LIVE.ON |
+| **Indosat** | 0814, 0815, 0816, 0855-0858, 0895-0899 | IM3, Mentari (merged with Tri) |
+| **Smartfren** | 0881-0889 | Smartfren Power Up |
+| **Axis** | 0831, 0832, 0833, 0838 | Acquired by XL but separate branding |
+
+<Callout type="info">
+**Recent Changes:** Tri (3 Indonesia) merged with Indosat in 2024. Former Tri prefixes (089x) are now categorized under Indosat.
+</Callout>
+
+### Coverage
+
+- **Mobile**: All major Indonesian operators
+- **Landline**: 200+ area codes covering all 38 provinces
+- **Regions**: Jakarta, Java, Bali, Sumatra, Sulawesi, Kalimantan, Nusa Tenggara, Maluku, Papua
+
+## Installation
+
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+  <Tabs.Tab>
+    ```bash
+    npm install @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    pnpm add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    yarn add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    bun add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Quick Start
+
+```typescript
+import { 
+  validatePhoneNumber, 
+  formatPhoneNumber, 
+  parsePhoneNumber,
+  getOperator 
+} from '@indodev/toolkit/phone'
+
+// Validate
+const isValid = validatePhoneNumber('081234567890')
+console.log(isValid) // true
+
+// Format
+const formatted = formatPhoneNumber('081234567890', 'international')
+console.log(formatted) // '+62 812-3456-7890'
+
+// Get operator
+const operator = getOperator('081234567890')
+console.log(operator) // 'Telkomsel'
+
+// Parse (get all info)
+const info = parsePhoneNumber('081234567890')
+console.log(info.operator) // 'Telkomsel'
+console.log(info.formatted.international) // '+62 812-3456-7890'
+```
+
+## API Reference
+
+### validatePhoneNumber()
+
+Validates whether a string is a valid Indonesian phone number.
+
+**Type Signature:**
+```typescript
+function validatePhoneNumber(phone: string): boolean
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `phone` | `string` | The phone number string to validate |
+
+**Returns:**
+
+`boolean` - Returns `true` if valid, `false` otherwise
+
+**Validation Rules:**
+
+**For Mobile Numbers (08xx):**
+- Starts with `08` (national) or `628` (international)
+- Has valid operator prefix (0811, 0812, 0817, etc.)
+- Total length is 10-13 digits
+
+**For Landline Numbers:**
+- Starts with `0` followed by area code (021, 022, etc.)
+- Total length is 9-11 digits
+- Area code exists in Indonesian numbering plan
+
+**Accepted Formats:**
+- National: `081234567890`, `0812-3456-7890`
+- International: `+6281234567890`, `+62 812-3456-7890`
+- Without plus: `6281234567890`, `62 812-3456-7890`
+
+**Examples:**
+
+```typescript
+// Valid mobile numbers
+validatePhoneNumber('081234567890')
+// ✅ true
+
+validatePhoneNumber('0812-3456-7890')
+// ✅ true
+
+validatePhoneNumber('+6281234567890')
+// ✅ true
+
+validatePhoneNumber('+62 812-3456-7890')
+// ✅ true
+
+validatePhoneNumber('6281234567890')
+// ✅ true
+
+// Valid landline
+validatePhoneNumber('0212345678')
+// ✅ true (Jakarta)
+
+validatePhoneNumber('022-1234567')
+// ✅ true (Bandung)
+
+// Invalid numbers
+validatePhoneNumber('1234')
+// ❌ false (too short)
+
+validatePhoneNumber('08001234567')
+// ❌ false (invalid prefix)
+
+validatePhoneNumber('+1234567890')
+// ❌ false (wrong country code)
+
+validatePhoneNumber('abc123')
+// ❌ false (contains letters)
+
+// Edge cases
+validatePhoneNumber('')
+// ❌ false (empty)
+
+validatePhoneNumber('081234567') 
+// ❌ false (too short for mobile)
+
+validatePhoneNumber('08123456789012345')
+// ❌ false (too long)
+```
+
+**Use Cases:**
+
+```typescript
+// Form validation
+function validatePhoneInput(input: string): { valid: boolean; error?: string } {
+  if (!input) {
+    return { valid: false, error: 'Phone number is required' }
+  }
+  
+  if (!validatePhoneNumber(input)) {
+    return { valid: false, error: 'Invalid Indonesian phone number' }
+  }
+  
+  return { valid: true }
+}
+
+// API endpoint validation
+app.post('/register', (req, res) => {
+  const { phone } = req.body
+  
+  if (!validatePhoneNumber(phone)) {
+    return res.status(400).json({
+      error: 'Invalid phone number format'
+    })
+  }
+  
+  // Process registration
+})
+
+// Batch validation
+const phones = ['081234567890', '0212345678', 'invalid']
+const validPhones = phones.filter(validatePhoneNumber)
+console.log(validPhones) // ['081234567890', '0212345678']
+
+// Real-time validation in React
+function PhoneInput() {
+  const [phone, setPhone] = useState('')
+  const isValid = validatePhoneNumber(phone)
+  
+  return (
+    <input
+      value={phone}
+      onChange={e => setPhone(e.target.value)}
+      className={isValid ? 'valid' : 'invalid'}
+    />
+  )
+}
+```
+
+---
+
+### formatPhoneNumber()
+
+Formats a phone number to the specified style with appropriate separators.
+
+**Type Signature:**
+```typescript
+function formatPhoneNumber(
+  phone: string, 
+  format?: PhoneFormat
+): string
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `phone` | `string` | - | The phone number to format |
+| `format` | `PhoneFormat` | `'national'` | Target format style |
+
+**Format Types:**
+
+```typescript
+type PhoneFormat = 'international' | 'national' | 'e164' | 'display'
+```
+
+| Format | Example | Use Case |
+|--------|---------|----------|
+| `international` | `+62 812-3456-7890` | Display to international users |
+| `national` | `0812-3456-7890` | Display to Indonesian users |
+| `e164` | `6281234567890` | API calls, database storage |
+| `display` | `0812-3456-7890` | Same as national |
+
+**Returns:**
+
+`string` - Formatted phone number, or original string if invalid
+
+**Examples:**
+
+```typescript
+// International format
+formatPhoneNumber('081234567890', 'international')
+// '+62 812-3456-7890'
+
+formatPhoneNumber('6281234567890', 'international')
+// '+62 812-3456-7890'
+
+// National format (default)
+formatPhoneNumber('081234567890')
+// '0812-3456-7890'
+
+formatPhoneNumber('+6281234567890', 'national')
+// '0812-3456-7890'
+
+// E.164 format (no spaces/dashes)
+formatPhoneNumber('0812-3456-7890', 'e164')
+// '6281234567890'
+
+formatPhoneNumber('+62 812-3456-7890', 'e164')
+// '6281234567890'
+
+// Display format (same as national)
+formatPhoneNumber('081234567890', 'display')
+// '0812-3456-7890'
+
+// Landline formatting
+formatPhoneNumber('0212345678', 'national')
+// '021-2345678'
+
+formatPhoneNumber('0212345678', 'international')
+// '+62 21-2345678'
+
+// Invalid input returns as-is
+formatPhoneNumber('invalid')
+// 'invalid'
+
+// Different input formats all work
+formatPhoneNumber('08123456789')
+formatPhoneNumber('0812-3456-789')
+formatPhoneNumber('+62812-3456-789')
+formatPhoneNumber('62 812 3456 789')
+// All produce: '0812-3456-789' (national)
+```
+
+**Use Cases:**
+
+```typescript
+// Display in UI
+function ContactCard({ phone }: { phone: string }) {
+  return (
+    <div>
+      <span>Phone: {formatPhoneNumber(phone, 'national')}</span>
+    </div>
+  )
+}
+
+// International audience
+function InternationalContact({ phone }: { phone: string }) {
+  return (
+    <a href={`tel:${formatPhoneNumber(phone, 'e164')}`}>
+      {formatPhoneNumber(phone, 'international')}
+    </a>
+  )
+}
+
+// Database storage
+function saveUser(data: { phone: string }) {
+  return db.users.create({
+    phone: formatPhoneNumber(data.phone, 'e164')
+  })
+}
+
+// WhatsApp link
+function WhatsAppButton({ phone }: { phone: string }) {
+  const e164 = formatPhoneNumber(phone, 'e164')
+  return (
+    <a href={`https://wa.me/${e164}`}>
+      Chat on WhatsApp
+    </a>
+  )
+}
+
+// SMS link
+function SMSLink({ phone, message }: { phone: string, message: string }) {
+  const e164 = formatPhoneNumber(phone, 'e164')
+  return (
+    <a href={`sms:${e164}?body=${encodeURIComponent(message)}`}>
+      Send SMS
+    </a>
+  )
+}
+```
+
+---
+
+### parsePhoneNumber()
+
+Parses a phone number and extracts all embedded information in a single call.
+
+**Type Signature:**
+```typescript
+function parsePhoneNumber(phone: string): PhoneInfo | null
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `phone` | `string` | The phone number to parse |
+
+**Returns:**
+
+`PhoneInfo | null` - Parsed information object, or `null` if invalid
+
+**Examples:**
+
+```typescript
+// Parse mobile number
+const mobile = parsePhoneNumber('081234567890')
+console.log(mobile)
+// {
+//   countryCode: '62',
+//   operator: 'Telkomsel',
+//   number: '81234567890',
+//   formatted: {
+//     international: '+62 812-3456-7890',
+//     national: '0812-3456-7890',
+//     e164: '6281234567890'
+//   },
+//   isValid: true,
+//   isMobile: true,
+//   isLandline: false
+// }
+
+// Parse with different input format
+const info = parsePhoneNumber('+62 812-3456-7890')
+console.log(info.operator) // 'Telkomsel'
+console.log(info.formatted.national) // '0812-3456-7890'
+
+// Parse XL number
+const xl = parsePhoneNumber('081734567890')
+console.log(xl.operator) // 'XL'
+
+// Parse Indosat number
+const indosat = parsePhoneNumber('085612345678')
+console.log(indosat.operator) // 'Indosat'
+
+// Parse landline
+const landline = parsePhoneNumber('0212345678')
+console.log(landline)
+// {
+//   countryCode: '62',
+//   operator: null,
+//   number: '212345678',
+//   formatted: {
+//     international: '+62 21-2345678',
+//     national: '021-2345678',
+//     e164: '62212345678'
+//   },
+//   isValid: true,
+//   isMobile: false,
+//   isLandline: true,
+//   region: 'Jakarta'
+// }
+
+// Parse Bandung landline
+const bandung = parsePhoneNumber('0221234567')
+console.log(bandung.region) // 'Bandung'
+
+// Invalid input returns null
+const invalid = parsePhoneNumber('invalid')
+console.log(invalid) // null
+```
+
+**Use Cases:**
+
+```typescript
+// Extract and display all info
+function PhoneDetails({ phone }: { phone: string }) {
+  const info = parsePhoneNumber(phone)
+  
+  if (!info) {
+    return <div>Invalid phone number</div>
+  }
+  
+  return (
+    <div>
+      <div>Type: {info.isMobile ? 'Mobile' : 'Landline'}</div>
+      {info.operator && <div>Operator: {info.operator}</div>}
+      {info.region && <div>Region: {info.region}</div>}
+      <div>International: {info.formatted.international}</div>
+      <div>National: {info.formatted.national}</div>
+    </div>
+  )
+}
+
+// Normalize for database
+function normalizePhone(input: string) {
+  const info = parsePhoneNumber(input)
+  return info ? info.formatted.e164 : null
+}
+
+// Send SMS to mobile only
+function sendSMS(phone: string, message: string) {
+  const info = parsePhoneNumber(phone)
+  
+  if (!info?.isMobile) {
+    throw new Error('Can only send SMS to mobile numbers')
+  }
+  
+  // Send SMS using E.164 format
+  return smsService.send(info.formatted.e164, message)
+}
+
+// Filter by operator
+function filterByOperator(phones: string[], operator: string) {
+  return phones.filter(phone => {
+    const info = parsePhoneNumber(phone)
+    return info?.operator === operator
+  })
+}
+
+// Group by region (landlines)
+function groupByRegion(phones: string[]) {
+  const groups: Record<string, string[]> = {}
+  
+  phones.forEach(phone => {
+    const info = parsePhoneNumber(phone)
+    if (info?.region) {
+      if (!groups[info.region]) groups[info.region] = []
+      groups[info.region].push(phone)
+    }
+  })
+  
+  return groups
+}
+```
+
+---
+
+### getOperator()
+
+Detects the mobile operator from a phone number.
+
+**Type Signature:**
+```typescript
+function getOperator(phone: string): string | null
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `phone` | `string` | The phone number to check |
+
+**Returns:**
+
+`string | null` - Operator name, or `null` if not detected
+
+**Operator Names:**
+- `'Telkomsel'` - Indonesia's largest operator
+- `'XL'` - XL Axiata
+- `'Indosat'` - Indosat Ooredoo (includes former Tri)
+- `'Smartfren'` - CDMA operator
+- `'Axis'` - Owned by XL, separate branding
+
+**Examples:**
+
+```typescript
+// Telkomsel numbers
+getOperator('081234567890') // 'Telkomsel'
+getOperator('0812-3456-7890') // 'Telkomsel'
+getOperator('+6281234567890') // 'Telkomsel'
+getOperator('082112345678') // 'Telkomsel'
+getOperator('085234567890') // 'Telkomsel'
+
+// XL numbers
+getOperator('081734567890') // 'XL'
+getOperator('081834567890') // 'XL'
+getOperator('087734567890') // 'XL'
+
+// Indosat numbers (including former Tri)
+getOperator('081434567890') // 'Indosat'
+getOperator('085634567890') // 'Indosat'
+getOperator('089534567890') // 'Indosat' (former Tri)
+
+// Smartfren numbers
+getOperator('088134567890') // 'Smartfren'
+getOperator('088834567890') // 'Smartfren'
+
+// Axis numbers
+getOperator('083134567890') // 'Axis'
+getOperator('083834567890') // 'Axis'
+
+// Non-mobile returns null
+getOperator('0212345678') // null (landline)
+getOperator('invalid') // null (invalid)
+
+// Different formats work
+getOperator('0812-3456-7890') // 'Telkomsel'
+getOperator('+62 812-3456-7890') // 'Telkomsel'
+getOperator('62812-3456-7890') // 'Telkomsel'
+```
+
+**Use Cases:**
+
+```typescript
+// Display operator logo
+function PhoneWithOperator({ phone }: { phone: string }) {
+  const operator = getOperator(phone)
+  
+  return (
+    <div>
+      {operator && <img src={`/logos/${operator.toLowerCase()}.png`} />}
+      <span>{formatPhoneNumber(phone)}</span>
+    </div>
+  )
+}
+
+// Send via operator-specific API
+function sendOTP(phone: string, code: string) {
+  const operator = getOperator(phone)
+  
+  switch (operator) {
+    case 'Telkomsel':
+      return telkomselAPI.sendSMS(phone, code)
+    case 'XL':
+      return xlAPI.sendSMS(phone, code)
+    case 'Indosat':
+      return indosatAPI.sendSMS(phone, code)
+    default:
+      return genericSMSAPI.send(phone, code)
+  }
+}
+
+// Operator-based pricing
+function calculateSMSCost(phone: string, count: number) {
+  const operator = getOperator(phone)
+  
+  const rates = {
+    'Telkomsel': 300,
+    'XL': 250,
+    'Indosat': 250,
+    'Smartfren': 200,
+    'Axis': 200
+  }
+  
+  const rate = rates[operator] || 300
+  return count * rate
+}
+
+// Group by operator
+function groupByOperator(phones: string[]) {
+  return phones.reduce((acc, phone) => {
+    const operator = getOperator(phone) || 'Unknown'
+    if (!acc[operator]) acc[operator] = []
+    acc[operator].push(phone)
+    return acc
+  }, {} as Record<string, string[]>)
+}
+
+// Operator statistics
+function getOperatorStats(phones: string[]) {
+  const stats: Record<string, number> = {}
+  
+  phones.forEach(phone => {
+    const operator = getOperator(phone)
+    if (operator) {
+      stats[operator] = (stats[operator] || 0) + 1
+    }
+  })
+  
+  return stats
+}
+```
+
+---
+
+### isMobileNumber()
+
+Checks if a phone number is a mobile number (08xx).
+
+**Type Signature:**
+```typescript
+function isMobileNumber(phone: string): boolean
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `phone` | `string` | The phone number to check |
+
+**Returns:**
+
+`boolean` - `true` if mobile, `false` otherwise
+
+**Examples:**
+
+```typescript
+// Mobile numbers
+isMobileNumber('081234567890') // true
+isMobileNumber('+6281234567890') // true
+isMobileNumber('0817-3456-7890') // true
+
+// Landlines
+isMobileNumber('0212345678') // false
+isMobileNumber('0221234567') // false
+
+// Invalid
+isMobileNumber('invalid') // false
+```
+
+---
+
+### isLandlineNumber()
+
+Checks if a phone number is a landline number.
+
+**Type Signature:**
+```typescript
+function isLandlineNumber(phone: string): boolean
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `phone` | `string` | The phone number to check |
+
+**Returns:**
+
+`boolean` - `true` if landline, `false` otherwise
+
+**Examples:**
+
+```typescript
+// Landlines
+isLandlineNumber('0212345678') // true (Jakarta)
+isLandlineNumber('0221234567') // true (Bandung)
+isLandlineNumber('02741234567') // true (Yogyakarta)
+
+// Mobile
+isLandlineNumber('081234567890') // false
+
+// Invalid
+isLandlineNumber('invalid') // false
+```
+
+---
+
+### toInternational()
+
+Converts a phone number to international format (+62 xxx-xxxx-xxxx).
+
+**Type Signature:**
+```typescript
+function toInternational(phone: string): string
+```
+
+**Examples:**
+
+```typescript
+toInternational('081234567890')
+// '+62 812-3456-7890'
+
+toInternational('0212345678')
+// '+62 21-2345678'
+
+toInternational('+6281234567890')
+// '+62 812-3456-7890'
+```
+
+---
+
+### toNational()
+
+Converts a phone number to national format (08xx-xxxx-xxxx).
+
+**Type Signature:**
+```typescript
+function toNational(phone: string): string
+```
+
+**Examples:**
+
+```typescript
+toNational('+6281234567890')
+// '0812-3456-7890'
+
+toNational('6281234567890')
+// '0812-3456-7890'
+
+toNational('081234567890')
+// '0812-3456-7890'
+```
+
+---
+
+### toE164()
+
+Converts a phone number to E.164 format (6281234567890).
+
+**Type Signature:**
+```typescript
+function toE164(phone: string): string
+```
+
+**Examples:**
+
+```typescript
+toE164('0812-3456-7890')
+// '6281234567890'
+
+toE164('+62 812-3456-7890')
+// '6281234567890'
+
+toE164('081234567890')
+// '6281234567890'
+```
+
+---
+
+### cleanPhoneNumber()
+
+Removes all non-digit characters from a phone number, preserving leading +.
+
+**Type Signature:**
+```typescript
+function cleanPhoneNumber(phone: string): string
+```
+
+**Examples:**
+
+```typescript
+cleanPhoneNumber('0812-3456-7890')
+// '081234567890'
+
+cleanPhoneNumber('+62 812 3456 7890')
+// '+6281234567890'
+
+cleanPhoneNumber('(0812) 3456-7890')
+// '081234567890'
+```
+
+---
+
+### maskPhoneNumber()
+
+Masks a phone number for privacy protection.
+
+**Type Signature:**
+```typescript
+function maskPhoneNumber(
+  phone: string, 
+  options?: MaskOptions
+): string
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `phone` | `string` | The phone number to mask |
+| `options` | `MaskOptions` | Optional masking configuration |
+
+**Options:**
+
+```typescript
+interface MaskOptions {
+  start?: number      // Digits to show at start (default: 4)
+  end?: number        // Digits to show at end (default: 4)
+  char?: string       // Mask character (default: '*')
+  separator?: string  // Optional separator (default: none)
+}
+```
+
+**Examples:**
+
+```typescript
+// Default masking (first 4, last 4)
+maskPhoneNumber('081234567890')
+// '0812****7890'
+
+// Custom visible digits
+maskPhoneNumber('081234567890', { start: 6, end: 4 })
+// '081234**7890'
+
+maskPhoneNumber('081234567890', { start: 2, end: 2 })
+// '08********90'
+
+// Custom mask character
+maskPhoneNumber('081234567890', { char: 'X' })
+// '0812XXXX7890'
+
+maskPhoneNumber('081234567890', { char: '•' })
+// '0812••••7890'
+
+// With separator
+maskPhoneNumber('081234567890', { separator: '-' })
+// '0812-****-7890'
+
+maskPhoneNumber('081234567890', {
+  start: 6,
+  end: 4,
+  char: 'X',
+  separator: '-'
+})
+// '081234-XX-7890'
+
+// International format
+maskPhoneNumber('+6281234567890')
+// '+628****7890'
+```
+
+**Use Cases:**
+
+```typescript
+// Display in public listings
+function UserCard({ user }) {
+  return (
+    <div>
+      <h3>{user.name}</h3>
+      <p>Phone: {maskPhoneNumber(user.phone)}</p>
+    </div>
+  )
+}
+
+// Different masking levels
+function displayPhone(phone: string, userRole: string) {
+  switch (userRole) {
+    case 'admin':
+      return formatPhoneNumber(phone) // Full visibility
+    case 'staff':
+      return maskPhoneNumber(phone, { start: 6, end: 4 })
+    default:
+      return maskPhoneNumber(phone, { start: 4, end: 0 })
+  }
+}
+
+// Mask for logs
+function logAction(phone: string, action: string) {
+  console.log(`User ${maskPhoneNumber(phone)} performed: ${action}`)
+}
+
+// Privacy-compliant export
+function exportUsers(users: User[]) {
+  return users.map(user => ({
+    ...user,
+    phone: maskPhoneNumber(user.phone, { separator: '-' })
+  }))
+}
+```
+
+---
+
+## Type Reference
+
+### PhoneInfo
+
+Information extracted from a valid phone number.
+
+```typescript
+interface PhoneInfo {
+  countryCode: string          // Always '62' for Indonesia
+  operator: string | null      // Mobile operator name
+  number: string               // Raw number without country code/zero
+  formatted: {
+    international: string      // '+62 812-3456-7890'
+    national: string           // '0812-3456-7890'
+    e164: string               // '6281234567890'
+  }
+  isValid: boolean             // Validation status
+  isMobile: boolean            // Is mobile number (08xx)
+  isLandline: boolean          // Is landline number
+  region?: string | null       // Region for landlines
+}
+```
+
+### PhoneFormat
+
+Format types for phone number display.
+
+```typescript
+type PhoneFormat = 'international' | 'national' | 'e164' | 'display'
+```
+
+### MaskOptions
+
+Configuration for masking phone numbers.
+
+```typescript
+interface MaskOptions {
+  start?: number      // Digits visible at start (default: 4)
+  end?: number        // Digits visible at end (default: 4)
+  char?: string       // Mask character (default: '*')
+  separator?: string  // Optional separator (default: none)
+}
+```
+
+---
+
+## Common Use Cases
+
+### Contact Form with Validation
+
+```typescript
+import { validatePhoneNumber, formatPhoneNumber } from '@indodev/toolkit/phone'
+import { useState } from 'react'
+
+function ContactForm() {
+  const [phone, setPhone] = useState('')
+  const [error, setError] = useState('')
+  
+  const handleChange = (input: string) => {
+    setPhone(input)
+    
+    if (input && !validatePhoneNumber(input)) {
+      setError('Invalid Indonesian phone number')
+    } else {
+      setError('')
+    }
+  }
+  
+  const handleBlur = () => {
+    if (phone && validatePhoneNumber(phone)) {
+      setPhone(formatPhoneNumber(phone, 'national'))
+    }
+  }
+  
+  const handleSubmit = () => {
+    if (!validatePhoneNumber(phone)) {
+      setError('Please enter a valid phone number')
+      return
+    }
+    
+    // Submit with E.164 format
+    const e164 = formatPhoneNumber(phone, 'e164')
+    api.submitContact({ phone: e164 })
+  }
+  
+  return (
+    <form>
+      <input
+        value={phone}
+        onChange={e => handleChange(e.target.value)}
+        onBlur={handleBlur}
+        placeholder="08xx-xxxx-xxxx"
+        className={error ? 'error' : ''}
+      />
+      {error && <span className="error">{error}</span>}
+      <button onClick={handleSubmit}>Submit</button>
+    </form>
+  )
+}
+```
+
+### Phone Number Display Component
+
+```typescript
+import { 
+  parsePhoneNumber, 
+  formatPhoneNumber,
+  maskPhoneNumber 
+} from '@indodev/toolkit/phone'
+
+interface PhoneDisplayProps {
+  phone: string
+  format?: 'full' | 'masked' | 'international'
+  showOperator?: boolean
+}
+
+function PhoneDisplay({ 
+  phone, 
+  format = 'full',
+  showOperator = false 
+}: PhoneDisplayProps) {
+  const info = parsePhoneNumber(phone)
+  
+  if (!info) {
+    return <span className="invalid">Invalid phone</span>
+  }
+  
+  let display: string
+  switch (format) {
+    case 'masked':
+      display = maskPhoneNumber(phone, { separator: '-' })
+      break
+    case 'international':
+      display = info.formatted.international
+      break
+    default:
+      display = info.formatted.national
+  }
+  
+  return (
+    <div className="phone-display">
+      {showOperator && info.operator && (
+        <img 
+          src={`/logos/${info.operator.toLowerCase()}.png`}
+          alt={info.operator}
+          className="operator-logo"
+        />
+      )}
+      <a href={`tel:${info.formatted.e164}`}>
+        {display}
+      </a>
+    </div>
+  )
+}
+```
+
+### Bulk Phone Number Processing
+
+```typescript
+import { 
+  validatePhoneNumber,
+  parsePhoneNumber,
+  formatPhoneNumber 
+} from '@indodev/toolkit/phone'
+
+interface ProcessResult {
+  valid: Array<{ original: string; formatted: string; operator?: string }>
+  invalid: string[]
+  duplicates: string[]
+}
+
+function processBulkPhones(phones: string[]): ProcessResult {
+  const result: ProcessResult = {
+    valid: [],
+    invalid: [],
+    duplicates: []
+  }
+  
+  const seen = new Set<string>()
+  
+  phones.forEach(phone => {
+    // Validate
+    if (!validatePhoneNumber(phone)) {
+      result.invalid.push(phone)
+      return
+    }
+    
+    // Parse and normalize
+    const info = parsePhoneNumber(phone)
+    if (!info) {
+      result.invalid.push(phone)
+      return
+    }
+    
+    const normalized = info.formatted.e164
+    
+    // Check duplicates
+    if (seen.has(normalized)) {
+      result.duplicates.push(phone)
+      return
+    }
+    
+    seen.add(normalized)
+    result.valid.push({
+      original: phone,
+      formatted: info.formatted.national,
+      operator: info.operator || undefined
+    })
+  })
+  
+  return result
+}
+
+// Usage
+const phones = [
+  '081234567890',
+  '0812-3456-7890',  // duplicate
+  '+6281734567890',
+  'invalid',
+  '0212345678'
+]
+
+const result = processBulkPhones(phones)
+console.log(result)
+// {
+//   valid: [
+//     { original: '081234567890', formatted: '0812-3456-7890', operator: 'Telkomsel' },
+//     { original: '+6281734567890', formatted: '0817-3456-7890', operator: 'XL' },
+//     { original: '0212345678', formatted: '021-2345678' }
+//   ],
+//   invalid: ['invalid'],
+//   duplicates: ['0812-3456-7890']
+// }
+```
+
+### OTP Service with Operator Detection
+
+```typescript
+import { parsePhoneNumber, getOperator } from '@indodev/toolkit/phone'
+
+class OTPService {
+  async send(phone: string, code: string) {
+    const info = parsePhoneNumber(phone)
+    
+    if (!info?.isMobile) {
+      throw new Error('OTP can only be sent to mobile numbers')
+    }
+    
+    const operator = getOperator(phone)
+    const e164 = info.formatted.e164
+    
+    // Use operator-specific gateway for better delivery
+    switch (operator) {
+      case 'Telkomsel':
+        return this.sendViaTelkomsel(e164, code)
+      case 'XL':
+      case 'Axis':
+        return this.sendViaXL(e164, code)
+      case 'Indosat':
+        return this.sendViaIndosat(e164, code)
+      default:
+        return this.sendViaGeneric(e164, code)
+    }
+  }
+  
+  private async sendViaTelkomsel(phone: string, code: string) {
+    // Telkomsel-specific API
+    return telkomselAPI.sendSMS(phone, `Your OTP: ${code}`)
+  }
+  
+  private async sendViaXL(phone: string, code: string) {
+    // XL-specific API
+    return xlAPI.sendSMS(phone, `Your OTP: ${code}`)
+  }
+  
+  private async sendViaIndosat(phone: string, code: string) {
+    // Indosat-specific API
+    return indosatAPI.sendSMS(phone, `Your OTP: ${code}`)
+  }
+  
+  private async sendViaGeneric(phone: string, code: string) {
+    // Generic SMS gateway
+    return smsAPI.send(phone, `Your OTP: ${code}`)
+  }
+}
+```
+
+### WhatsApp Integration
+
+```typescript
+import { parsePhoneNumber } from '@indodev/toolkit/phone'
+
+function WhatsAppButton({ 
+  phone, 
+  message 
+}: { 
+  phone: string
+  message?: string 
+}) {
+  const info = parsePhoneNumber(phone)
+  
+  if (!info?.isMobile) {
+    return null // WhatsApp only works with mobile
+  }
+  
+  const e164 = info.formatted.e164
+  const text = message ? `?text=${encodeURIComponent(message)}` : ''
+  const url = `https://wa.me/${e164}${text}`
+  
+  return (
+    <a 
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="whatsapp-button"
+    >
+      <img src="/whatsapp-icon.svg" alt="WhatsApp" />
+      Chat on WhatsApp
+    </a>
+  )
+}
+```
+
+### Data Export with Privacy
+
+```typescript
+import { maskPhoneNumber, formatPhoneNumber } from '@indodev/toolkit/phone'
+
+function exportUserData(
+  users: User[],
+  privacyLevel: 'public' | 'internal' | 'admin'
+) {
+  return users.map(user => {
+    let phone: string
+    
+    switch (privacyLevel) {
+      case 'public':
+        // Minimal visibility
+        phone = maskPhoneNumber(user.phone, { start: 4, end: 0 })
+        break
+      case 'internal':
+        // Partial visibility
+        phone = maskPhoneNumber(user.phone, { separator: '-' })
+        break
+      case 'admin':
+        // Full visibility
+        phone = formatPhoneNumber(user.phone, 'national')
+        break
+    }
+    
+    return {
+      name: user.name,
+      email: user.email,
+      phone
+    }
+  })
+}
+```
+
+---
+
+## Best Practices
+
+### 1. Always Validate Before Processing
+
+```typescript
+// ❌ BAD: Assuming input is valid
+function sendSMS(phone: string) {
+  return smsAPI.send(phone, 'Hello')
+}
+
+// ✅ GOOD: Validate first
+function sendSMS(phone: string) {
+  if (!validatePhoneNumber(phone)) {
+    throw new Error('Invalid phone number')
+  }
+  
+  const info = parsePhoneNumber(phone)
+  if (!info?.isMobile) {
+    throw new Error('SMS can only be sent to mobile numbers')
+  }
+  
+  return smsAPI.send(info.formatted.e164, 'Hello')
+}
+```
+
+### 2. Store in E.164 Format
+
+```typescript
+// ❌ BAD: Storing with separators
+await db.users.create({
+  phone: '0812-3456-7890' // Hard to query/compare
+})
+
+// ✅ GOOD: Store in E.164
+await db.users.create({
+  phone: formatPhoneNumber('0812-3456-7890', 'e164') // '6281234567890'
+})
+
+// Query becomes easier
+const users = await db.users.where({
+  phone: formatPhoneNumber(searchTerm, 'e164')
+})
+```
+
+### 3. Format for Display Context
+
+```typescript
+// ✅ GOOD: Match audience
+function PhoneDisplay({ phone, international }) {
+  const format = international ? 'international' : 'national'
+  return <span>{formatPhoneNumber(phone, format)}</span>
+}
+
+// ✅ GOOD: Use E.164 for links
+function PhoneLink({ phone }) {
+  const e164 = formatPhoneNumber(phone, 'e164')
+  const display = formatPhoneNumber(phone, 'national')
+  
+  return <a href={`tel:${e164}`}>{display}</a>
+}
+```
+
+### 4. Protect Privacy Appropriately
+
+```typescript
+// ✅ GOOD: Mask in public contexts
+function PublicProfile({ user }) {
+  return (
+    <div>
+      <h3>{user.name}</h3>
+      <p>Phone: {maskPhoneNumber(user.phone)}</p>
+    </div>
+  )
+}
+
+// ✅ GOOD: Show full in admin panel
+function AdminUserView({ user }) {
+  return (
+    <div>
+      <h3>{user.name}</h3>
+      <p>Phone: {formatPhoneNumber(user.phone)}</p>
+    </div>
+  )
+}
+
+// ✅ GOOD: Mask in logs
+logger.info(`OTP sent to ${maskPhoneNumber(phone)}`)
+```
+
+### 5. Handle Multiple Input Formats
+
+```typescript
+// ✅ GOOD: Accept any valid format
+function processPhone(input: string) {
+  // User might enter: 0812..., +62..., 628...
+  if (!validatePhoneNumber(input)) {
+    throw new Error('Invalid phone number')
+  }
+  
+  // Normalize to E.164 for processing
+  return formatPhoneNumber(input, 'e164')
+}
+```
+
+### 6. Use Operator Info Wisely
+
+```typescript
+// ✅ GOOD: Show operator logo
+function ContactCard({ phone }) {
+  const info = parsePhoneNumber(phone)
+  
+  return (
+    <div>
+      {info?.operator && (
+        <img src={`/logos/${info.operator}.png`} />
+      )}
+      <span>{formatPhoneNumber(phone)}</span>
+    </div>
+  )
+}
+
+// ✅ GOOD: Operator-based features
+function canReceiveFlashSMS(phone: string) {
+  const operator = getOperator(phone)
+  // Only certain operators support flash SMS
+  return ['Telkomsel', 'XL', 'Indosat'].includes(operator || '')
+}
+```
+
+---
+
+## Troubleshooting
+
+### Q: Why does validation fail for a valid-looking number?
+
+A: Check these common issues:
+- Length: Mobile should be 10-13 digits, landline 9-11 digits
+- Prefix: Must be a valid operator prefix (0811, 0812, etc.) or area code
+- Format: Remove extra characters except digits, +, -, space, ()
+
+```typescript
+// Check step by step
+const phone = '08001234567'
+
+console.log(validatePhoneNumber(phone)) // false
+console.log(getOperator(phone)) // null - invalid prefix '0800'
+
+// Valid prefixes start with 08[1-9]
+const fixed = '081234567890'
+console.log(validatePhoneNumber(fixed)) // true
+```
+
+### Q: How do I handle international callers?
+
+A: Always use international format for display and E.164 for tel: links:
+
+```typescript
+function InternationalPhone({ phone }) {
+  const info = parsePhoneNumber(phone)
+  
+  return (
+    <a href={`tel:${info?.formatted.e164}`}>
+      {info?.formatted.international}
+    </a>
+  )
+}
+```
+
+### Q: Why does getOperator() return null?
+
+A: This happens when:
+- The number is a landline (not mobile)
+- The prefix is not in our database
+- The number is invalid
+
+```typescript
+const phone = '0212345678'
+console.log(getOperator(phone)) // null (landline)
+
+const mobile = '081234567890'
+console.log(getOperator(mobile)) // 'Telkomsel'
+```
+
+### Q: How do I detect if a number is Telkomsel?
+
+A: Use getOperator() or check the prefix:
+
+```typescript
+const phone = '081234567890'
+const operator = getOperator(phone)
+
+if (operator === 'Telkomsel') {
+  // Telkomsel-specific logic
+}
+
+// Or check info
+const info = parsePhoneNumber(phone)
+if (info?.operator === 'Telkomsel') {
+  // ...
+}
+```
+
+### Q: Can I format numbers from CSV/Excel imports?
+
+A: Yes, clean and validate first:
+
+```typescript
+function importPhones(csvData: string[][]) {
+  return csvData
+    .map(row => row[0]) // Phone column
+    .map(phone => {
+      // Clean common Excel formatting
+      const cleaned = phone.replace(/['\s]/g, '')
+      
+      if (!validatePhoneNumber(cleaned)) {
+        return null
+      }
+      
+      return formatPhoneNumber(cleaned, 'e164')
+    })
+    .filter(Boolean)
+}
+```
+
+### Q: How do I handle the Tri → Indosat merger?
+
+A: The library already handles this. Former Tri prefixes (089x) are now under Indosat:
+
+```typescript
+getOperator('089534567890') // 'Indosat'
+// Tri merged with Indosat in 2024
+```
+
+---
+
+## Data Sources
+
+Phone number data is based on:
+- **Operator Prefixes**: Official operator documentation and [Wikipedia](https://en.wikipedia.org/wiki/Telephone_numbers_in_Indonesia) 
+- **Area Codes**: Ministry of Communication and Information Technology [Wikipedia](https://en.wikipedia.org/wiki/Telephone_numbers_in_Indonesia) 
+- **Last Updated**: December 2025
+
+<Callout type="info">
+The library includes 200+ area codes covering all 38 Indonesian provinces and major cities.
+</Callout>
+
+---
+
+## Coverage Summary
+
+### Mobile Operators (5)
+- Telkomsel (9 prefixes)
+- XL (7 prefixes)
+- Indosat (12 prefixes, includes former Tri)
+- Smartfren (9 prefixes)
+- Axis (4 prefixes)
+
+### Regions (All 38 Provinces)
+- **Java**: Jakarta, West Java, Central Java, East Java, Yogyakarta, Banten
+- **Sumatra**: Aceh, North, West, South, Riau, Jambi, Bengkulu, Lampung, Bangka Belitung, Riau Islands
+- **Sulawesi**: North, Central, South, Southeast, Gorontalo, West
+- **Kalimantan**: West, Central, South, East, North
+- **Others**: Bali, NTB, NTT, Maluku, North Maluku, Papua, West Papua, and new Papua provinces

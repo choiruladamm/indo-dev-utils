@@ -1,14 +1,68 @@
-import { Bleed } from 'nextra/components'
+---
+title: Home
+---
 
-# Introduction
+# @indodev/toolkit
 
-**Nextra** is a [Next.js](https://nextjs.org) based static site generator.
+Type-safe utilities for Indonesian data validation and formatting.
+[Github](https://github.com/choiruladamm/indo-dev-utils)
 
-It supports Markdown and React components ([MDX](/features/mdx)), automatically
-generated [sidebar and anchor links](/get-started#sidebar-and-anchor-links),
-file-system based routing, built-in syntax highlighting, image optimization,
-custom layouts, i18n, and all the features you love about Next.js.
+## Features
 
-Here's what you will get in 1 minute:
+- 🎯 **Type-Safe** - Full TypeScript support with strict types
+- 📦 **Tree-Shakeable** - Import only what you need (~10KB per module)
+- ⚡ **Zero Dependencies** - No external dependencies. Fast and secure
+- 🧪 **Battle-Tested** - 95%+ test coverage with 470+ test cases
 
-<Bleed>![Nextra Example](/demo.png)</Bleed>
+## Installation
+
+```bash
+npm install @indodev/toolkit
+```
+
+## Quick Example
+
+```typescript
+import { validateNIK } from '@indodev/toolkit/nik'
+import { formatPhoneNumber } from '@indodev/toolkit/phone'
+import { formatRupiah } from '@indodev/toolkit/currency'
+
+// Validate NIK
+validateNIK('3201234567890123') // true
+
+// Format phone number
+formatPhoneNumber('081234567890', 'international')
+// '+62 812-3456-7890'
+
+// Format currency
+formatRupiah(1500000)
+// 'Rp 1.500.000'
+```
+
+## Modules
+
+### [NIK](/docs/api/nik)
+Validate, parse, format, and mask Indonesian National Identity Numbers. Extract location, birth date, and gender information.
+
+### [Phone](/docs/api/phone)
+Validate and format Indonesian phone numbers. Detect operators (Telkomsel, XL, Indosat, etc.) and handle 200+ area codes.
+
+### [Currency](/docs/api/currency)
+Format Indonesian Rupiah with proper separators. Convert numbers to words (terbilang) for invoices and legal documents.
+
+## Why @indodev/toolkit?
+
+Building applications that handle Indonesian data? This library solves common challenges:
+
+- **NIK Validation** - Ensure national IDs are valid before processing
+- **Phone Formatting** - Display phone numbers consistently across your app
+- **Rupiah Formatting** - Show prices with proper Indonesian formatting
+- **Operator Detection** - Send SMS through the right gateway
+- **Terbilang Conversion** - Generate invoices and receipts with words
+- **Privacy Protection** - Mask sensitive data appropriately
+
+## What's Next?
+
+- **[🚀 Getting Started](/getting-started)** - Quick start guide with installation and basic usage examples
+- **[📖 API Documentation](/docs/api/currency)** - Comprehensive API reference for all modules and functions
+- **[💡 Examples](/docs)** - Real-world usage patterns and integration examples (Coming Soon)

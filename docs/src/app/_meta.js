@@ -1,13 +1,14 @@
 export default {
   index: {
-    display: 'hidden'
+    display: 'hidden',
   },
   docs: {
     type: 'page',
-    title: 'Documentation'
+    title: 'Documentation',
   },
   blog: {
     type: 'page',
-    title: 'Blog'
+    title: 'Blog',
+    display: 'hidden',
   }
 }
