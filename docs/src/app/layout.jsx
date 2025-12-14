@@ -10,7 +10,7 @@ import { getPageMap } from 'nextra/page-map';
 import 'nextra-theme-docs/style.css';
 
 export const metadata = {
-  metadataBase: new URL('https://indodev-toolkit.vercel.app'), // Update with your Vercel domain
+  metadataBase: new URL('https://toolkit.adamm.cloud'), // Update with your Vercel domain
   title: {
     template: '%s – @indodev/toolkit',
     default: '@indodev/toolkit – Indonesian Developer Utilities',
@@ -24,7 +24,7 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://indodev-toolkit.vercel.app',
+    url: 'https://toolkit.adamm.cloud',
     title: '@indodev/toolkit',
     description: 'Type-safe Indonesian data validation and formatting utilities',
     siteName: '@indodev/toolkit',
