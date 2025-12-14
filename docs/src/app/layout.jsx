@@ -10,7 +10,7 @@ import { getPageMap } from 'nextra/page-map';
 import 'nextra-theme-docs/style.css';
 
 export const metadata = {
-  metadataBase: new URL('https://toolkit.adamm.cloud'), // Update with your Vercel domain
+  metadataBase: new URL('https://toolkit.adamm.cloud'),
   title: {
     template: '%s – @indodev/toolkit',
     default: '@indodev/toolkit – Indonesian Developer Utilities',
