@@ -1,59 +1,81 @@
-/* eslint-env node */
-import { Footer, Layout, Navbar } from 'nextra-theme-docs'
-import { Banner, Head } from 'nextra/components'
-import { getPageMap } from 'nextra/page-map'
-import 'nextra-theme-docs/style.css'
+/**
+ * eslint-env node
+ *
+ * @format
+ */
+
+import { Footer, Layout, Navbar } from 'nextra-theme-docs';
+import { Head } from 'nextra/components';
+import { getPageMap } from 'nextra/page-map';
+import 'nextra-theme-docs/style.css';
 
 export const metadata = {
-  metadataBase: new URL('https://nextra.site'),
+  metadataBase: new URL('https://indodev-toolkit.vercel.app'), // Update with your Vercel domain
   title: {
-    template: '%s - Nextra'
+    template: '%s – @indodev/toolkit',
+    default: '@indodev/toolkit – Indonesian Developer Utilities',
   },
-  description: 'Nextra: the Next.js site builder',
-  applicationName: 'Nextra',
+  description: 'Type-safe Indonesian data validation and formatting utilities for TypeScript',
+  applicationName: '@indodev/toolkit',
   generator: 'Next.js',
-  appleWebApp: {
-    title: 'Nextra'
-  },
-  other: {
-    'msapplication-TileImage': '/ms-icon-144x144.png',
-    'msapplication-TileColor': '#fff'
+  keywords: ['indonesia', 'typescript', 'validation', 'nik', 'phone', 'rupiah', 'utilities'],
+  authors: [{ name: 'Choirul Adam', url: 'https://github.com/choiruladamm' }],
+  creator: 'Choirul Adam',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://indodev-toolkit.vercel.app',
+    title: '@indodev/toolkit',
+    description: 'Type-safe Indonesian data validation and formatting utilities',
+    siteName: '@indodev/toolkit',
+    images: [
+      {
+        url: './opengraph-image.png',
+        width: 1200,
+        height: 630,
+        alt: '@indodev/toolkit - Indonesian Developer Utilities',
+      },
+    ],
   },
   twitter: {
-    site: 'https://nextra.site'
-  }
-}
+    card: 'summary_large_image',
+    title: '@indodev/toolkit',
+    description: 'Type-safe Indonesian data validation and formatting utilities',
+    creator: '@choiruladamm',
+  },
+};
 
 export default async function RootLayout({ children }) {
   const navbar = (
     <Navbar
       logo={
-        <div>
-          <b>Nextra</b>{' '}
-          <span style={{ opacity: '60%' }}>The Next Docs Builder</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <b>@indodev/toolkit</b>
         </div>
       }
-      // Next.js discord server
-      chatLink="https://discord.gg/hEM84NMkRv"
+      logoLink="/docs"
+      projectLink="https://github.com/choiruladamm/indo-dev-utils"
     />
-  )
-  const pageMap = await getPageMap()
+  );
+
+  const pageMap = await getPageMap();
+
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
-      <Head faviconGlyph="✦" />
+      <Head faviconGlyph="🇮🇩" />
       <body>
         <Layout
-          banner={<Banner storageKey="Nextra 2">Nextra 2 Alpha</Banner>}
           navbar={navbar}
-          footer={<Footer>MIT {new Date().getFullYear()} © Nextra.</Footer>}
           editLink="Edit this page on GitHub"
-          docsRepositoryBase="https://github.com/shuding/nextra/blob/main/examples/docs"
-          sidebar={{ defaultMenuCollapseLevel: 1 }}
+          docsRepositoryBase="https://github.com/choiruladamm/indo-dev-utils/tree/main/docs/content"
+          sidebar={{
+            toggleButton: true,
+          }}
           pageMap={pageMap}
         >
           {children}
         </Layout>
       </body>
     </html>
-  )
+  );
 }
