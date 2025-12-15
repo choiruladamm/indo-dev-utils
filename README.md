@@ -22,6 +22,8 @@ TypeScript utilities for Indonesian data validation and formatting.
 
 Building apps for Indonesia means dealing with NIK validation, phone number formatting, and Rupiah display. Instead of rewriting the same logic across projects, use battle-tested utilities that just work.
 
+## #suck your dick!!
+
 ## Features
 
 - **NIK validation** - Verify Indonesian National Identity Numbers with province, date, and gender checks
