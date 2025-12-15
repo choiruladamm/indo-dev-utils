@@ -290,8 +290,8 @@ MIT © [choiruladamm](https://github.com/choiruladamm)
 
 ## Support
 
-- 📖 [Documentation](#) (coming soon)
-- 🐛 [Report Issues](https://github.com/yourusername/indo-dev-utils/issues)
+- 📖 [Documentation](https://toolkit.adamm.cloud/docs)
+- 🐛 [Report Issues](https://github.com/choiruladamm/indo-dev-utils/issues)
 
 ---
 
