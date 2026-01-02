@@ -1,6 +1,6 @@
 {
   "name": "@indodev/toolkit",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "Indonesian developer utilities for validation, formatting, and more",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -47,6 +47,16 @@
         "types": "./dist/currency/index.d.cts",
         "default": "./dist/currency/index.cjs"
       }
+    },
+    "./text": {
+      "import": {
+        "types": "./dist/text/index.d.ts",
+        "default": "./dist/text/index.js"
+      },
+      "require": {
+        "types": "./dist/text/index.d.cts",
+        "default": "./dist/text/index.cjs"
+      }
     }
   },
   "files": [
@@ -70,7 +80,7 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
-    "prepublishOnly": "pnpm run build && pnpm run test:run && publint",
+    "prepublish:only": "pnpm run build && pnpm run test:run && publint",
     "changeset": "changeset",
     "release": "changeset publish"
   },
@@ -83,6 +93,12 @@
     "currency",
     "rupiah",
     "terbilang",
+    "text",
+    "slug",
+    "slugify",
+    "abbreviation",
+    "sanitize",
+    "string-utils",
     "typescript",
     "utilities",
     "formatting",

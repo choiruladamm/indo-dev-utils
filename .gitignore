@@ -14,6 +14,7 @@ out/
 .env.*.local
 
 # IDE
+.agent/
 .vscode/
 .idea/
 *.swp
