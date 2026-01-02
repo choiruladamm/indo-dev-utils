@@ -1,0 +1,650 @@
+---
+title: Text
+description: Utilities for text manipulation including capitalization, abbreviation, slug generation, and string comparison.
+---
+
+import { Callout, Tabs, Steps } from 'nextra/components';
+
+# Text Utilities
+
+Comprehensive utilities for text manipulation with Indonesian language context optimization.
+
+## Overview
+
+The Text module provides a suite of tools for robust string manipulation, designed specifically to handle Indonesian language nuances. It addresses common challenges such as proper title casing with particles, expanding local abbreviations, generating URL-safe slugs, and comparing strings with various sensitivity levels.
+
+### Features
+
+- **Smart Capitalization**: Title casing that respects Indonesian particles (di, ke, dari, yang) and keeps acronyms (PT, CV, dll) uppercase.
+- **Abbreviation Handling**: Expand and contract common Indonesian abbreviations (e.g., "Jl." to "Jalan", "Bpk." to "Bapak").
+- **Slug Generation**: Create SEO-friendly slugs that handle Indonesian conjunctions (e.g., "&" becomes "dan", "/" becomes "atau").
+- **Text Extraction**: Truncate text intelligently at word boundaries and extract words while preserving Indonesian hyphenated words (e.g., "anak-anak").
+- **Robust Comparison**: Compare strings with options to ignore case, whitespace, and accents for accurate searching and filtering.
+- **Sanitization**: Clean and normalize text input to prevent injection rendering issues and ensure consistency.
+
+## Installation
+
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+  <Tabs.Tab>
+    ```bash
+    npm install @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    pnpm add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    yarn add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    bun add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Quick Start
+
+```typescript
+import { toTitleCase, slugify, truncate, compareStrings, expandAbbreviation } from '@indodev/toolkit/text';
+
+// Title Case
+console.log(toTitleCase('laskar pelangi: kisah nyata'));
+// 'Laskar Pelangi: Kisah Nyata'
+
+// Slug
+console.log(slugify('Baju Pria & Wanita'));
+// 'baju-pria-dan-wanita'
+
+// Truncate
+console.log(truncate('Ini adalah text yang sangat panjang', 20));
+// 'Ini adalah text...'
+
+// Comparison
+console.log(compareStrings('surabaya', 'SURABAYA'));
+// true
+
+// Abbreviation
+console.log(expandAbbreviation('Jl. Sudirman No. 1'));
+// 'Jalan Sudirman Nomor 1'
+```
+
+## API Reference
+
+### toTitleCase()
+
+Converts text to title case, respecting Indonesian grammar rules for particles (di, ke, dari, yang, etc.) and keeping acronyms uppercase.
+
+**Type Signature:**
+
+```typescript
+function toTitleCase(text: string, options?: TitleCaseOptions): string;
+```
+
+**Parameters:**
+
+| Name      | Type               | Description            |
+| --------- | ------------------ | ---------------------- |
+| `text`    | `string`           | The text to convert    |
+| `options` | `TitleCaseOptions` | Optional configuration |
+
+**Returns:**
+
+`string` - Title-cased text
+
+**Indonesian Rules:**
+
+- Particles like `di`, `ke`, `dari`, `yang`, `pada`, `untuk` remain lowercase unless they are the first word.
+- Acronyms like `PT`, `CV`, `SD`, `SMP`, `SMA` are forced to uppercase.
+
+**Examples:**
+
+```typescript
+// Basic usage
+toTitleCase('buku panduan belajar di rumah');
+// 'Buku Panduan Belajar di Rumah' (particle 'di' is lowercase)
+
+// With acronyms
+toTitleCase('laporan tahunan pt maju jaya');
+// 'Laporan Tahunan PT Maju Jaya' ('PT' is recognized acronym)
+
+// Sentences
+toTitleCase('ibu pergi ke pasar');
+// 'Ibu Pergi ke Pasar'
+```
+
+---
+
+### expandAbbreviation()
+
+Expands common Indonesian abbreviations to their full forms. Supports addresses, titles, honorifics, and organizations.
+
+**Type Signature:**
+
+```typescript
+function expandAbbreviation(text: string, options?: ExpandOptions): string;
+```
+
+**Parameters:**
+
+| Name      | Type            | Description                                     |
+| --------- | --------------- | ----------------------------------------------- |
+| `text`    | `string`        | The text containing abbreviations               |
+| `options` | `ExpandOptions` | Optional configuration for mode and custom maps |
+
+**Returns:**
+
+`string` - Text with abbreviations expanded
+
+**Supported Categories:**
+
+- **Address**: Jl., Gg., No., Kec., Kab., etc.
+- **Title**: Prof., Dr., Ir., S.Pd., etc.
+- **Honorific**: Bpk., Ibu, Sdr., Yth., etc.
+- **Organization**: PT., CV., UD., Tbk., etc.
+
+**Examples:**
+
+```typescript
+// Address expansion
+expandAbbreviation('Jl. Merdeka No. 45');
+// 'Jalan Merdeka Nomor 45'
+
+// Title expansion
+expandAbbreviation('Prof. Dr. Habibie');
+// 'Profesor Doktor Habibie'
+
+// Specific mode
+expandAbbreviation('Dr. di Jl. Sudirman', { mode: 'address' });
+// 'Dr. di Jalan Sudirman' (only expands address)
+```
+
+---
+
+### contractAbbreviation()
+
+Contracts full words into their standard abbreviations (reverse of expand).
+
+**Type Signature:**
+
+```typescript
+function contractAbbreviation(text: string, options?: ExpandOptions): string;
+```
+
+**Parameters:**
+
+| Name      | Type            | Description                    |
+| --------- | --------------- | ------------------------------ |
+| `text`    | `string`        | The text containing full words |
+| `options` | `ExpandOptions` | Optional configuration         |
+
+**Returns:**
+
+`string` - Text with full words contracted to abbreviations
+
+**Examples:**
+
+```typescript
+contractAbbreviation('Jalan Jenderal Sudirman');
+// 'Jl. Jenderal Sudirman'
+
+contractAbbreviation('Profesor Doktor');
+// 'Prof. Dr.'
+```
+
+---
+
+### slugify()
+
+Creates URL-friendly slugs from text, handling Indonesian conjunctions and special characters.
+
+**Type Signature:**
+
+```typescript
+function slugify(text: string, options?: SlugifyOptions): string;
+```
+
+**Parameters:**
+
+| Name      | Type             | Description            |
+| --------- | ---------------- | ---------------------- |
+| `text`    | `string`         | The text to slugify    |
+| `options` | `SlugifyOptions` | Optional configuration |
+
+**Returns:**
+
+`string` - URL-safe slug
+
+**Conjunction Handling:**
+
+- `&` -> `dan`
+- `/` -> `atau`
+- `+` -> `plus` (default behavior)
+
+**Examples:**
+
+```typescript
+// Basic usage
+slugify('Cara Membuat Website');
+// 'cara-membuat-website'
+
+// Handling conjunctions
+slugify('Pria & Wanita');
+// 'pria-dan-wanita' (ampersand converted to 'dan')
+
+slugify('Hitam/Putih');
+// 'hitam-atau-putih' (slash converted to 'atau')
+
+// Custom separator
+slugify('Halo Dunia', { separator: '_' });
+// 'halo_dunia'
+```
+
+---
+
+### truncate()
+
+Shortens text to a maximum length without cutting words in half (smart truncation).
+
+**Type Signature:**
+
+```typescript
+function truncate(text: string, maxLength: number, options?: TruncateOptions): string;
+```
+
+**Parameters:**
+
+| Name        | Type              | Description                               |
+| ----------- | ----------------- | ----------------------------------------- |
+| `text`      | `string`          | Text to truncate                          |
+| `maxLength` | `number`          | Maximum allowed length                    |
+| `options`   | `TruncateOptions` | Configuration for ellipsis and boundaries |
+
+**Returns:**
+
+`string` - Truncated text
+
+**Examples:**
+
+```typescript
+const text = 'Ini adalah kalimat yang cukup panjang';
+
+// Smart cut (word boundary)
+truncate(text, 15);
+// 'Ini adalah...'
+
+// Custom ellipsis
+truncate(text, 15, { ellipsis: '…' });
+// 'Ini adalah…'
+
+// Force cut (ignore word boundary)
+truncate(text, 10, { wordBoundary: false });
+// 'Ini adalah...' (might cut mid-word depending on length)
+```
+
+---
+
+### extractWords()
+
+Splits text into words, handling Indonesian hyphenated words correctly.
+
+**Type Signature:**
+
+```typescript
+function extractWords(text: string, options?: ExtractOptions): string[];
+```
+
+**Parameters:**
+
+| Name      | Type             | Description                             |
+| --------- | ---------------- | --------------------------------------- |
+| `text`    | `string`         | Text to parse                           |
+| `options` | `ExtractOptions` | Filters for min length, lowercase, etc. |
+
+**Returns:**
+
+`string[]` - Array of extracted words
+
+**Examples:**
+
+```typescript
+extractWords('Anak-anak bermain bola!');
+// ['Anak-anak', 'bermain', 'bola'] (keeps 'Anak-anak' together)
+
+extractWords('Halo, apa kabar?', { lowercase: true });
+// ['halo', 'apa', 'kabar']
+```
+
+---
+
+### compareStrings()
+
+Compares two strings with advanced options to ignore case, whitespace, and accents.
+
+**Type Signature:**
+
+```typescript
+function compareStrings(str1: string, str2: string, options?: CompareOptions): boolean;
+```
+
+**Parameters:**
+
+| Name      | Type             | Description      |
+| --------- | ---------------- | ---------------- |
+| `str1`    | `string`         | First string     |
+| `str2`    | `string`         | Second string    |
+| `options` | `CompareOptions` | Comparison flags |
+
+**Returns:**
+
+`boolean` - `true` if strings match according to options
+
+**Options:**
+
+```typescript
+interface CompareOptions {
+  caseSensitive?: boolean; // default: false
+  ignoreWhitespace?: boolean; // default: false
+  ignoreAccents?: boolean; // default: false
+}
+```
+
+**Examples:**
+
+```typescript
+// Case insensitive (default)
+compareStrings('Jakarta', 'jakarta');
+// true
+
+// Ignore whitespace
+compareStrings('  Surabaya  ', 'Surabaya', { ignoreWhitespace: true });
+// true
+
+// Ignore accents
+compareStrings('Café', 'Cafe', { ignoreAccents: true });
+// true
+```
+
+---
+
+### similarity()
+
+Calculates Levenshtein similarity score between two strings (0.0 to 1.0).
+
+**Type Signature:**
+
+```typescript
+function similarity(str1: string, str2: string): number;
+```
+
+**Parameters:**
+
+| Name   | Type     | Description   |
+| ------ | -------- | ------------- |
+| `str1` | `string` | First string  |
+| `str2` | `string` | Second string |
+
+**Returns:**
+
+`number` - Similarity score (0.0 = different, 1.0 = identical)
+
+**Examples:**
+
+```typescript
+similarity('Jakarta', 'Jakarta'); // 1.0
+similarity('Jakarta', 'Jakart'); // 0.85
+similarity('Jakarta', 'Bandung'); // 0.14
+```
+
+---
+
+### sanitize()
+
+Removes unwanted characters and normalizes text.
+
+**Type Signature:**
+
+```typescript
+function sanitize(text: string, options?: SanitizeOptions): string;
+```
+
+**Parameters:**
+
+| Name      | Type              | Description      |
+| --------- | ----------------- | ---------------- |
+| `text`    | `string`          | Text to sanitize |
+| `options` | `SanitizeOptions` | Configuration    |
+
+**Returns:**
+
+`string` - Sanitized string
+
+**Examples:**
+
+```typescript
+sanitize('  Halo   Dunia  '); // 'Halo Dunia'
+sanitize('<b>Bold</b>', { stripHtml: true }); // 'Bold'
+```
+
+---
+
+### removeAccents()
+
+Removes diacritics from characters (e.g., 'é' -> 'e').
+
+**Type Signature:**
+
+```typescript
+function removeAccents(text: string): string;
+```
+
+**Examples:**
+
+```typescript
+removeAccents('Café'); // 'Cafe'
+removeAccents('Àpropos'); // 'Apropos'
+```
+
+---
+
+## Type Reference
+
+### TitleCaseOptions
+
+Configuration input for `toTitleCase`.
+
+```typescript
+export interface TitleCaseOptions {
+  /**
+   * If true, keeps original casing for words not in the exception list.
+   * @default false
+   */
+  preserveOriginal?: boolean;
+}
+```
+
+### SlugifyOptions
+
+Configuration input for `slugify`.
+
+```typescript
+export interface SlugifyOptions {
+  /**
+   * Separator character (e.g. '-', '_')
+   * @default '-'
+   */
+  separator?: string;
+  /**
+   * Convert 'and' -> 'dan', '/' -> 'atau'
+   * @default true
+   */
+  convertConjunctions?: boolean;
+}
+```
+
+### TruncateOptions
+
+Configuration input for `truncate`.
+
+```typescript
+export interface TruncateOptions {
+  /**
+   * String to append when text is truncated.
+   * @default '...'
+   */
+  ellipsis?: string;
+  /**
+   * Respect word boundaries (avoid cutting mid-word).
+   * @default true
+   */
+  wordBoundary?: boolean;
+}
+```
+
+### ExtractOptions
+
+Configuration input for `extractWords`.
+
+```typescript
+export interface ExtractOptions {
+  /**
+   * Convert words to lowercase.
+   * @default false
+   */
+  lowercase?: boolean;
+  /**
+   * remove punctuation marks.
+   * @default true
+   */
+  removePunctuation?: boolean;
+  /**
+   * Minimum length of words to extract.
+   * @default 1
+   */
+  minLength?: number;
+}
+```
+
+### CompareOptions
+
+Configuration input for `compareStrings`.
+
+```typescript
+export interface CompareOptions {
+  /**
+   * Perform case-sensitive comparison.
+   * @default false
+   */
+  caseSensitive?: boolean;
+  /**
+   * Ignore leading/trailing whitespace.
+   * @default false
+   */
+  ignoreWhitespace?: boolean;
+  /**
+   * Ignore diacritics/accents.
+   * @default false
+   */
+  ignoreAccents?: boolean;
+}
+```
+
+---
+
+## Common Use Cases
+
+### Search Filtering
+
+```typescript
+import { compareStrings } from '@indodev/toolkit/text';
+
+function searchItems(items: string[], query: string) {
+  return items.filter((item) =>
+    compareStrings(item, query, {
+      caseSensitive: false,
+      ignoreWhitespace: true,
+    })
+  );
+}
+```
+
+### URL Generation for Blog Posts
+
+```typescript
+import { slugify } from '@indodev/toolkit/text';
+
+function createBlogPostUrl(title: string) {
+  const customSlug = slugify(title, {
+    separator: '-',
+    lowercase: true, // Ensure everything is lowercase for URLs
+  });
+  return `/blog/${customSlug}`;
+}
+```
+
+### Address Formatting
+
+```typescript
+import { toTitleCase, expandAbbreviation } from '@indodev/toolkit/text';
+
+function formatAddress(rawAddress: string) {
+  // 1. Expand abbreviations (Jl., Gg., No.)
+  const expanded = expandAbbreviation(rawAddress, { mode: 'address' });
+
+  // 2. Fix casing (Jalan Mawar Melati)
+  return toTitleCase(expanded);
+}
+
+console.log(formatAddress('jl. mawar melati no. 5'));
+// 'Jalan Mawar Melati Nomor 5'
+```
+
+---
+
+## Best Practices
+
+### Input Sanitization
+
+Always sanitize user input before storing or processing it, especially when dealing with names or addresses that might contain irregular whitespace or HTML tags.
+
+```typescript
+const cleanInput = sanitize(userInput, { stripHtml: true });
+```
+
+### Slug Uniqueness
+
+The `slugify` function generates a URL-safe string, but it does not guarantee uniqueness in your database. Always check for existing slugs and append a suffix if necessary.
+
+```typescript
+const baseSlug = slugify(title);
+let finalSlug = baseSlug;
+let counter = 1;
+while (await db.slugExists(finalSlug)) {
+  finalSlug = `${baseSlug}-${counter++}`;
+}
+```
+
+### Comparison Performance
+
+For large lists, if you only need exact case-insensitive matching, standard string comparison methods might be slightly faster. Use `compareStrings` when you need robust handling of whitespace accents or specific comparison rules.
+
+---
+
+## Troubleshooting
+
+### `truncate` cutting text shorter than expected
+
+If `wordBoundary` is true (default), `truncate` will cut at the last space _before_ the maxLength to avoid splitting a word. This means the resulting string might be shorter than `maxLength`. If you need exact character count, set `wordBoundary: false`.
+
+### `compareStrings` returns false for similar strings
+
+Check if `ignoreWhitespace` options are set correctly. By default, `compareStrings` is precise. If one string has a newline or tab and the other doesn't, they won't match unless whitespace is normalized.
+
+<Callout type="info">
+  **Note:** `similarity()` is strictly Levenshtein distance. It is case-sensitive. For case-insensitive similarity, convert both strings to
+  lowercase before calling `similarity()`.
+</Callout>

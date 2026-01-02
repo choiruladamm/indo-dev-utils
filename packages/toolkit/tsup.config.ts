@@ -6,6 +6,7 @@ export default defineConfig({
     'nik/index': 'src/nik/index.ts',
     'phone/index': 'src/phone/index.ts',
     'currency/index': 'src/currency/index.ts',
+    'text/index': 'src/text/index.ts',
   },
   format: ['cjs', 'esm'],
   dts: {

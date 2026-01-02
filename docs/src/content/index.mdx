@@ -4,15 +4,15 @@ title: Home
 
 # @indodev/toolkit
 
-Type-safe utilities for Indonesian data validation and formatting.
-[Github](https://github.com/choiruladamm/indo-dev-utils)
+Type-safe utilities for Indonesian data validation and formatting.  
+[Github](https://github.com/choiruladamm/indo-dev-utils) • [npm](https://npmjs.com/package/@indodev/toolkit)
 
 ## Features
 
 - 🎯 **Type-Safe** - Full TypeScript support with strict types
-- 📦 **Tree-Shakeable** - Import only what you need (~10KB per module)
+- 📦 **Tree-Shakeable** - Import only what you need (~5-12KB per module)
 - ⚡ **Zero Dependencies** - No external dependencies. Fast and secure
-- 🧪 **Battle-Tested** - 95%+ test coverage with 470+ test cases
+- 🧪 **Battle-Tested** - 95%+ test coverage with 1060+ test cases
 
 ## Installation
 
@@ -23,32 +23,44 @@ npm install @indodev/toolkit
 ## Quick Example
 
 ```typescript
-import { validateNIK } from '@indodev/toolkit/nik'
-import { formatPhoneNumber } from '@indodev/toolkit/phone'
-import { formatRupiah } from '@indodev/toolkit/currency'
+import { validateNIK } from '@indodev/toolkit/nik';
+import { formatPhoneNumber } from '@indodev/toolkit/phone';
+import { formatRupiah } from '@indodev/toolkit/currency';
+import { slugify } from '@indodev/toolkit/text';
 
 // Validate NIK
-validateNIK('3201234567890123') // true
+validateNIK('3201234567890123'); // true
 
 // Format phone number
-formatPhoneNumber('081234567890', 'international')
+formatPhoneNumber('081234567890', 'international');
 // '+62 812-3456-7890'
 
 // Format currency
-formatRupiah(1500000)
+formatRupiah(1500000);
 // 'Rp 1.500.000'
+
+// Indonesian-aware slug
+slugify('Pria & Wanita');
+// 'pria-dan-wanita'
 ```
 
 ## Modules
 
 ### [NIK](/docs/api/nik)
+
 Validate, parse, format, and mask Indonesian National Identity Numbers. Extract location, birth date, and gender information.
 
 ### [Phone](/docs/api/phone)
+
 Validate and format Indonesian phone numbers. Detect operators (Telkomsel, XL, Indosat, etc.) and handle 200+ area codes.
 
 ### [Currency](/docs/api/currency)
+
 Format Indonesian Rupiah with proper separators. Convert numbers to words (terbilang) for invoices and legal documents.
+
+### [Text](/docs/api/text)
+
+Smart text manipulation with Indonesian language support. Title casing, slug generation, abbreviation expansion, and robust string comparison.
 
 ## Why @indodev/toolkit?
 
@@ -57,12 +69,13 @@ Building applications that handle Indonesian data? This library solves common ch
 - **NIK Validation** - Ensure national IDs are valid before processing
 - **Phone Formatting** - Display phone numbers consistently across your app
 - **Rupiah Formatting** - Show prices with proper Indonesian formatting
+- **Text Processing** - Handle Indonesian text with proper grammar rules
 - **Operator Detection** - Send SMS through the right gateway
 - **Terbilang Conversion** - Generate invoices and receipts with words
 - **Privacy Protection** - Mask sensitive data appropriately
 
 ## What's Next?
 
-- **[🚀 Getting Started](/getting-started)** - Quick start guide with installation and basic usage examples
-- **[📖 API Documentation](/docs/api/currency)** - Comprehensive API reference for all modules and functions
-- **[💡 Examples](/docs)** - Real-world usage patterns and integration examples (Coming Soon)
+- **[🚀 Getting Started](/getting-started)** - Quick start guide with installation and basic usage
+- **[📖 API Documentation](/docs/api/currency)** - Comprehensive API reference for all modules
+- **[🎯 Examples](/docs/api/text)** - Real-world usage patterns and integration examples
