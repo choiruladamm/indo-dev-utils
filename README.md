@@ -1,3 +1,5 @@
+<!-- @format -->
+
 <!-- # @indodev/toolkit
 
 TypeScript utilities for Indonesian data validation and formatting.
@@ -27,12 +29,14 @@ Building apps for Indonesia means dealing with NIK validation, phone number form
 - **NIK validation** - Verify Indonesian National Identity Numbers with province, date, and gender checks
 - **Phone formatting** - Support for all major operators (Telkomsel, XL, Indosat, Smartfren, Axis) and 200+ area codes
 - **Rupiah formatting** - Display currency with proper grammar rules (1,5 juta, not 1,0 juta)
+- **Text utilities** - Indonesian-specific text processing (slug, capitalization, extraction, sanitization)
 - **Terbilang converter** - Numbers to Indonesian words (1500000 → "satu juta lima ratus ribu rupiah")
 - **Type-safe** - Full TypeScript support with proper type inference
-- **Well-tested** - 470+ test cases with 95%+ coverage
+- **Well-tested** - 500+ test cases with 95%+ coverage
 - **Zero dependencies** - Lightweight and tree-shakeable
 
 ## Install
+
 ```bash
 npm install @indodev/toolkit
 ```
@@ -40,6 +44,7 @@ npm install @indodev/toolkit
 ## Usage
 
 ### NIK Validation & Parsing
+
 ```typescript
 import { validateNIK, parseNIK, maskNIK } from '@indodev/toolkit/nik';
 
@@ -58,6 +63,7 @@ maskNIK('3201234567890123'); // '3201****0123'
 ```
 
 ### Phone Numbers
+
 ```typescript
 import { validatePhoneNumber, formatPhoneNumber, getOperator } from '@indodev/toolkit/phone';
 
@@ -75,19 +81,20 @@ getOperator('085612345678'); // 'Indosat'
 ```
 
 ### Currency Formatting
+
 ```typescript
 import { formatRupiah, formatCompact, toWords } from '@indodev/toolkit/currency';
 
 // Standard format
 formatRupiah(1500000); // 'Rp 1.500.000'
-formatRupiah(1500000.50, { decimal: true }); // 'Rp 1.500.000,50'
+formatRupiah(1500000.5, { decimal: true }); // 'Rp 1.500.000,50'
 
 // Compact format (follows Indonesian grammar!)
 formatCompact(1500000); // 'Rp 1,5 juta'
 formatCompact(1000000); // 'Rp 1 juta' (not '1,0 juta')
 
 // Terbilang
-toWords(1500000); 
+toWords(1500000);
 // 'satu juta lima ratus ribu rupiah'
 
 toWords(1500000, { uppercase: true, withCurrency: false });
@@ -95,6 +102,7 @@ toWords(1500000, { uppercase: true, withCurrency: false });
 ```
 
 ### Parsing (Reverse Operations)
+
 ```typescript
 import { parseNIK } from '@indodev/toolkit/nik';
 import { parsePhoneNumber } from '@indodev/toolkit/phone';
@@ -109,6 +117,7 @@ parseRupiah('Rp 500 ribu'); // 500000
 ## Real-World Examples
 
 ### E-commerce Checkout
+
 ```typescript
 import { formatRupiah, formatCompact } from '@indodev/toolkit/currency';
 
@@ -125,6 +134,7 @@ import { formatRupiah, formatCompact } from '@indodev/toolkit/currency';
 ```
 
 ### User Registration Form
+
 ```typescript
 import { validateNIK } from '@indodev/toolkit/nik';
 import { validatePhoneNumber } from '@indodev/toolkit/phone';
@@ -133,16 +143,17 @@ function validateForm(data) {
   if (!validateNIK(data.nik)) {
     return 'NIK tidak valid';
   }
-  
+
   if (!validatePhoneNumber(data.phone)) {
     return 'Nomor telepon tidak valid';
   }
-  
+
   return null;
 }
 ```
 
 ### Invoice Generator
+
 ```typescript
 import { formatRupiah, toWords } from '@indodev/toolkit/currency';
 
@@ -159,6 +170,7 @@ console.log(`Terbilang: ${toWords(total, { uppercase: true })}`);
 ## TypeScript Support
 
 Full type inference out of the box:
+
 ```typescript
 import type { NIKInfo, PhoneInfo, RupiahOptions } from '@indodev/toolkit';
 
@@ -179,6 +191,7 @@ const options: RupiahOptions = {
 ## Tree-Shaking
 
 Import only what you need - unused code gets removed:
+
 ```typescript
 // ✅ Recommended: Import from submodules
 import { formatRupiah } from '@indodev/toolkit/currency';
@@ -191,6 +204,7 @@ import { formatRupiah, validateNIK } from '@indodev/toolkit';
 ## Framework Examples
 
 Works with any framework:
+
 ```typescript
 // React
 import { formatRupiah } from '@indodev/toolkit/currency';
@@ -213,7 +227,7 @@ export default {
 // Svelte
 <script>
   import { validateNIK } from '@indodev/toolkit/nik';
-  
+
   $: isValid = validateNIK(nik);
 </script>
 ```
@@ -222,40 +236,50 @@ export default {
 
 ### NIK Module
 
-| Function | Description |
-|----------|-------------|
-| `validateNIK(nik)` | Check if NIK is valid |
-| `parseNIK(nik)` | Extract province, birth date, gender |
-| `formatNIK(nik, separator?)` | Format with separators |
-| `maskNIK(nik, options?)` | Mask for privacy |
+| Function                     | Description                          |
+| ---------------------------- | ------------------------------------ |
+| `validateNIK(nik)`           | Check if NIK is valid                |
+| `parseNIK(nik)`              | Extract province, birth date, gender |
+| `formatNIK(nik, separator?)` | Format with separators               |
+| `maskNIK(nik, options?)`     | Mask for privacy                     |
 
 ### Phone Module
 
-| Function | Description |
-|----------|-------------|
-| `validatePhoneNumber(phone)` | Validate Indonesian phone numbers |
+| Function                           | Description                           |
+| ---------------------------------- | ------------------------------------- |
+| `validatePhoneNumber(phone)`       | Validate Indonesian phone numbers     |
 | `formatPhoneNumber(phone, format)` | Format to international/national/e164 |
-| `getOperator(phone)` | Detect operator (Telkomsel, XL, etc) |
-| `parsePhoneNumber(phone)` | Get all phone info |
+| `getOperator(phone)`               | Detect operator (Telkomsel, XL, etc)  |
+| `parsePhoneNumber(phone)`          | Get all phone info                    |
 
 ### Currency Module
 
-| Function | Description |
-|----------|-------------|
-| `formatRupiah(amount, options?)` | Standard Rupiah format |
-| `formatCompact(amount)` | Compact format (1,5 juta) |
-| `parseRupiah(formatted)` | Parse formatted string to number |
-| `toWords(amount, options?)` | Convert to Indonesian words |
-| `roundToClean(amount, unit?)` | Round to clean amounts |
+| Function                         | Description                      |
+| -------------------------------- | -------------------------------- |
+| `formatRupiah(amount, options?)` | Standard Rupiah format           |
+| `formatCompact(amount)`          | Compact format (1,5 juta)        |
+| `parseRupiah(formatted)`         | Parse formatted string to number |
+| `toWords(amount, options?)`      | Convert to Indonesian words      |
+| `roundToClean(amount, unit?)`    | Round to clean amounts           |
+
+### Text Module
+
+| Function                   | Description                                 |
+| -------------------------- | ------------------------------------------- |
+| `toSlug(text, options?)`   | Generate URL-friendly slugs                 |
+| `capitalize(text, style?)` | Smart capitalization (title, sentence, etc) |
+| `extractNumbers(text)`     | Extract numbers from text                   |
+| `extractEmails(text)`      | Extract email addresses                     |
+| `sanitizeText(text)`       | Clean and normalize text                    |
 
 ## Bundle Size
 
-| Module | Size (minified + gzipped) |
-|--------|---------------------------|
-| NIK | ~8 KB |
-| Phone | ~12 KB |
-| Currency | ~10 KB |
-| **Total** | **~30 KB** |
+| Module    | Size (minified + gzipped) |
+| --------- | ------------------------- |
+| NIK       | ~8 KB                     |
+| Phone     | ~12 KB                    |
+| Currency  | ~10 KB                    |
+| **Total** | **~30 KB**                |
 
 Import only what you need to keep your bundle small.
 
@@ -275,14 +299,21 @@ Found a bug? Want to add more Indonesian utilities?
 
 ## Roadmap
 
+**Current version:** 0.2.0
+
+**Completed:**
+
 - [x] NIK validation & parsing
 - [x] Phone number utilities
 - [x] Currency formatting & terbilang
-- [ ] NPWP validation
-- [ ] Bank account validation
-- [ ] Indonesian address parsing
-- [ ] Date & holiday utilities
-- [ ] Zod schema exports
+- [x] Text utilities (slug, capitalization, extraction)
+
+**Planned:**
+
+- [ ] Enhanced validation (NPWP format validation, email validators)
+- [ ] Indonesian datetime utilities (date formatting, relative time)
+- [ ] Number & measurement utilities (enhanced terbilang, formatters)
+- [ ] Form validation helpers (Zod schemas)
 
 ## License
 
