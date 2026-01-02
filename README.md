@@ -1,15 +1,5 @@
 <!-- @format -->
 
-<!-- # @indodev/toolkit
-
-TypeScript utilities for Indonesian data validation and formatting.
-
-<div align="center">
-
-[![CI](https://github.com/choiruladamm/indo-dev-utils/actions/workflows/ci.yml/badge.svg)](https://github.com/choiruladamm/indo-dev-utils/actions) [![npm version](https://img.shields.io/npm/v/@indodev/toolkit.svg)](https://npmjs.com/package/@indodev/toolkit) [![bundle size](https://img.shields.io/bundlephobia/minzip/@indodev/toolkit)](https://bundlephobia.com/package/@indodev/toolkit) [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://typescriptlang.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-</div> -->
-
 <div align="center">
 
 # @indodev/toolkit
@@ -22,17 +12,17 @@ TypeScript utilities for Indonesian data validation and formatting.
 
 ## Why?
 
-Building apps for Indonesia means dealing with NIK validation, phone number formatting, and Rupiah display. Instead of rewriting the same logic across projects, use battle-tested utilities that just work.
+Building apps for Indonesia means dealing with NIK validation, phone number formatting, Rupiah display, and proper text handling. Instead of rewriting the same logic across projects, use battle-tested utilities that just work.
 
 ## Features
 
 - **NIK validation** - Verify Indonesian National Identity Numbers with province, date, and gender checks
 - **Phone formatting** - Support for all major operators (Telkomsel, XL, Indosat, Smartfren, Axis) and 200+ area codes
 - **Rupiah formatting** - Display currency with proper grammar rules (1,5 juta, not 1,0 juta)
-- **Text utilities** - Indonesian-specific text processing (slug, capitalization, extraction, sanitization)
+- **Text utilities** - Smart capitalization, slug generation, abbreviation expansion, and string comparison with Indonesian language support
 - **Terbilang converter** - Numbers to Indonesian words (1500000 → "satu juta lima ratus ribu rupiah")
 - **Type-safe** - Full TypeScript support with proper type inference
-- **Well-tested** - 500+ test cases with 95%+ coverage
+- **Well-tested** - 1060+ test cases with 95%+ coverage
 - **Zero dependencies** - Lightweight and tree-shakeable
 
 ## Install
@@ -41,7 +31,7 @@ Building apps for Indonesia means dealing with NIK validation, phone number form
 npm install @indodev/toolkit
 ```
 
-## Usage
+## Quick Start
 
 ### NIK Validation & Parsing
 
@@ -50,12 +40,10 @@ import { validateNIK, parseNIK, maskNIK } from '@indodev/toolkit/nik';
 
 // Validate
 validateNIK('3201234567890123'); // true
-validateNIK('1234'); // false
 
 // Extract info
 const info = parseNIK('3201234567890123');
 console.log(info.province.name); // 'Jawa Barat'
-console.log(info.birthDate); // Date object
 console.log(info.gender); // 'male' or 'female'
 
 // Mask for privacy
@@ -67,17 +55,12 @@ maskNIK('3201234567890123'); // '3201****0123'
 ```typescript
 import { validatePhoneNumber, formatPhoneNumber, getOperator } from '@indodev/toolkit/phone';
 
-// Validate (works with 08xx, +62, 62 formats)
+// Validate and format
 validatePhoneNumber('081234567890'); // true
-validatePhoneNumber('+6281234567890'); // true
-
-// Format
 formatPhoneNumber('081234567890', 'international'); // '+62 812-3456-7890'
-formatPhoneNumber('081234567890', 'national'); // '0812-3456-7890'
 
 // Detect operator
 getOperator('081234567890'); // 'Telkomsel'
-getOperator('085612345678'); // 'Indosat'
 ```
 
 ### Currency Formatting
@@ -87,149 +70,35 @@ import { formatRupiah, formatCompact, toWords } from '@indodev/toolkit/currency'
 
 // Standard format
 formatRupiah(1500000); // 'Rp 1.500.000'
-formatRupiah(1500000.5, { decimal: true }); // 'Rp 1.500.000,50'
 
 // Compact format (follows Indonesian grammar!)
 formatCompact(1500000); // 'Rp 1,5 juta'
 formatCompact(1000000); // 'Rp 1 juta' (not '1,0 juta')
 
 // Terbilang
-toWords(1500000);
-// 'satu juta lima ratus ribu rupiah'
-
-toWords(1500000, { uppercase: true, withCurrency: false });
-// 'Satu juta lima ratus ribu'
+toWords(1500000); // 'satu juta lima ratus ribu rupiah'
 ```
 
-### Parsing (Reverse Operations)
+### Text Utilities
 
 ```typescript
-import { parseNIK } from '@indodev/toolkit/nik';
-import { parsePhoneNumber } from '@indodev/toolkit/phone';
-import { parseRupiah } from '@indodev/toolkit/currency';
+import { toTitleCase, slugify, expandAbbreviation, truncate } from '@indodev/toolkit/text';
 
-// Parse formatted strings back
-parseRupiah('Rp 1.500.000'); // 1500000
-parseRupiah('Rp 1,5 juta'); // 1500000
-parseRupiah('Rp 500 ribu'); // 500000
-```
+// Smart title case (respects Indonesian particles)
+toTitleCase('buku panduan belajar di rumah');
+// 'Buku Panduan Belajar di Rumah'
 
-## Real-World Examples
+// Indonesian-aware slugs
+slugify('Pria & Wanita'); // 'pria-dan-wanita'
+slugify('Hitam/Putih'); // 'hitam-atau-putih'
 
-### E-commerce Checkout
+// Expand abbreviations
+expandAbbreviation('Jl. Sudirman No. 45');
+// 'Jalan Sudirman Nomor 45'
 
-```typescript
-import { formatRupiah, formatCompact } from '@indodev/toolkit/currency';
-
-// Product card
-<div className="price">
-  {formatCompact(product.price)} {/* "Rp 1,5 juta" */}
-</div>
-
-// Checkout total
-<div className="total">
-  Total: {formatRupiah(cart.total, { decimal: true })}
-  {/* "Rp 1.500.000,50" */}
-</div>
-```
-
-### User Registration Form
-
-```typescript
-import { validateNIK } from '@indodev/toolkit/nik';
-import { validatePhoneNumber } from '@indodev/toolkit/phone';
-
-function validateForm(data) {
-  if (!validateNIK(data.nik)) {
-    return 'NIK tidak valid';
-  }
-
-  if (!validatePhoneNumber(data.phone)) {
-    return 'Nomor telepon tidak valid';
-  }
-
-  return null;
-}
-```
-
-### Invoice Generator
-
-```typescript
-import { formatRupiah, toWords } from '@indodev/toolkit/currency';
-
-const total = 1500000;
-
-console.log(`Total: ${formatRupiah(total)}`);
-console.log(`Terbilang: ${toWords(total, { uppercase: true })}`);
-
-// Output:
-// Total: Rp 1.500.000
-// Terbilang: Satu juta lima ratus ribu rupiah
-```
-
-## TypeScript Support
-
-Full type inference out of the box:
-
-```typescript
-import type { NIKInfo, PhoneInfo, RupiahOptions } from '@indodev/toolkit';
-
-const nikInfo: NIKInfo = parseNIK('3201234567890123');
-// nikInfo.province ✓ auto-complete works
-// nikInfo.birthDate ✓ Date type
-// nikInfo.gender ✓ 'male' | 'female' | null
-
-const options: RupiahOptions = {
-  symbol: true,
-  decimal: true,
-  precision: 2,
-  separator: '.',
-  decimalSeparator: ',',
-};
-```
-
-## Tree-Shaking
-
-Import only what you need - unused code gets removed:
-
-```typescript
-// ✅ Recommended: Import from submodules
-import { formatRupiah } from '@indodev/toolkit/currency';
-import { validateNIK } from '@indodev/toolkit/nik';
-
-// ⚠️ Works but imports everything
-import { formatRupiah, validateNIK } from '@indodev/toolkit';
-```
-
-## Framework Examples
-
-Works with any framework:
-
-```typescript
-// React
-import { formatRupiah } from '@indodev/toolkit/currency';
-
-function ProductCard({ price }) {
-  return <div>{formatRupiah(price)}</div>;
-}
-
-// Vue
-import { formatPhoneNumber } from '@indodev/toolkit/phone';
-
-export default {
-  computed: {
-    formattedPhone() {
-      return formatPhoneNumber(this.phone, 'international');
-    }
-  }
-}
-
-// Svelte
-<script>
-  import { validateNIK } from '@indodev/toolkit/nik';
-
-  $: isValid = validateNIK(nik);
-</script>
+// Smart truncation
+truncate('Ini adalah text yang sangat panjang', 20);
+// 'Ini adalah text...'
 ```
 
 ## API Reference
@@ -260,68 +129,66 @@ export default {
 | `formatCompact(amount)`          | Compact format (1,5 juta)        |
 | `parseRupiah(formatted)`         | Parse formatted string to number |
 | `toWords(amount, options?)`      | Convert to Indonesian words      |
-| `roundToClean(amount, unit?)`    | Round to clean amounts           |
 
 ### Text Module
 
-| Function                   | Description                                 |
-| -------------------------- | ------------------------------------------- |
-| `toSlug(text, options?)`   | Generate URL-friendly slugs                 |
-| `capitalize(text, style?)` | Smart capitalization (title, sentence, etc) |
-| `extractNumbers(text)`     | Extract numbers from text                   |
-| `extractEmails(text)`      | Extract email addresses                     |
-| `sanitizeText(text)`       | Clean and normalize text                    |
+| Function                               | Description                                     |
+| -------------------------------------- | ----------------------------------------------- |
+| `toTitleCase(text, options?)`          | Smart capitalization with Indonesian rules      |
+| `slugify(text, options?)`              | URL-friendly slugs with Indonesian conjunctions |
+| `expandAbbreviation(text, options?)`   | Expand Indonesian abbreviations (Jl., Bpk.)     |
+| `truncate(text, maxLength, options?)`  | Smart text truncation at word boundaries        |
+| `compareStrings(str1, str2, options?)` | Robust string comparison                        |
+| `sanitize(text, options?)`             | Clean and normalize text                        |
+
+## TypeScript Support
+
+Full type inference out of the box:
+
+```typescript
+import type { NIKInfo, PhoneInfo, RupiahOptions } from '@indodev/toolkit';
+
+const nikInfo: NIKInfo = parseNIK('3201234567890123');
+// Auto-complete for province, birthDate, gender ✓
+```
+
+## Tree-Shaking
+
+Import only what you need - unused code gets removed:
+
+```typescript
+// ✅ Recommended: Import from submodules
+import { formatRupiah } from '@indodev/toolkit/currency';
+import { validateNIK } from '@indodev/toolkit/nik';
+import { slugify } from '@indodev/toolkit/text';
+
+// ⚠️ Works but imports everything
+import { formatRupiah, validateNIK, slugify } from '@indodev/toolkit';
+```
 
 ## Bundle Size
 
 | Module    | Size (minified + gzipped) |
 | --------- | ------------------------- |
-| NIK       | ~8 KB                     |
+| NIK       | ~5 KB                     |
 | Phone     | ~12 KB                    |
-| Currency  | ~10 KB                    |
-| **Total** | **~30 KB**                |
-
-Import only what you need to keep your bundle small.
+| Currency  | ~6 KB                     |
+| Text      | ~8 KB                     |
+| **Total** | **~31 KB**                |
 
 ## Requirements
 
 - Node.js >= 18
 - TypeScript >= 5.0 (optional)
 
-## Contributing
+## Documentation
 
-Found a bug? Want to add more Indonesian utilities?
-
-1. Fork the repo
-2. Create a branch: `git checkout -b feat/my-feature`
-3. Make changes and add tests
-4. Submit a PR
-
-## Roadmap
-
-**Current version:** 0.2.0
-
-**Completed:**
-
-- [x] NIK validation & parsing
-- [x] Phone number utilities
-- [x] Currency formatting & terbilang
-- [x] Text utilities (slug, capitalization, extraction)
-
-**Planned:**
-
-- [ ] Enhanced validation (NPWP format validation, email validators)
-- [ ] Indonesian datetime utilities (date formatting, relative time)
-- [ ] Number & measurement utilities (enhanced terbilang, formatters)
-- [ ] Form validation helpers (Zod schemas)
+- 📖 [Full Documentation](https://toolkit.adamm.cloud/docs)
+- 🐛 [Report Issues](https://github.com/choiruladamm/indo-dev-utils/issues)
 
 ## License
 
 MIT © [choiruladamm](https://github.com/choiruladamm)
-
-## Support
-
-- 🐛 [Report Issues](https://github.com/yourusername/indo-dev-utils/issues)
 
 ---
 
