@@ -71,12 +71,12 @@ This enables proper resolution of subpaths like `@indodev/toolkit/nik`.
 ### React / Next.js
 
 ```tsx
-import { parseNIK } from '@indodev/toolkit/nik';
+import { parseNIK, validateNIK } from '@indodev/toolkit/nik';
 import { useState } from 'react';
 
 export function NIKCard() {
   const [nik, setNik] = useState('');
-  const info = nik.length === 16 ? parseNIK(nik) : null;
+  const info = validateNIK(nik) ? parseNIK(nik) : null;
 
   return (
     <div className="card">
