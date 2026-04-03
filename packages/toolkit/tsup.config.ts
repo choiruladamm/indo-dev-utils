@@ -7,6 +7,9 @@ export default defineConfig({
     'phone/index': 'src/phone/index.ts',
     'currency/index': 'src/currency/index.ts',
     'text/index': 'src/text/index.ts',
+    'npwp/index': 'src/npwp/index.ts',
+    'plate/index': 'src/plate/index.ts',
+    'vin/index': 'src/vin/index.ts',
   },
   format: ['cjs', 'esm'],
   dts: {
