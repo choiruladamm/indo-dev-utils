@@ -8,10 +8,10 @@
  * @example
  * Basic usage:
  * ```typescript
- * import { 
- *   validatePhoneNumber, 
- *   formatPhoneNumber, 
- *   getOperator 
+ * import {
+ *   validatePhoneNumber,
+ *   formatPhoneNumber,
+ *   getOperator
  * } from '@indodev/toolkit/phone';
  *
  * // Validate
@@ -51,7 +51,7 @@
  * import { toInternational, toNational, toE164 } from '@indodev/toolkit/phone';
  *
  * const phone = '081234567890';
- * 
+ *
  * toInternational(phone); // '+62 812-3456-7890'
  * toNational(phone);      // '0812-3456-7890'
  * toE164(phone);          // '6281234567890'
@@ -76,6 +76,8 @@ export {
   maskPhoneNumber,
 } from './format';
 
-export { parsePhoneNumber, getOperator } from './parse';
+export { generateWALink, generateSmsLink, generateTelLink } from './links';
+
+export { parsePhoneNumber, getOperator, isProvider } from './parse';
 
 export type { PhoneInfo, PhoneFormat, MaskOptions } from './types';

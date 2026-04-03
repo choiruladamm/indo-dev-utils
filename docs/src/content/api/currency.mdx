@@ -3,7 +3,8 @@ title: Currency
 description: Indonesian Rupiah formatting, parsing, and conversion utilities
 ---
 
-import { Callout, Tabs, Steps } from 'nextra/components'
+
+import { Callout, Tabs, Steps } from 'nextra/components';
 
 # Currency
 
@@ -25,6 +26,7 @@ The Currency module provides type-safe utilities for formatting, parsing, and co
 ### Why This Module?
 
 Indonesian Rupiah formatting has unique requirements:
+
 - Uses `.` (dot) for thousands separator (not comma)
 - Uses `,` (comma) for decimal separator (not dot)
 - Has specific compact format units: ribu, juta, miliar, triliun
@@ -59,23 +61,31 @@ Indonesian Rupiah formatting has unique requirements:
 ## Quick Start
 
 ```typescript
-import { formatRupiah, formatCompact, toWords, parseRupiah } from '@indodev/toolkit/currency'
+import { formatRupiah, formatCompact, toWords, parseRupiah } from '@indodev/toolkit/currency';
 
 // Format currency
-formatRupiah(1500000)
+formatRupiah(1500000);
 // 'Rp 1.500.000'
 
 // Compact format
-formatCompact(1500000)
+formatCompact(1500000);
 // 'Rp 1,5 juta'
 
 // Convert to words (terbilang)
-toWords(1500000)
+toWords(1500000);
 // 'satu juta lima ratus ribu rupiah'
 
 // Parse back to number
-parseRupiah('Rp 1.500.000')
+parseRupiah('Rp 1.500.000');
 // 1500000
+
+// Accounting format (parentheses for negatives)
+formatAccounting(-1500000);
+// '(Rp 1.500.000)'
+
+// Calculate tax
+calculateTax(1000000, 11);
+// 110000
 ```
 
 ## API Reference
@@ -85,15 +95,16 @@ parseRupiah('Rp 1.500.000')
 Formats a number as Indonesian Rupiah currency with customizable options.
 
 **Type Signature:**
+
 ```typescript
-function formatRupiah(amount: number, options?: RupiahOptions): string
+function formatRupiah(amount: number, options?: RupiahOptions): string;
 ```
 
 **Parameters:**
 
-| Name | Type | Description |
-|------|------|-------------|
-| `amount` | `number` | The amount to format |
+| Name      | Type            | Description                       |
+| --------- | --------------- | --------------------------------- |
+| `amount`  | `number`        | The amount to format              |
 | `options` | `RupiahOptions` | Optional formatting configuration |
 
 **Returns:**
@@ -104,12 +115,12 @@ function formatRupiah(amount: number, options?: RupiahOptions): string
 
 ```typescript
 interface RupiahOptions {
-  symbol?: boolean              // Show 'Rp' symbol (default: true)
-  decimal?: boolean             // Show decimal places (default: false)
-  separator?: string            // Thousands separator (default: '.')
-  decimalSeparator?: string     // Decimal separator (default: ',')
-  precision?: number            // Decimal places (default: 0 or 2)
-  spaceAfterSymbol?: boolean    // Space after 'Rp' (default: true)
+  symbol?: boolean; // Show 'Rp' symbol (default: true)
+  decimal?: boolean; // Show decimal places (default: false)
+  separator?: string; // Thousands separator (default: '.')
+  decimalSeparator?: string; // Decimal separator (default: ',')
+  precision?: number; // Decimal places (default: 0 or 2)
+  spaceAfterSymbol?: boolean; // Space after 'Rp' (default: true)
 }
 ```
 
@@ -117,59 +128,59 @@ interface RupiahOptions {
 
 ```typescript
 // Basic formatting
-formatRupiah(1500000)
+formatRupiah(1500000);
 // 'Rp 1.500.000'
 
-formatRupiah(999)
+formatRupiah(999);
 // 'Rp 999'
 
-formatRupiah(0)
+formatRupiah(0);
 // 'Rp 0'
 
 // With decimals
-formatRupiah(1500000.50, { decimal: true })
+formatRupiah(1500000.5, { decimal: true });
 // 'Rp 1.500.000,50'
 
-formatRupiah(1500000.5, { decimal: true, precision: 1 })
+formatRupiah(1500000.5, { decimal: true, precision: 1 });
 // 'Rp 1.500.000,5'
 
-formatRupiah(1500000, { decimal: true, precision: 2 })
+formatRupiah(1500000, { decimal: true, precision: 2 });
 // 'Rp 1.500.000,00'
 
 // Without symbol
-formatRupiah(1500000, { symbol: false })
+formatRupiah(1500000, { symbol: false });
 // '1.500.000'
 
-formatRupiah(1500000.50, { symbol: false, decimal: true })
+formatRupiah(1500000.5, { symbol: false, decimal: true });
 // '1.500.000,50'
 
 // Custom separators (international format)
-formatRupiah(1500000, { separator: ',', decimalSeparator: '.' })
+formatRupiah(1500000, { separator: ',', decimalSeparator: '.' });
 // 'Rp 1,500,000'
 
-formatRupiah(1500000.50, { 
+formatRupiah(1500000.5, {
   decimal: true,
   separator: ',',
-  decimalSeparator: '.'
-})
+  decimalSeparator: '.',
+});
 // 'Rp 1,500,000.50'
 
 // No space after symbol
-formatRupiah(1500000, { spaceAfterSymbol: false })
+formatRupiah(1500000, { spaceAfterSymbol: false });
 // 'Rp1.500.000'
 
 // Negative numbers
-formatRupiah(-1500000)
+formatRupiah(-1500000);
 // 'Rp -1.500.000'
 
-formatRupiah(-1500000, { symbol: false })
+formatRupiah(-1500000, { symbol: false });
 // '-1.500.000'
 
 // Large numbers
-formatRupiah(1234567890)
+formatRupiah(1234567890);
 // 'Rp 1.234.567.890'
 
-formatRupiah(1234567890.12, { decimal: true })
+formatRupiah(1234567890.12, { decimal: true });
 // 'Rp 1.234.567.890,12'
 ```
 
@@ -203,7 +214,7 @@ function InvoiceItem({ item }) {
 function PaymentSummary({ amount }) {
   const tax = amount * 0.11 // 11% PPN
   const total = amount + tax
-  
+
   return (
     <div>
       <div>Subtotal: {formatRupiah(amount, { decimal: true })}</div>
@@ -227,19 +238,80 @@ function ExportData(amounts: number[]) {
 
 ---
 
+### formatAccounting()
+
+Formats a number using accounting notation, where negative numbers are enclosed in parentheses.
+
+**Type Signature:**
+
+```typescript
+function formatAccounting(amount: number, options?: RupiahOptions): string;
+```
+
+**Parameters:**
+
+| Name      | Type            | Description                       |
+| --------- | --------------- | --------------------------------- |
+| `amount`  | `number`        | The amount to format              |
+| `options` | `RupiahOptions` | Optional formatting configuration |
+
+**Returns:**
+
+`string` - Formatted accounting string.
+
+**Examples:**
+
+```typescript
+formatAccounting(1500000); // 'Rp 1.500.000'
+formatAccounting(-1500000); // '(Rp 1.500.000)'
+formatAccounting(-1500, { symbol: false }); // '(1.500)'
+```
+
+---
+
+### addRupiahSymbol()
+
+Adds the Rupiah symbol ('Rp ') to a string if it's not already present.
+
+**Type Signature:**
+
+```typescript
+function addRupiahSymbol(amount: string | number): string;
+```
+
+**Parameters:**
+
+| Name     | Type    | Description |
+| -------- | ------- | ----------- | ------------------------------ |
+| `amount` | `string | number`     | The value to add the symbol to |
+
+**Returns:**
+
+`string` - String with 'Rp ' prefix.
+
+**Examples:**
+
+```typescript
+addRupiahSymbol('1.500.000'); // 'Rp 1.500.000'
+addRupiahSymbol(1500000); // 'Rp 1500000'
+```
+
+---
+
 ### formatCompact()
 
 Formats numbers using Indonesian compact notation with proper grammar rules.
 
 **Type Signature:**
+
 ```typescript
-function formatCompact(amount: number): string
+function formatCompact(amount: number): string;
 ```
 
 **Parameters:**
 
-| Name | Type | Description |
-|------|------|-------------|
+| Name     | Type     | Description          |
+| -------- | -------- | -------------------- |
 | `amount` | `number` | The amount to format |
 
 **Returns:**
@@ -248,16 +320,17 @@ function formatCompact(amount: number): string
 
 **Compact Units:**
 
-| Unit | Value | English Equivalent |
-|------|-------|-------------------|
-| ribu | 1,000 | thousand |
-| juta | 1,000,000 | million |
-| miliar | 1,000,000,000 | billion |
-| triliun | 1,000,000,000,000 | trillion |
+| Unit    | Value             | English Equivalent |
+| ------- | ----------------- | ------------------ |
+| ribu    | 1,000             | thousand           |
+| juta    | 1,000,000         | million            |
+| miliar  | 1,000,000,000     | billion            |
+| triliun | 1,000,000,000,000 | trillion           |
 
 **Grammar Rules:**
 
 The function follows proper Indonesian grammar:
+
 - `1 juta` not `1,0 juta` (removes trailing .0)
 - `500 ribu` not `0,5 juta` (uses appropriate unit)
 - Numbers below 100,000 use standard formatting
@@ -266,52 +339,52 @@ The function follows proper Indonesian grammar:
 
 ```typescript
 // Millions (juta)
-formatCompact(1000000)
+formatCompact(1000000);
 // 'Rp 1 juta'
 
-formatCompact(1500000)
+formatCompact(1500000);
 // 'Rp 1,5 juta'
 
-formatCompact(2300000)
+formatCompact(2300000);
 // 'Rp 2,3 juta'
 
 // Thousands (ribu)
-formatCompact(500000)
+formatCompact(500000);
 // 'Rp 500 ribu'
 
-formatCompact(750000)
+formatCompact(750000);
 // 'Rp 750 ribu'
 
 // Below 100k: standard formatting
-formatCompact(99000)
+formatCompact(99000);
 // 'Rp 99.000'
 
-formatCompact(1500)
+formatCompact(1500);
 // 'Rp 1.500'
 
 // Billions (miliar)
-formatCompact(1000000000)
+formatCompact(1000000000);
 // 'Rp 1 miliar'
 
-formatCompact(2500000000)
+formatCompact(2500000000);
 // 'Rp 2,5 miliar'
 
 // Trillions (triliun)
-formatCompact(1000000000000)
+formatCompact(1000000000000);
 // 'Rp 1 triliun'
 
-formatCompact(1500000000000)
+formatCompact(1500000000000);
 // 'Rp 1,5 triliun'
 
 // Negative numbers
-formatCompact(-1500000)
+formatCompact(-1500000);
 // 'Rp -1,5 juta'
 
 // Grammar: proper rounding
-formatCompact(1000000)
+formatCompact(1000000);
 // 'Rp 1 juta' (not '1,0 juta')
 
-formatCompact(1100000)
+formatCompact(1100000);
 // 'Rp 1,1 juta'
 ```
 
@@ -359,7 +432,8 @@ function ChartLabel({ value }: { value: number }) {
 ```
 
 <Callout type="info">
-**Grammar Note:** The function automatically handles Indonesian grammar rules. Numbers are rounded to one decimal place, and trailing zeros are removed (e.g., "1 juta" instead of "1,0 juta").
+  **Grammar Note:** The function automatically handles Indonesian grammar rules. Numbers are rounded to one decimal place, and trailing
+  zeros are removed (e.g., "1 juta" instead of "1,0 juta").
 </Callout>
 
 ---
@@ -369,14 +443,15 @@ function ChartLabel({ value }: { value: number }) {
 Parses formatted Rupiah strings back to numeric values. Handles multiple formats including standard, compact, and international notation.
 
 **Type Signature:**
+
 ```typescript
-function parseRupiah(formatted: string): number | null
+function parseRupiah(formatted: string): number | null;
 ```
 
 **Parameters:**
 
-| Name | Type | Description |
-|------|------|-------------|
+| Name        | Type     | Description                          |
+| ----------- | -------- | ------------------------------------ |
 | `formatted` | `string` | The formatted Rupiah string to parse |
 
 **Returns:**
@@ -396,68 +471,68 @@ function parseRupiah(formatted: string): number | null
 
 ```typescript
 // Standard format
-parseRupiah('Rp 1.500.000')
+parseRupiah('Rp 1.500.000');
 // 1500000
 
-parseRupiah('1.500.000')
+parseRupiah('1.500.000');
 // 1500000
 
 // With decimals
-parseRupiah('Rp 1.500.000,50')
+parseRupiah('Rp 1.500.000,50');
 // 1500000.5
 
-parseRupiah('Rp 1.500.000,99')
+parseRupiah('Rp 1.500.000,99');
 // 1500000.99
 
 // Compact formats
-parseRupiah('Rp 1,5 juta')
+parseRupiah('Rp 1,5 juta');
 // 1500000
 
-parseRupiah('Rp 500 ribu')
+parseRupiah('Rp 500 ribu');
 // 500000
 
-parseRupiah('Rp 2,5 miliar')
+parseRupiah('Rp 2,5 miliar');
 // 2500000000
 
-parseRupiah('Rp 1 triliun')
+parseRupiah('Rp 1 triliun');
 // 1000000000000
 
 // International format
-parseRupiah('Rp 1,500,000')
+parseRupiah('Rp 1,500,000');
 // 1500000
 
-parseRupiah('Rp 1,500,000.50')
+parseRupiah('Rp 1,500,000.50');
 // 1500000.5
 
 // Negative numbers
-parseRupiah('Rp -1.500.000')
+parseRupiah('Rp -1.500.000');
 // -1500000
 
-parseRupiah('-1.500.000')
+parseRupiah('-1.500.000');
 // -1500000
 
 // Without 'Rp' symbol
-parseRupiah('1500000')
+parseRupiah('1500000');
 // 1500000
 
-parseRupiah('1.500.000')
+parseRupiah('1.500.000');
 // 1500000
 
 // Invalid input
-parseRupiah('invalid')
+parseRupiah('invalid');
 // null
 
-parseRupiah('')
+parseRupiah('');
 // null
 
-parseRupiah('abc')
+parseRupiah('abc');
 // null
 
 // Edge cases
-parseRupiah('Rp 0')
+parseRupiah('Rp 0');
 // 0
 
-parseRupiah('0')
+parseRupiah('0');
 // 0
 ```
 
@@ -467,11 +542,11 @@ parseRupiah('0')
 // Parse user input from forms
 function handlePriceInput(input: string) {
   const amount = parseRupiah(input)
-  
+
   if (amount === null) {
     return { error: 'Invalid price format' }
   }
-  
+
   return { amount }
 }
 
@@ -494,18 +569,18 @@ function calculateTotal(items: { price: string }[]) {
 // Validate and convert user input
 function PriceInput({ value, onChange }) {
   const [displayValue, setDisplayValue] = useState(value)
-  
+
   const handleChange = (input: string) => {
     // Allow user to type freely
     setDisplayValue(input)
-    
+
     // Parse and notify parent if valid
     const parsed = parseRupiah(input)
     if (parsed !== null) {
       onChange(parsed)
     }
   }
-  
+
   const handleBlur = () => {
     // Format on blur
     const parsed = parseRupiah(displayValue)
@@ -513,7 +588,7 @@ function PriceInput({ value, onChange }) {
       setDisplayValue(formatRupiah(parsed))
     }
   }
-  
+
   return (
     <input
       value={displayValue}
@@ -532,7 +607,8 @@ function normalizeAmounts(amounts: string[]) {
 ```
 
 <Callout type="info">
-**Smart Parsing:** The function automatically detects the format (Indonesian vs International) based on separator positions and handles both correctly.
+  **Smart Parsing:** The function automatically detects the format (Indonesian vs International) based on separator positions and handles
+  both correctly.
 </Callout>
 
 ---
@@ -542,16 +618,17 @@ function normalizeAmounts(amounts: string[]) {
 Converts numbers to Indonesian words (terbilang) following proper Indonesian grammar rules. Essential for checks, invoices, and legal documents.
 
 **Type Signature:**
+
 ```typescript
-function toWords(amount: number, options?: WordOptions): string
+function toWords(amount: number, options?: WordOptions): string;
 ```
 
 **Parameters:**
 
-| Name | Type | Description |
-|------|------|-------------|
-| `amount` | `number` | The number to convert (supports up to trillions) |
-| `options` | `WordOptions` | Optional conversion settings |
+| Name      | Type          | Description                                      |
+| --------- | ------------- | ------------------------------------------------ |
+| `amount`  | `number`      | The number to convert (supports up to trillions) |
+| `options` | `WordOptions` | Optional conversion settings                     |
 
 **Returns:**
 
@@ -561,14 +638,15 @@ function toWords(amount: number, options?: WordOptions): string
 
 ```typescript
 interface WordOptions {
-  uppercase?: boolean     // Capitalize first letter (default: false)
-  withCurrency?: boolean  // Add 'rupiah' suffix (default: true)
+  uppercase?: boolean; // Capitalize first letter (default: false)
+  withCurrency?: boolean; // Add 'rupiah' suffix (default: true)
 }
 ```
 
 **Indonesian Grammar Rules:**
 
 The function implements proper Indonesian number pronunciation:
+
 - `100` = "seratus" (not "satu ratus")
 - `1000` = "seribu" (not "satu ribu")
 - `11` = "sebelas" (not "satu belas")
@@ -578,72 +656,72 @@ The function implements proper Indonesian number pronunciation:
 
 ```typescript
 // Basic numbers
-toWords(0)
+toWords(0);
 // 'nol rupiah'
 
-toWords(1)
+toWords(1);
 // 'satu rupiah'
 
-toWords(10)
+toWords(10);
 // 'sepuluh rupiah'
 
-toWords(11)
+toWords(11);
 // 'sebelas rupiah'
 
-toWords(100)
+toWords(100);
 // 'seratus rupiah'
 
-toWords(1000)
+toWords(1000);
 // 'seribu rupiah'
 
 // Complex numbers
-toWords(123)
+toWords(123);
 // 'seratus dua puluh tiga rupiah'
 
-toWords(1500)
+toWords(1500);
 // 'seribu lima ratus rupiah'
 
-toWords(12345)
+toWords(12345);
 // 'dua belas ribu tiga ratus empat puluh lima rupiah'
 
 // Large numbers
-toWords(1000000)
+toWords(1000000);
 // 'satu juta rupiah'
 
-toWords(1500000)
+toWords(1500000);
 // 'satu juta lima ratus ribu rupiah'
 
-toWords(2345678)
+toWords(2345678);
 // 'dua juta tiga ratus empat puluh lima ribu enam ratus tujuh puluh delapan rupiah'
 
 // Billions
-toWords(1000000000)
+toWords(1000000000);
 // 'satu miliar rupiah'
 
-toWords(1500000000)
+toWords(1500000000);
 // 'satu miliar lima ratus juta rupiah'
 
 // Trillions
-toWords(1000000000000)
+toWords(1000000000000);
 // 'satu triliun rupiah'
 
 // With options: uppercase
-toWords(1500000, { uppercase: true })
+toWords(1500000, { uppercase: true });
 // 'Satu juta lima ratus ribu rupiah'
 
 // With options: no currency
-toWords(1500000, { withCurrency: false })
+toWords(1500000, { withCurrency: false });
 // 'satu juta lima ratus ribu'
 
-toWords(1500000, { uppercase: true, withCurrency: false })
+toWords(1500000, { uppercase: true, withCurrency: false });
 // 'Satu juta lima ratus ribu'
 
 // Negative numbers
-toWords(-1500000)
+toWords(-1500000);
 // 'minus satu juta lima ratus ribu rupiah'
 
 // Edge cases
-toWords(99999999)
+toWords(99999999);
 // 'sembilan puluh sembilan juta sembilan ratus sembilan puluh sembilan ribu sembilan ratus sembilan puluh sembilan rupiah'
 ```
 
@@ -667,7 +745,7 @@ function InvoiceTotal({ total }: { total: number }) {
 // Check printing
 function PrintCheck({ amount, recipient }: { amount: number, recipient: string }) {
   const words = toWords(amount, { uppercase: true })
-  
+
   return (
     <div className="check">
       <div>Pay to: {recipient}</div>
@@ -717,7 +795,8 @@ function QuantityInWords({ quantity }: { quantity: number }) {
 ```
 
 <Callout type="warning">
-**Note:** The function converts the integer part only. Decimal values are floored before conversion. For financial documents, format decimals separately or round to whole numbers first.
+  **Note:** The function converts the integer part only. Decimal values are floored before conversion. For financial documents, format
+  decimals separately or round to whole numbers first.
 </Callout>
 
 ---
@@ -727,21 +806,22 @@ function QuantityInWords({ quantity }: { quantity: number }) {
 Rounds currency amounts to clean, readable values. Useful for budgets, estimates, and approximate displays.
 
 **Type Signature:**
+
 ```typescript
-function roundToClean(amount: number, unit?: RoundUnit): number
+function roundToClean(amount: number, unit?: RoundUnit): number;
 ```
 
 **Parameters:**
 
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-| `amount` | `number` | - | The amount to round |
-| `unit` | `RoundUnit` | `'ribu'` | The unit to round to |
+| Name     | Type        | Default  | Description          |
+| -------- | ----------- | -------- | -------------------- |
+| `amount` | `number`    | -        | The amount to round  |
+| `unit`   | `RoundUnit` | `'ribu'` | The unit to round to |
 
 **Round Units:**
 
 ```typescript
-type RoundUnit = 'ribu' | 'ratus-ribu' | 'juta'
+type RoundUnit = 'ribu' | 'ratus-ribu' | 'juta';
 
 // Values:
 // 'ribu'       = 1,000
@@ -753,53 +833,53 @@ type RoundUnit = 'ribu' | 'ratus-ribu' | 'juta'
 
 ```typescript
 // Round to thousands (ribu)
-roundToClean(1234567)
+roundToClean(1234567);
 // 1235000
 
-roundToClean(1234567, 'ribu')
+roundToClean(1234567, 'ribu');
 // 1235000
 
-roundToClean(1234, 'ribu')
+roundToClean(1234, 'ribu');
 // 1000
 
-roundToClean(1567, 'ribu')
+roundToClean(1567, 'ribu');
 // 2000
 
 // Round to hundred thousands (ratus-ribu)
-roundToClean(1234567, 'ratus-ribu')
+roundToClean(1234567, 'ratus-ribu');
 // 1200000
 
-roundToClean(1567890, 'ratus-ribu')
+roundToClean(1567890, 'ratus-ribu');
 // 1600000
 
-roundToClean(45000, 'ratus-ribu')
+roundToClean(45000, 'ratus-ribu');
 // 0
 
-roundToClean(87654, 'ratus-ribu')
+roundToClean(87654, 'ratus-ribu');
 // 100000
 
 // Round to millions (juta)
-roundToClean(1234567, 'juta')
+roundToClean(1234567, 'juta');
 // 1000000
 
-roundToClean(1567890, 'juta')
+roundToClean(1567890, 'juta');
 // 2000000
 
-roundToClean(456789, 'juta')
+roundToClean(456789, 'juta');
 // 0
 
 // Negative numbers
-roundToClean(-1234567, 'ribu')
+roundToClean(-1234567, 'ribu');
 // -1235000
 
-roundToClean(-1234567, 'juta')
+roundToClean(-1234567, 'juta');
 // -1000000
 
 // Edge cases
-roundToClean(0)
+roundToClean(0);
 // 0
 
-roundToClean(500, 'ribu')
+roundToClean(500, 'ribu');
 // 1000 (rounds up at midpoint)
 ```
 
@@ -809,7 +889,7 @@ roundToClean(500, 'ribu')
 // Budget estimates
 function BudgetEstimate({ rawAmount }: { rawAmount: number }) {
   const rounded = roundToClean(rawAmount, 'juta')
-  
+
   return (
     <div>
       <div>Estimated Budget</div>
@@ -823,7 +903,7 @@ function BudgetEstimate({ rawAmount }: { rawAmount: number }) {
 function PriceRange({ min, max }: { min: number, max: number }) {
   const roundedMin = roundToClean(min, 'ratus-ribu')
   const roundedMax = roundToClean(max, 'ratus-ribu')
-  
+
   return (
     <div>
       {formatCompact(roundedMin)} - {formatCompact(roundedMax)}
@@ -835,7 +915,7 @@ function PriceRange({ min, max }: { min: number, max: number }) {
 function ApproximateTotal({ items }) {
   const exact = items.reduce((sum, item) => sum + item.price, 0)
   const approx = roundToClean(exact, 'ribu')
-  
+
   return (
     <div>
       <div>Approximately {formatCompact(approx)}</div>
@@ -863,8 +943,40 @@ function allocateBudget(total: number, percentages: number[]) {
 ```
 
 <Callout type="info">
-**Rounding Behavior:** Uses standard rounding (0.5 rounds up). For financial calculations, always round after calculations, not before.
+  **Rounding Behavior:** Uses standard rounding (0.5 rounds up). For financial calculations, always round after calculations, not before.
 </Callout>
+
+---
+
+---
+
+### calculateTax()
+
+Calculates tax (PPN) from a given amount and percentage.
+
+**Type Signature:**
+
+```typescript
+function calculateTax(amount: number, percentage: number): number;
+```
+
+**Parameters:**
+
+| Name         | Type     | Description                           |
+| ------------ | -------- | ------------------------------------- |
+| `amount`     | `number` | The base amount                       |
+| `percentage` | `number` | The tax percentage (e.g., 11 for 11%) |
+
+**Returns:**
+
+`number` - The calculated tax amount.
+
+**Examples:**
+
+```typescript
+calculateTax(1000000, 11); // 110000
+calculateTax(500000, 10); // 50000
+```
 
 ---
 
@@ -876,16 +988,17 @@ Configuration options for formatting Rupiah currency.
 
 ```typescript
 interface RupiahOptions {
-  symbol?: boolean              // Show 'Rp' symbol (default: true)
-  decimal?: boolean             // Show decimal places (default: false)
-  separator?: string            // Thousands separator (default: '.')
-  decimalSeparator?: string     // Decimal separator (default: ',')
-  precision?: number            // Decimal places (default: 0 or 2)
-  spaceAfterSymbol?: boolean    // Space after 'Rp' (default: true)
+  symbol?: boolean; // Show 'Rp' symbol (default: true)
+  decimal?: boolean; // Show decimal places (default: false)
+  separator?: string; // Thousands separator (default: '.')
+  decimalSeparator?: string; // Decimal separator (default: ',')
+  precision?: number; // Decimal places (default: 0 or 2)
+  spaceAfterSymbol?: boolean; // Space after 'Rp' (default: true)
 }
 ```
 
 **Default Values:**
+
 - `symbol`: `true` - Shows "Rp" prefix
 - `decimal`: `false` - No decimal places
 - `separator`: `'.'` - Indonesian standard
@@ -899,12 +1012,13 @@ Options for converting numbers to Indonesian words.
 
 ```typescript
 interface WordOptions {
-  uppercase?: boolean     // Capitalize first letter (default: false)
-  withCurrency?: boolean  // Add 'rupiah' suffix (default: true)
+  uppercase?: boolean; // Capitalize first letter (default: false)
+  withCurrency?: boolean; // Add 'rupiah' suffix (default: true)
 }
 ```
 
 **Usage:**
+
 - `uppercase`: For formal documents (invoices, contracts)
 - `withCurrency`: Omit when describing quantities, not money
 
@@ -913,10 +1027,11 @@ interface WordOptions {
 Units for rounding currency amounts.
 
 ```typescript
-type RoundUnit = 'ribu' | 'ratus-ribu' | 'juta'
+type RoundUnit = 'ribu' | 'ratus-ribu' | 'juta';
 ```
 
 **Values:**
+
 - `'ribu'`: 1,000 (thousands)
 - `'ratus-ribu'`: 100,000 (hundred thousands)
 - `'juta'`: 1,000,000 (millions)
@@ -933,11 +1048,11 @@ import { formatRupiah, formatCompact } from '@indodev/toolkit/currency'
 function ProductCard({ product }) {
   const hasDiscount = product.discount > 0
   const finalPrice = product.price * (1 - product.discount)
-  
+
   return (
     <div className="product-card">
       <h3>{product.name}</h3>
-      
+
       {hasDiscount ? (
         <div className="price">
           <span className="original">{formatRupiah(product.price)}</span>
@@ -947,7 +1062,7 @@ function ProductCard({ product }) {
       ) : (
         <div className="price">{formatRupiah(product.price)}</div>
       )}
-      
+
       {product.installment && (
         <div className="installment">
           or {formatCompact(product.price / 12)}/month
@@ -973,12 +1088,12 @@ function generateInvoice(data: InvoiceData) {
   const subtotal = data.items.reduce((sum, item) => {
     return sum + item.qty * item.price
   }, 0)
-  
+
   const discountAmount = subtotal * data.discount
   const afterDiscount = subtotal - discountAmount
   const taxAmount = afterDiscount * data.tax
   const total = afterDiscount + taxAmount
-  
+
   return {
     items: data.items.map(item => ({
       ...item,
@@ -995,7 +1110,7 @@ function generateInvoice(data: InvoiceData) {
 // Usage in component
 function Invoice({ data }: { data: InvoiceData }) {
   const invoice = generateInvoice(data)
-  
+
   return (
     <div className="invoice">
       <table>
@@ -1018,7 +1133,7 @@ function Invoice({ data }: { data: InvoiceData }) {
           ))}
         </tbody>
       </table>
-      
+
       <div className="summary">
         <div>Subtotal: {invoice.subtotal}</div>
         <div>Discount: -{invoice.discount}</div>
@@ -1053,18 +1168,18 @@ function FinancialDashboard({ stats }: { stats: DashboardStats }) {
           trend={stats.growth > 0 ? 'up' : 'down'}
           change={`${(stats.growth * 100).toFixed(1)}%`}
         />
-        
+
         <StatCard
           label="Expenses"
           value={formatCompact(stats.expenses)}
         />
-        
+
         <StatCard
           label="Profit"
           value={formatCompact(stats.profit)}
           highlight={stats.profit > 0}
         />
-        
+
         <StatCard
           label="Target"
           value={formatCompact(roundToClean(stats.revenue * 1.2, 'juta'))}
@@ -1086,10 +1201,10 @@ function PaymentForm() {
   const [displayAmount, setDisplayAmount] = useState('')
   const [actualAmount, setActualAmount] = useState(0)
   const [error, setError] = useState('')
-  
+
   const handleAmountChange = (input: string) => {
     setDisplayAmount(input)
-    
+
     const parsed = parseRupiah(input)
     if (parsed === null) {
       setError('Invalid amount format')
@@ -1102,23 +1217,23 @@ function PaymentForm() {
       setActualAmount(parsed)
     }
   }
-  
+
   const handleBlur = () => {
     if (actualAmount > 0) {
       setDisplayAmount(formatRupiah(actualAmount))
     }
   }
-  
+
   const handleSubmit = () => {
     if (actualAmount < 10000) {
       alert('Amount too low')
       return
     }
-    
+
     // Process payment
     console.log('Processing payment:', actualAmount)
   }
-  
+
   return (
     <form>
       <div className="form-group">
@@ -1132,7 +1247,7 @@ function PaymentForm() {
         />
         {error && <span className="error">{error}</span>}
       </div>
-      
+
       <button
         type="button"
         onClick={handleSubmit}
@@ -1161,20 +1276,20 @@ function BudgetCalculator({ income }: { income: number }) {
     { name: 'Tabungan & Investasi', percentage: 20 },
     { name: 'Gaya Hidup', percentage: 30 },
   ]
-  
+
   const allocations = categories.map(cat => ({
     ...cat,
     amount: income * (cat.percentage / 100),
     rounded: roundToClean(income * (cat.percentage / 100), 'ribu')
   }))
-  
+
   return (
     <div className="budget-calculator">
       <div className="income">
         <h3>Penghasilan Bulanan</h3>
         <div className="amount">{formatRupiah(income)}</div>
       </div>
-      
+
       <div className="allocations">
         {allocations.map(allocation => (
           <div key={allocation.name} className="allocation">
@@ -1225,15 +1340,15 @@ function BudgetCalculator({ income }: { income: number }) {
 
 ```typescript
 // ❌ BAD: Not showing decimals for prices with cents
-formatRupiah(1500000.50)
+formatRupiah(1500000.5);
 // 'Rp 1.500.000' (loses .50)
 
 // ✅ GOOD: Enable decimals when needed
-formatRupiah(1500000.50, { decimal: true })
+formatRupiah(1500000.5, { decimal: true });
 // 'Rp 1.500.000,50'
 
 // ✅ GOOD: Set precision explicitly
-formatRupiah(1500000.5, { decimal: true, precision: 2 })
+formatRupiah(1500000.5, { decimal: true, precision: 2 });
 // 'Rp 1.500.000,50'
 ```
 
@@ -1242,24 +1357,24 @@ formatRupiah(1500000.5, { decimal: true, precision: 2 })
 ```typescript
 // ❌ BAD: Directly using user input
 function processPayment(input: string) {
-  const amount = parseFloat(input) // Can fail
+  const amount = parseFloat(input); // Can fail
   // ...
 }
 
 // ✅ GOOD: Parse and validate
 function processPayment(input: string) {
-  const amount = parseRupiah(input)
-  
+  const amount = parseRupiah(input);
+
   if (amount === null) {
-    throw new Error('Invalid amount format')
+    throw new Error('Invalid amount format');
   }
-  
+
   if (amount < 1000) {
-    throw new Error('Amount too low')
+    throw new Error('Amount too low');
   }
-  
+
   // Process valid amount
-  return amount
+  return amount;
 }
 ```
 
@@ -1309,7 +1424,7 @@ function ProductList({ products }) {
     })),
     [products]
   )
-  
+
   return formatted.map(product => (
     <div key={product.id}>
       {product.formattedPrice}
@@ -1328,21 +1443,21 @@ const products = rawProducts.map(p => ({
 
 ```typescript
 // ❌ BAD: Mixing separators in same application
-formatRupiah(1000, { separator: '.' })
-formatRupiah(2000, { separator: ',' }) // Inconsistent
+formatRupiah(1000, { separator: '.' });
+formatRupiah(2000, { separator: ',' }); // Inconsistent
 
 // ✅ GOOD: Create wrapper with default options
 const formatIDR = (amount: number, options?: RupiahOptions) => {
   return formatRupiah(amount, {
     separator: '.',
     decimalSeparator: ',',
-    ...options
-  })
-}
+    ...options,
+  });
+};
 
 // Use everywhere
-formatIDR(1000)
-formatIDR(2000)
+formatIDR(1000);
+formatIDR(2000);
 ```
 
 ---
@@ -1352,17 +1467,18 @@ formatIDR(2000)
 ### Q: Why does parseRupiah return null?
 
 A: Common reasons:
+
 - Input contains non-numeric characters (except separators)
 - Empty or invalid string
 - Malformed format
 
 ```typescript
 // Check input first
-const input = 'Rp abc'
-const result = parseRupiah(input)
+const input = 'Rp abc';
+const result = parseRupiah(input);
 
 if (result === null) {
-  console.log('Invalid format') // Will log this
+  console.log('Invalid format'); // Will log this
 }
 ```
 
@@ -1372,14 +1488,14 @@ A: Set precision explicitly:
 
 ```typescript
 // Default: 2 decimals when decimal=true
-formatRupiah(1500.5, { decimal: true })
+formatRupiah(1500.5, { decimal: true });
 // 'Rp 1.500,50'
 
 // Custom precision
-formatRupiah(1500.5, { decimal: true, precision: 1 })
+formatRupiah(1500.5, { decimal: true, precision: 1 });
 // 'Rp 1.500,5'
 
-formatRupiah(1500, { decimal: true, precision: 0 })
+formatRupiah(1500, { decimal: true, precision: 0 });
 // 'Rp 1.500'
 ```
 
@@ -1388,11 +1504,11 @@ formatRupiah(1500, { decimal: true, precision: 0 })
 A: Yes, customize separators:
 
 ```typescript
-formatRupiah(1500000.50, {
+formatRupiah(1500000.5, {
   separator: ',',
   decimalSeparator: '.',
-  decimal: true
-})
+  decimal: true,
+});
 // 'Rp 1,500,000.50'
 ```
 
@@ -1401,11 +1517,11 @@ formatRupiah(1500000.50, {
 A: `toWords()` only converts integers. Format decimals separately:
 
 ```typescript
-const amount = 1500000.50
-const integer = Math.floor(amount)
-const decimal = Math.round((amount - integer) * 100)
+const amount = 1500000.5;
+const integer = Math.floor(amount);
+const decimal = Math.round((amount - integer) * 100);
 
-const words = `${toWords(integer)} koma ${toWords(decimal, { withCurrency: false })}`
+const words = `${toWords(integer)} koma ${toWords(decimal, { withCurrency: false })}`;
 // 'satu juta lima ratus ribu rupiah koma lima puluh'
 ```
 
@@ -1414,13 +1530,13 @@ const words = `${toWords(integer)} koma ${toWords(decimal, { withCurrency: false
 A: The library supports up to trillions:
 
 ```typescript
-formatRupiah(1234567890123)
+formatRupiah(1234567890123);
 // 'Rp 1.234.567.890.123'
 
-formatCompact(1234567890123)
+formatCompact(1234567890123);
 // 'Rp 1,2 triliun'
 
-toWords(1000000000000)
+toWords(1000000000000);
 // 'satu triliun rupiah'
 ```
 
@@ -1429,12 +1545,11 @@ toWords(1000000000000)
 ## Data Standards
 
 All formatting follows official Indonesian standards:
+
 - **Separator**: `.` (dot) for thousands
 - **Decimal**: `,` (comma) for decimals
 - **Symbol**: `Rp` with space
 - **Units**: ribu, juta, miliar, triliun
 - **Grammar**: Proper Indonesian number pronunciation rules
 
-<Callout type="info">
-The library is based on Bahasa Indonesia formal writing standards and common business practices in Indonesia.
-</Callout>
+<Callout type="info">The library is based on Bahasa Indonesia formal writing standards and common business practices in Indonesia.</Callout>

@@ -3,7 +3,8 @@ title: NIK
 description: Indonesian National Identity Number utilities for validation, parsing, formatting, and masking
 ---
 
-import { Callout, Tabs, Steps } from 'nextra/components'
+
+import { Callout, Tabs, Steps } from 'nextra/components';
 
 # NIK
 
@@ -39,18 +40,19 @@ A valid NIK consists of 16 digits organized as follows:
 
 **Breaking down the example `3201018901310123`:**
 
-| Position | Value | Meaning |
-|----------|-------|---------|
-| 1-2 | `32` | Province: Jawa Barat |
-| 3-4 | `01` | Regency: Kab. Bogor |
-| 5-6 | `01` | District code |
-| 7-8 | `89` | Year: 1989 |
-| 9-10 | `01` | Month: January |
-| 11-12 | `31` | Day: 31st (male) |
-| 13-16 | `0123` | Serial number |
+| Position | Value  | Meaning              |
+| -------- | ------ | -------------------- |
+| 1-2      | `32`   | Province: Jawa Barat |
+| 3-4      | `01`   | Regency: Kab. Bogor  |
+| 5-6      | `01`   | District code        |
+| 7-8      | `89`   | Year: 1989           |
+| 9-10     | `01`   | Month: January       |
+| 11-12    | `31`   | Day: 31st (male)     |
+| 13-16    | `0123` | Serial number        |
 
 <Callout type="info">
-**Gender Encoding:** For females, the day is encoded as `actual_day + 40`. For example, a female born on January 15th would have `55` (15 + 40) in the day position.
+  **Gender Encoding:** For females, the day is encoded as `actual_day + 40`. For example, a female born on January 15th would have `55` (15
+  + 40) in the day position.
 </Callout>
 
 ## Installation
@@ -81,25 +83,28 @@ A valid NIK consists of 16 digits organized as follows:
 ## Quick Start
 
 ```typescript
-import { validateNIK, parseNIK, formatNIK, maskNIK } from '@indodev/toolkit/nik'
+import { validateNIK, parseNIK, formatNIK, maskNIK } from '@indodev/toolkit/nik';
 
 // Validate a NIK
-const isValid = validateNIK('3201018901310123')
-console.log(isValid) // true
+const isValid = validateNIK('3201018901310123');
+console.log(isValid); // true
 
 // Extract information from NIK
-const info = parseNIK('3201018901310123')
-console.log(info?.province.name) // 'Jawa Barat'
-console.log(info?.gender) // 'male'
-console.log(info?.birthDate) // Date object: 1989-01-31
+const info = parseNIK('3201018901310123');
+console.log(info?.province.name); // 'Jawa Barat'
+console.log(info?.gender); // 'male'
+
+// Get age and formatted birth date
+const age = getAge('3201018901310123'); // e.g., 35
+const birthDateStr = formatBirthDate('3201018901310123'); // '31 Januari 1989'
 
 // Format for display
-const formatted = formatNIK('3201018901310123')
-console.log(formatted) // '32-01-01-89-01-31-0123'
+const formatted = formatNIK('3201018901310123');
+console.log(formatted); // '32-01-01-89-01-31-0123'
 
 // Mask for privacy
-const masked = maskNIK('3201018901310123')
-console.log(masked) // '3201********0123'
+const masked = maskNIK('3201018901310123');
+console.log(masked); // '3201********0123'
 ```
 
 ## API Reference
@@ -109,14 +114,15 @@ console.log(masked) // '3201********0123'
 Validates whether a string is a valid NIK format.
 
 **Type Signature:**
+
 ```typescript
-function validateNIK(nik: string): boolean
+function validateNIK(nik: string): boolean;
 ```
 
 **Parameters:**
 
-| Name | Type | Description |
-|------|------|-------------|
+| Name  | Type     | Description                |
+| ----- | -------- | -------------------------- |
 | `nik` | `string` | The NIK string to validate |
 
 **Returns:**
@@ -134,23 +140,23 @@ function validateNIK(nik: string): boolean
 
 ```typescript
 // Valid NIK
-validateNIK('3201018901310123')
+validateNIK('3201018901310123');
 // ✅ true
 
 // Invalid: wrong length
-validateNIK('1234')
+validateNIK('1234');
 // ❌ false
 
 // Invalid: non-numeric characters
-validateNIK('320101890131012A')
+validateNIK('320101890131012A');
 // ❌ false
 
 // Invalid: province code doesn't exist
-validateNIK('9912345678901234')
+validateNIK('9912345678901234');
 // ❌ false
 
 // Invalid: impossible date (February 30th)
-validateNIK('3201018902300123')
+validateNIK('3201018902300123');
 // ❌ false
 ```
 
@@ -159,20 +165,80 @@ validateNIK('3201018902300123')
 ```typescript
 // Form validation
 function handleSubmit(formData: FormData) {
-  const nik = formData.get('nik') as string
-  
+  const nik = formData.get('nik') as string;
+
   if (!validateNIK(nik)) {
-    return { error: 'Invalid NIK format' }
+    return { error: 'Invalid NIK format' };
   }
-  
+
   // Process valid NIK
-  return { success: true }
+  return { success: true };
 }
 
 // Batch validation
-const niks = ['3201018901310123', '3175031234567890', 'invalid']
-const validNiks = niks.filter(validateNIK)
-console.log(validNiks) // ['3201018901310123', '3175031234567890']
+const niks = ['3201018901310123', '3175031234567890', 'invalid'];
+const validNiks = niks.filter(validateNIK);
+console.log(validNiks); // ['3201018901310123', '3175031234567890']
+```
+
+---
+
+### isValidForGender()
+
+Validates whether a NIK matches a given gender.
+
+**Type Signature:**
+
+```typescript
+function isValidForGender(nik: string, gender: 'male' | 'female'): boolean;
+```
+
+**Parameters:**
+
+| Name     | Type                 | Description             |
+| -------- | -------------------- | ----------------------- |
+| `nik`    | `string`             | The 16-digit NIK string |
+| `gender` | `'male' \| 'female'` | The expected gender     |
+
+**Returns:**
+
+`boolean` - Returns `true` if the NIK matches the gender, `false` otherwise.
+
+**Examples:**
+
+```typescript
+isValidForGender('3201018901310123', 'male'); // ✅ true
+isValidForGender('3201018901310123', 'female'); // ❌ false
+```
+
+---
+
+### isValidForBirthDate()
+
+Validates whether a NIK matches a given birth date.
+
+**Type Signature:**
+
+```typescript
+function isValidForBirthDate(nik: string, birthDate: Date): boolean;
+```
+
+**Parameters:**
+
+| Name        | Type     | Description             |
+| ----------- | -------- | ----------------------- |
+| `nik`       | `string` | The 16-digit NIK string |
+| `birthDate` | `Date`   | The expected birth date |
+
+**Returns:**
+
+`boolean` - Returns `true` if the NIK matches the birth date, `false` otherwise.
+
+**Examples:**
+
+```typescript
+const birthDate = new Date(1989, 0, 31);
+isValidForBirthDate('3201018901310123', birthDate); // ✅ true
 ```
 
 ---
@@ -182,14 +248,15 @@ console.log(validNiks) // ['3201018901310123', '3175031234567890']
 Parses a NIK string and extracts all embedded information including location, birth date, and gender.
 
 **Type Signature:**
+
 ```typescript
-function parseNIK(nik: string): NIKInfo | null
+function parseNIK(nik: string): NIKInfo | null;
 ```
 
 **Parameters:**
 
-| Name | Type | Description |
-|------|------|-------------|
+| Name  | Type     | Description                      |
+| ----- | -------- | -------------------------------- |
 | `nik` | `string` | The 16-digit NIK string to parse |
 
 **Returns:**
@@ -200,8 +267,8 @@ function parseNIK(nik: string): NIKInfo | null
 
 ```typescript
 // Parse male NIK
-const male = parseNIK('3201018901310123')
-console.log(male)
+const male = parseNIK('3201018901310123');
+console.log(male);
 // {
 //   province: { code: '32', name: 'Jawa Barat' },
 //   regency: { code: '01', name: 'Kab. Bogor' },
@@ -213,19 +280,19 @@ console.log(male)
 // }
 
 // Parse female NIK (day + 40)
-const female = parseNIK('3201019508550123')
-console.log(female?.gender) // 'female'
-console.log(female?.birthDate) // Date('1995-08-15')
+const female = parseNIK('3201019508550123');
+console.log(female?.gender); // 'female'
+console.log(female?.birthDate); // Date('1995-08-15')
 // Day 55 = 15 + 40 (female encoding)
 
 // Parse Jakarta NIK
-const jakarta = parseNIK('3175031234567890')
-console.log(jakarta?.province.name) // 'DKI Jakarta'
-console.log(jakarta?.regency.name) // 'Kota Jakarta Pusat'
+const jakarta = parseNIK('3175031234567890');
+console.log(jakarta?.province.name); // 'DKI Jakarta'
+console.log(jakarta?.regency.name); // 'Kota Jakarta Pusat'
 
 // Invalid NIK returns null
-const invalid = parseNIK('invalid-nik')
-console.log(invalid) // null
+const invalid = parseNIK('invalid-nik');
+console.log(invalid); // null
 ```
 
 **Use Cases:**
@@ -233,49 +300,117 @@ console.log(invalid) // null
 ```typescript
 // Extract age from NIK
 function getAgeFromNIK(nik: string): number | null {
-  const info = parseNIK(nik)
-  if (!info?.birthDate) return null
-  
-  const today = new Date()
-  const birthDate = info.birthDate
-  let age = today.getFullYear() - birthDate.getFullYear()
-  
+  const info = parseNIK(nik);
+  if (!info?.birthDate) return null;
+
+  const today = new Date();
+  const birthDate = info.birthDate;
+  let age = today.getFullYear() - birthDate.getFullYear();
+
   // Adjust if birthday hasn't occurred this year
-  const monthDiff = today.getMonth() - birthDate.getMonth()
+  const monthDiff = today.getMonth() - birthDate.getMonth();
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-    age--
+    age--;
   }
-  
-  return age
+
+  return age;
 }
 
 // Display user information
 function displayUserInfo(nik: string) {
-  const info = parseNIK(nik)
-  
+  const info = parseNIK(nik);
+
   if (!info) {
-    return 'Invalid NIK'
+    return 'Invalid NIK';
   }
-  
+
   return `
     Location: ${info.province.name}, ${info.regency.name}
     Birth Date: ${info.birthDate?.toLocaleDateString('id-ID')}
     Gender: ${info.gender === 'male' ? 'Laki-laki' : 'Perempuan'}
-  `
+  `;
 }
 
 // Filter by province
 function filterByProvince(niks: string[], provinceCode: string) {
-  return niks.filter(nik => {
-    const info = parseNIK(nik)
-    return info?.province.code === provinceCode
-  })
+  return niks.filter((nik) => {
+    const info = parseNIK(nik);
+    return info?.province.code === provinceCode;
+  });
 }
 ```
 
 <Callout type="warning">
-**Note on District Names:** District names are currently `null` in the returned object as comprehensive district data is not yet included in the library. Province and regency data are complete and accurate.
+  **Note on District Names:** District names are currently `null` in the returned object as comprehensive district data is not yet included
+  in the library. Province and regency data are complete and accurate.
 </Callout>
+
+---
+
+### getAge()
+
+Calculates age from a NIK as of a given reference date (defaults to today).
+
+**Type Signature:**
+
+```typescript
+function getAge(nik: string, referenceDate?: Date): number | null;
+```
+
+**Parameters:**
+
+| Name            | Type     | Description                                 |
+| --------------- | -------- | ------------------------------------------- |
+| `nik`           | `string` | The 16-digit NIK string                     |
+| `referenceDate` | `Date`   | Optional reference date for age calculation |
+
+**Returns:**
+
+`number | null` - Calculated age in years, or `null` if the NIK is invalid.
+
+**Examples:**
+
+```typescript
+const age = getAge('3201018901310123');
+console.log(age); // e.g., 35 (if today is 2024)
+```
+
+---
+
+### formatBirthDate()
+
+Formats the birth date encoded in a NIK into a localized string.
+
+**Type Signature:**
+
+```typescript
+function formatBirthDate(nik: string, options?: Intl.DateTimeFormatOptions, locale?: string): string | null;
+```
+
+**Parameters:**
+
+| Name      | Type                         | Default   | Description             |
+| --------- | ---------------------------- | --------- | ----------------------- |
+| `nik`     | `string`                     | -         | The 16-digit NIK string |
+| `options` | `Intl.DateTimeFormatOptions` | -         | Formatting options      |
+| `locale`  | `string`                     | `'id-ID'` | The locale to use       |
+
+**Returns:**
+
+`string | null` - Formatted date string, or `null` if the NIK is invalid.
+
+**Examples:**
+
+```typescript
+formatBirthDate('3201018901310123');
+// '31 Januari 1989'
+
+formatBirthDate('3201018901310123', { year: 'numeric' });
+// '1989'
+
+formatBirthDate('3201018901310123', undefined, 'en-US');
+// 'January 31, 1989'
+```
 
 ---
 
@@ -284,16 +419,17 @@ function filterByProvince(niks: string[], provinceCode: string) {
 Formats a NIK string with separators for better readability.
 
 **Type Signature:**
+
 ```typescript
-function formatNIK(nik: string, separator?: string): string
+function formatNIK(nik: string, separator?: string): string;
 ```
 
 **Parameters:**
 
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-| `nik` | `string` | - | The 16-digit NIK string to format |
-| `separator` | `string` | `'-'` | Character to use as separator between segments |
+| Name        | Type     | Default | Description                                    |
+| ----------- | -------- | ------- | ---------------------------------------------- |
+| `nik`       | `string` | -       | The 16-digit NIK string to format              |
+| `separator` | `string` | `'-'`   | Character to use as separator between segments |
 
 **Returns:**
 
@@ -317,27 +453,27 @@ SSSS = Serial number
 
 ```typescript
 // Default separator (dash)
-formatNIK('3201018901310123')
+formatNIK('3201018901310123');
 // '32-01-01-89-01-31-0123'
 
 // Custom separator: space
-formatNIK('3201018901310123', ' ')
+formatNIK('3201018901310123', ' ');
 // '32 01 01 89 01 31 0123'
 
 // Custom separator: dot
-formatNIK('3201018901310123', '.')
+formatNIK('3201018901310123', '.');
 // '32.01.01.89.01.31.0123'
 
 // Custom separator: underscore
-formatNIK('3201018901310123', '_')
+formatNIK('3201018901310123', '_');
 // '32_01_01_89_01_31_0123'
 
 // Invalid NIK returns as-is
-formatNIK('1234')
+formatNIK('1234');
 // '1234'
 
 // Empty separator (no formatting)
-formatNIK('3201018901310123', '')
+formatNIK('3201018901310123', '');
 // '3201018901310123'
 ```
 
@@ -372,15 +508,16 @@ console.log(formatted)
 Masks a NIK to protect privacy while maintaining partial visibility for verification purposes.
 
 **Type Signature:**
+
 ```typescript
-function maskNIK(nik: string, options?: MaskOptions): string
+function maskNIK(nik: string, options?: MaskOptions): string;
 ```
 
 **Parameters:**
 
-| Name | Type | Description |
-|------|------|-------------|
-| `nik` | `string` | The 16-digit NIK string to mask |
+| Name      | Type          | Description                                 |
+| --------- | ------------- | ------------------------------------------- |
+| `nik`     | `string`      | The 16-digit NIK string to mask             |
 | `options` | `MaskOptions` | Optional configuration for masking behavior |
 
 **Returns:**
@@ -391,10 +528,10 @@ function maskNIK(nik: string, options?: MaskOptions): string
 
 ```typescript
 interface MaskOptions {
-  start?: number      // Characters to show at start (default: 4)
-  end?: number        // Characters to show at end (default: 4)
-  char?: string       // Mask character (default: '*')
-  separator?: string  // Optional separator (default: none)
+  start?: number; // Characters to show at start (default: 4)
+  end?: number; // Characters to show at end (default: 4)
+  char?: string; // Mask character (default: '*')
+  separator?: string; // Optional separator (default: none)
 }
 ```
 
@@ -402,28 +539,28 @@ interface MaskOptions {
 
 ```typescript
 // Default masking (first 4, last 4)
-maskNIK('3201018901310123')
+maskNIK('3201018901310123');
 // '3201********0123'
 
 // Custom visible characters
-maskNIK('3201018901310123', { start: 6, end: 4 })
+maskNIK('3201018901310123', { start: 6, end: 4 });
 // '320101******0123'
 
-maskNIK('3201018901310123', { start: 2, end: 2 })
+maskNIK('3201018901310123', { start: 2, end: 2 });
 // '32************23'
 
 // Custom mask character
-maskNIK('3201018901310123', { char: 'X' })
+maskNIK('3201018901310123', { char: 'X' });
 // '3201XXXXXXXX0123'
 
-maskNIK('3201018901310123', { char: '•' })
+maskNIK('3201018901310123', { char: '•' });
 // '3201••••••••0123'
 
 // With separator
-maskNIK('3201018901310123', { separator: '-' })
+maskNIK('3201018901310123', { separator: '-' });
 // '32-01-**-**-**-**-0123'
 
-maskNIK('3201018901310123', { separator: ' ' })
+maskNIK('3201018901310123', { separator: ' ' });
 // '32 01 ** ** ** ** 0123'
 
 // Combined options
@@ -431,16 +568,16 @@ maskNIK('3201018901310123', {
   start: 6,
   end: 4,
   char: 'X',
-  separator: '-'
-})
+  separator: '-',
+});
 // '32-01-01-XX-XX-XX-0123'
 
 // Complete masking
-maskNIK('3201018901310123', { start: 0, end: 0 })
+maskNIK('3201018901310123', { start: 0, end: 0 });
 // '****************'
 
 // Invalid NIK returns as-is
-maskNIK('invalid')
+maskNIK('invalid');
 // 'invalid'
 ```
 
@@ -484,7 +621,8 @@ function exportUserData(users: User[]) {
 ```
 
 <Callout type="info">
-**Privacy Best Practice:** When displaying NIKs in logs, public interfaces, or shared systems, always use masking to protect user privacy while maintaining enough information for verification.
+  **Privacy Best Practice:** When displaying NIKs in logs, public interfaces, or shared systems, always use masking to protect user privacy
+  while maintaining enough information for verification.
 </Callout>
 
 ---
@@ -498,21 +636,21 @@ Information extracted from a valid NIK.
 ```typescript
 interface NIKInfo {
   province: {
-    code: string      // Two-digit province code (e.g., '32')
-    name: string      // Full province name (e.g., 'Jawa Barat')
-  }
+    code: string; // Two-digit province code (e.g., '32')
+    name: string; // Full province name (e.g., 'Jawa Barat')
+  };
   regency: {
-    code: string      // Two-digit regency code (e.g., '01')
-    name: string      // Full regency name (e.g., 'Kab. Bogor')
-  }
+    code: string; // Two-digit regency code (e.g., '01')
+    name: string; // Full regency name (e.g., 'Kab. Bogor')
+  };
   district: {
-    code: string      // Two-digit district code (e.g., '01')
-    name: string | null  // District name (currently null)
-  }
-  birthDate: Date | null  // Parsed birth date
-  gender: 'male' | 'female' | null  // Derived from day encoding
-  serialNumber: string | null  // Four-digit serial number
-  isValid: boolean  // Overall validity flag
+    code: string; // Two-digit district code (e.g., '01')
+    name: string | null; // District name (currently null)
+  };
+  birthDate: Date | null; // Parsed birth date
+  gender: 'male' | 'female' | null; // Derived from day encoding
+  serialNumber: string | null; // Four-digit serial number
+  isValid: boolean; // Overall validity flag
 }
 ```
 
@@ -532,10 +670,10 @@ Configuration options for masking NIKs.
 
 ```typescript
 interface MaskOptions {
-  start?: number      // Characters to show at start (default: 4)
-  end?: number        // Characters to show at end (default: 4)
-  char?: string       // Mask character (default: '*')
-  separator?: string  // Optional separator (default: none)
+  start?: number; // Characters to show at start (default: 4)
+  end?: number; // Characters to show at end (default: 4)
+  char?: string; // Mask character (default: '*')
+  separator?: string; // Optional separator (default: none)
 }
 ```
 
@@ -546,9 +684,7 @@ interface MaskOptions {
 - **char**: Character used for masking (single character)
 - **separator**: If provided, formats the NIK with separators before masking
 
-<Callout type="warning">
-**Constraint:** `start + end` must be less than 16, otherwise the NIK is returned unmodified.
-</Callout>
+<Callout type="warning">**Constraint:** `start + end` must be less than 16, otherwise the NIK is returned unmodified.</Callout>
 
 ---
 
@@ -557,14 +693,14 @@ interface MaskOptions {
 ### Age Verification
 
 ```typescript
-import { parseNIK } from '@indodev/toolkit/nik'
+import { parseNIK } from '@indodev/toolkit/nik';
 
 function isAdult(nik: string): boolean {
-  const info = parseNIK(nik)
-  if (!info?.birthDate) return false
-  
-  const age = new Date().getFullYear() - info.birthDate.getFullYear()
-  return age >= 17 // Indonesian adult age
+  const info = parseNIK(nik);
+  if (!info?.birthDate) return false;
+
+  const age = new Date().getFullYear() - info.birthDate.getFullYear();
+  return age >= 17; // Indonesian adult age
 }
 
 // Usage
@@ -578,71 +714,74 @@ if (isAdult(userNIK)) {
 ### Regional Filtering
 
 ```typescript
-import { parseNIK } from '@indodev/toolkit/nik'
+import { parseNIK } from '@indodev/toolkit/nik';
 
 // Find all users from Jakarta
 function getUsersFromJakarta(niks: string[]) {
-  return niks.filter(nik => {
-    const info = parseNIK(nik)
-    return info?.province.code === '31' // DKI Jakarta
-  })
+  return niks.filter((nik) => {
+    const info = parseNIK(nik);
+    return info?.province.code === '31'; // DKI Jakarta
+  });
 }
 
 // Group by province
 function groupByProvince(niks: string[]) {
-  return niks.reduce((acc, nik) => {
-    const info = parseNIK(nik)
-    if (!info) return acc
-    
-    const province = info.province.name
-    if (!acc[province]) acc[province] = []
-    acc[province].push(nik)
-    
-    return acc
-  }, {} as Record<string, string[]>)
+  return niks.reduce(
+    (acc, nik) => {
+      const info = parseNIK(nik);
+      if (!info) return acc;
+
+      const province = info.province.name;
+      if (!acc[province]) acc[province] = [];
+      acc[province].push(nik);
+
+      return acc;
+    },
+    {} as Record<string, string[]>
+  );
 }
 ```
 
 ### Form Validation
 
 ```typescript
-import { validateNIK, parseNIK } from '@indodev/toolkit/nik'
+import { validateNIK, parseNIK } from '@indodev/toolkit/nik';
 
 function validateUserForm(data: FormData) {
-  const nik = data.get('nik') as string
-  const birthDate = new Date(data.get('birthDate') as string)
-  
+  const nik = data.get('nik') as string;
+  const birthDate = new Date(data.get('birthDate') as string);
+
   // Validate NIK format
   if (!validateNIK(nik)) {
-    return { error: 'NIK tidak valid' }
+    return { error: 'NIK tidak valid' };
   }
-  
+
   // Verify birth date matches NIK
-  const info = parseNIK(nik)
+  const info = parseNIK(nik);
   if (info?.birthDate?.toDateString() !== birthDate.toDateString()) {
-    return { error: 'Tanggal lahir tidak sesuai dengan NIK' }
+    return { error: 'Tanggal lahir tidak sesuai dengan NIK' };
   }
-  
-  return { success: true, data: info }
+
+  return { success: true, data: info };
 }
 ```
 
 ### Privacy-Safe Display
 
 ```typescript
-import { maskNIK, formatNIK } from '@indodev/toolkit/nik'
+import { maskNIK, formatNIK } from '@indodev/toolkit/nik';
 
 // Different views based on context
-function NIKDisplay({ nik, context }: { nik: string, context: string }) {
+function NIKDisplay({ nik, context }: { nik: string; context: string }) {
   switch (context) {
     case 'admin':
-      return formatNIK(nik) // Full: '32-01-01-89-01-31-0123'
+      return formatNIK(nik); // Full: '32-01-01-89-01-31-0123'
     case 'profile':
-      return maskNIK(nik, { separator: '-' }) // Partial: '32-01-**-**-**-**-0123'
+      return maskNIK(nik, { separator: '-' }); // Partial: '32-01-**-**-**-**-0123'
     case 'public':
-      return maskNIK(nik, { start: 2, end: 2 }) // Minimal: '32************23'
+      return maskNIK(nik, { start: 2, end: 2 }); // Minimal: '32************23'
     default:
-      return '****-****-****-****' // Hidden
+      return '****-****-****-****'; // Hidden
   }
 }
 ```
@@ -650,34 +789,34 @@ function NIKDisplay({ nik, context }: { nik: string, context: string }) {
 ### Batch Processing
 
 ```typescript
-import { validateNIK, parseNIK } from '@indodev/toolkit/nik'
+import { validateNIK, parseNIK } from '@indodev/toolkit/nik';
 
 // Process CSV import
 function processNIKBatch(niks: string[]) {
   const results = {
     valid: [] as string[],
     invalid: [] as string[],
-    duplicates: [] as string[]
-  }
-  
-  const seen = new Set<string>()
-  
+    duplicates: [] as string[],
+  };
+
+  const seen = new Set<string>();
+
   for (const nik of niks) {
     if (!validateNIK(nik)) {
-      results.invalid.push(nik)
-      continue
+      results.invalid.push(nik);
+      continue;
     }
-    
+
     if (seen.has(nik)) {
-      results.duplicates.push(nik)
-      continue
+      results.duplicates.push(nik);
+      continue;
     }
-    
-    seen.add(nik)
-    results.valid.push(nik)
+
+    seen.add(nik);
+    results.valid.push(nik);
   }
-  
-  return results
+
+  return results;
 }
 ```
 
@@ -692,13 +831,13 @@ Always sanitize user input before validation:
 ```typescript
 function sanitizeNIK(input: string): string {
   // Remove all non-numeric characters
-  return input.replace(/\D/g, '')
+  return input.replace(/\D/g, '');
 }
 
 // Usage
-const userInput = '32-01-01-89-01-31-0123'
-const clean = sanitizeNIK(userInput) // '3201018901310123'
-const isValid = validateNIK(clean)
+const userInput = '32-01-01-89-01-31-0123';
+const clean = sanitizeNIK(userInput); // '3201018901310123'
+const isValid = validateNIK(clean);
 ```
 
 ### Error Handling
@@ -707,21 +846,21 @@ Handle parsing failures gracefully:
 
 ```typescript
 function safeParseNIK(nik: string): NIKInfo {
-  const info = parseNIK(nik)
-  
+  const info = parseNIK(nik);
+
   if (!info) {
-    throw new Error('Invalid NIK format')
+    throw new Error('Invalid NIK format');
   }
-  
-  return info
+
+  return info;
 }
 
 // Usage with try-catch
 try {
-  const info = safeParseNIK(userNIK)
-  console.log(info.province.name)
+  const info = safeParseNIK(userNIK);
+  console.log(info.province.name);
 } catch (error) {
-  console.error('Failed to parse NIK:', error.message)
+  console.error('Failed to parse NIK:', error.message);
 }
 ```
 
@@ -731,17 +870,17 @@ Always mask NIKs in logs and public displays:
 
 ```typescript
 // ❌ BAD: Exposing full NIK in logs
-console.log(`User ${nik} logged in`)
+console.log(`User ${nik} logged in`);
 
 // ✅ GOOD: Masked NIK in logs
-console.log(`User ${maskNIK(nik)} logged in`)
+console.log(`User ${maskNIK(nik)} logged in`);
 
 // ✅ GOOD: Masked in public API responses
 function getUserPublicProfile(nik: string) {
   return {
     nik: maskNIK(nik),
     // other fields...
-  }
+  };
 }
 ```
 
@@ -750,11 +889,11 @@ function getUserPublicProfile(nik: string) {
 Use TypeScript for type safety:
 
 ```typescript
-import type { NIKInfo, MaskOptions } from '@indodev/toolkit/nik'
+import type { NIKInfo, MaskOptions } from '@indodev/toolkit/nik';
 
 // Type-safe function
 function processNIK(nik: string): NIKInfo | null {
-  return parseNIK(nik)
+  return parseNIK(nik);
 }
 
 // Type-safe options
@@ -762,8 +901,8 @@ const options: MaskOptions = {
   start: 4,
   end: 4,
   char: '*',
-  separator: '-'
-}
+  separator: '-',
+};
 ```
 
 ### Performance
@@ -772,16 +911,16 @@ For large datasets, validate once and cache results:
 
 ```typescript
 // Cache validation results
-const validationCache = new Map<string, boolean>()
+const validationCache = new Map<string, boolean>();
 
 function cachedValidate(nik: string): boolean {
   if (validationCache.has(nik)) {
-    return validationCache.get(nik)!
+    return validationCache.get(nik)!;
   }
-  
-  const isValid = validateNIK(nik)
-  validationCache.set(nik, isValid)
-  return isValid
+
+  const isValid = validateNIK(nik);
+  validationCache.set(nik, isValid);
+  return isValid;
 }
 ```
 
@@ -794,15 +933,16 @@ function cachedValidate(nik: string): boolean {
 **Q: Why does `parseNIK()` return `null`?**
 
 A: This can happen if:
+
 - NIK length is not exactly 16 digits
 - Province code is invalid
 - Date components form an invalid date (e.g., February 30th)
 
 ```typescript
 // Check each component
-const nik = '3201018902300123' // February 30th (invalid)
-const info = parseNIK(nik)
-console.log(info) // null
+const nik = '3201018902300123'; // February 30th (invalid)
+const info = parseNIK(nik);
+console.log(info); // null
 ```
 
 **Q: Why is `district.name` always `null`?**
@@ -814,9 +954,9 @@ A: Currently, the library only includes province and regency data. District data
 A: The library automatically handles the +40 encoding for females:
 
 ```typescript
-const female = parseNIK('3201019508550123')
-console.log(female?.gender) // 'female'
-console.log(female?.birthDate) // 1995-08-15 (day 55 - 40 = 15)
+const female = parseNIK('3201019508550123');
+console.log(female?.gender); // 'female'
+console.log(female?.birthDate); // 1995-08-15 (day 55 - 40 = 15)
 ```
 
 **Q: Can I use this with React/Vue/etc?**
@@ -825,23 +965,19 @@ A: Yes! The library is framework-agnostic and works in any JavaScript environmen
 
 ```tsx
 // React example
-import { useState } from 'react'
-import { validateNIK, formatNIK } from '@indodev/toolkit/nik'
+import { useState } from 'react';
+import { validateNIK, formatNIK } from '@indodev/toolkit/nik';
 
 function NIKInput() {
-  const [nik, setNIK] = useState('')
-  const isValid = validateNIK(nik)
-  
+  const [nik, setNIK] = useState('');
+  const isValid = validateNIK(nik);
+
   return (
     <div>
-      <input
-        value={nik}
-        onChange={(e) => setNIK(e.target.value)}
-        className={isValid ? 'valid' : 'invalid'}
-      />
+      <input value={nik} onChange={(e) => setNIK(e.target.value)} className={isValid ? 'valid' : 'invalid'} />
       {isValid && <p>Formatted: {formatNIK(nik)}</p>}
     </div>
-  )
+  );
 }
 ```
 
@@ -850,9 +986,8 @@ function NIKInput() {
 ## Data Source
 
 Province and regency codes are based on official data from:
+
 - **Dukcapil Kemendagri** (Ministry of Home Affairs - Population and Civil Registration)
 - Updated to include all 38 Indonesian provinces (including new Papua provinces)
 
-<Callout type="info">
-For the most up-to-date administrative codes, always refer to official government sources.
-</Callout>
+<Callout type="info">For the most up-to-date administrative codes, always refer to official government sources.</Callout>

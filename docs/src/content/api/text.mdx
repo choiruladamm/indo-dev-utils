@@ -3,6 +3,7 @@ title: Text
 description: Utilities for text manipulation including capitalization, abbreviation, slug generation, and string comparison.
 ---
 
+
 import { Callout, Tabs, Steps } from 'nextra/components';
 
 # Text Utilities
@@ -71,6 +72,18 @@ console.log(compareStrings('surabaya', 'SURABAYA'));
 // Abbreviation
 console.log(expandAbbreviation('Jl. Sudirman No. 1'));
 // 'Jalan Sudirman Nomor 1'
+
+// Profanity Filter
+console.log(profanityFilter('jangan bicara kasar anjing'));
+// 'jangan bicara kasar ******'
+
+// Stopwords Removal
+console.log(removeStopwords('saya sedang makan nasi'));
+// 'makan nasi'
+
+// Normalization
+console.log(toFormal('gw pen makan nih'));
+// 'saya ingin makan ini'
 ```
 
 ## API Reference
@@ -194,6 +207,65 @@ contractAbbreviation('Jalan Jenderal Sudirman');
 
 contractAbbreviation('Profesor Doktor');
 // 'Prof. Dr.'
+```
+
+---
+
+### toFormal()
+
+Normalizes informal Indonesian text (slang/bahasa gaul) into formal Indonesian (Bahasa Baku).
+
+**Type Signature:**
+
+```typescript
+function toFormal(text: string): string;
+```
+
+**Parameters:**
+
+| Name   | Type     | Description                    |
+| ------ | -------- | ------------------------------ |
+| `text` | `string` | The informal text to normalize |
+
+**Returns:**
+
+`string` - Formalized text.
+
+**Examples:**
+
+```typescript
+toFormal('gw pen makan nih'); // 'saya ingin makan ini'
+toFormal('aq msh di jln'); // 'saya masih di jalan'
+toFormal('gpp bsk aja'); // 'tidak apa-apa besok saja'
+```
+
+---
+
+### isAlay()
+
+Detects if a string contains "alay" patterns (common informal Indonesian text using numbers/special characters for letters).
+
+**Type Signature:**
+
+```typescript
+function isAlay(text: string): boolean;
+```
+
+**Parameters:**
+
+| Name   | Type     | Description       |
+| ------ | -------- | ----------------- |
+| `text` | `string` | The text to check |
+
+**Returns:**
+
+`boolean` - `true` if alay patterns are detected.
+
+**Examples:**
+
+```typescript
+isAlay('4p4 k4b4r?'); // ✅ true
+isAlay('Apa kabar?'); // ❌ false
 ```
 
 ---
@@ -447,6 +519,72 @@ function removeAccents(text: string): string;
 ```typescript
 removeAccents('Café'); // 'Cafe'
 removeAccents('Àpropos'); // 'Apropos'
+```
+
+---
+
+### profanityFilter()
+
+Filters out profanity using a comprehensive list of Indonesian and English curse words.
+
+**Type Signature:**
+
+```typescript
+function profanityFilter(text: string, options?: FilterOptions): string;
+```
+
+**Parameters:**
+
+| Name      | Type            | Description                      |
+| --------- | --------------- | -------------------------------- |
+| `text`    | `string`        | The text to filter               |
+| `options` | `FilterOptions` | Optional filtering configuration |
+
+**Returns:**
+
+`string` - Filtered text with profanity masked.
+
+**Examples:**
+
+```typescript
+profanityFilter('jangan bicara kasar anjing');
+// 'jangan bicara kasar ******'
+
+profanityFilter('kasar banget asu', { replacement: '---' });
+// 'kasar banget ---'
+```
+
+---
+
+### removeStopwords()
+
+Removes common Indonesian and English stopwords (words with little semantic value like 'yang', 'di', 'the', 'is').
+
+**Type Signature:**
+
+```typescript
+function removeStopwords(text: string, language?: 'id' | 'en' | 'both'): string;
+```
+
+**Parameters:**
+
+| Name       | Type     | Default | Description         |
+| ---------- | -------- | ------- | ------------------- | -------- | ------------------------- |
+| `text`     | `string` | -       | The text to process |
+| `language` | `'id'    | 'en'    | 'both'`             | `'both'` | The language of stopwords |
+
+**Returns:**
+
+`string` - Text with stopwords removed.
+
+**Examples:**
+
+```typescript
+removeStopwords('saya sedang makan nasi');
+// 'makan nasi'
+
+removeStopwords('this is a book', 'en');
+// 'book'
 ```
 
 ---
