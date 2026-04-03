@@ -3,6 +3,34 @@ title: Changelog
 description: Latest updates and changes to the @indodev/toolkit library.
 ---
 
+## v0.3.0 - April 3, 2026
+
+### New Features
+
+#### NPWP Module
+- `validateNPWP()` - Validate format and checksums for 15-digit and 16-digit NPWP
+- `formatNPWP()` - Format 15/16-digit data into standard NPWP notations
+- `parseNPWP()` - Clean and parse NPWP segments
+- `maskNPWP()` - Mask NPWP digits for privacy and logging
+
+#### Vehicle Plate (Plat Nomor) Module
+- `validatePlate()` - Validate standard Indonesian vehicle plate numbers
+- `formatPlate()` - Format and normalize plate spacing
+- `getRegionFromPlate()` - Extract corresponding province and region names based on plate prefix
+
+#### Text Module Enhancements
+- `profanityFilter()` - Safely filter out common Indonesian bad words
+- `removeStopwords()` - Remove excessive filler words (stopwords) from Indonesian text
+- `toFormal()` - Normalize informal writing variants (slang) into formal Indonesian
+- `isAlay()` - Detect informal "alay" writing styles or excessive symbol usage
+- `contractAbbreviation()` - Revert expanded text back into standard abbreviations
+- `removeAccents()` - Remove diacritic marks (accents) for clean string comparisons
+
+#### Documentation & Core
+- Reorganized module utilities (`utils.ts`) into core functional exports 
+- Added `.prettierrc` for enforced source code formatting rules
+- Updated `API Documentation` with multiple runtime installation tabs (`npm`, `pnpm`, `yarn`, `bun`)
+
 ## v0.2.0 - January 2, 2026
 
 ### New Features
