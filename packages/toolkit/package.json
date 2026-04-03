@@ -87,6 +87,16 @@
         "types": "./dist/vin/index.d.cts",
         "default": "./dist/vin/index.cjs"
       }
+    },
+    "./email-validator": {
+      "import": {
+        "types": "./dist/email-validator/index.d.ts",
+        "default": "./dist/email-validator/index.js"
+      },
+      "require": {
+        "types": "./dist/email-validator/index.d.cts",
+        "default": "./dist/email-validator/index.cjs"
+      }
     }
   },
   "files": [
