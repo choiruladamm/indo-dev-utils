@@ -57,6 +57,26 @@
         "types": "./dist/text/index.d.cts",
         "default": "./dist/text/index.cjs"
       }
+    },
+    "./npwp": {
+      "import": {
+        "types": "./dist/npwp/index.d.ts",
+        "default": "./dist/npwp/index.js"
+      },
+      "require": {
+        "types": "./dist/npwp/index.d.cts",
+        "default": "./dist/npwp/index.cjs"
+      }
+    },
+    "./plate": {
+      "import": {
+        "types": "./dist/plate/index.d.ts",
+        "default": "./dist/plate/index.js"
+      },
+      "require": {
+        "types": "./dist/plate/index.d.cts",
+        "default": "./dist/plate/index.cjs"
+      }
     }
   },
   "files": [

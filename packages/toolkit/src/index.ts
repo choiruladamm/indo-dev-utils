@@ -5,7 +5,16 @@
  */
 
 // NIK (National Identity Number) utilities
-export { validateNIK, parseNIK, formatNIK, maskNIK } from './nik';
+export {
+  validateNIK,
+  parseNIK,
+  formatNIK,
+  maskNIK,
+  getAge,
+  formatBirthDate,
+  isValidForGender,
+  isValidForBirthDate,
+} from './nik';
 
 export type { NIKInfo, MaskOptions as NIKMaskOptions } from './nik';
 
@@ -22,6 +31,10 @@ export {
   getOperator,
   cleanPhoneNumber,
   maskPhoneNumber,
+  generateWALink,
+  generateSmsLink,
+  generateTelLink,
+  isProvider,
 } from './phone';
 
 export type {
@@ -30,8 +43,24 @@ export type {
   MaskOptions as PhoneMaskOptions,
 } from './phone';
 
+// NPWP (Taxpayer Identification Number) utilities
+export { validateNPWP, formatNPWP, parseNPWP, maskNPWP } from './npwp';
+
+export { validatePlate, getRegionFromPlate, formatPlate } from './plate';
+
+export type { NPWPInfo, MaskOptions as NPWPMaskOptions } from './npwp';
+
 // Currency utilities
-export { formatRupiah, formatCompact, parseRupiah, toWords } from './currency';
+export {
+  formatRupiah,
+  formatCompact,
+  parseRupiah,
+  toWords,
+  roundToClean,
+  formatAccounting,
+  calculateTax,
+  addRupiahSymbol,
+} from './currency';
 
 export type { RupiahOptions, WordOptions } from './currency';
 
@@ -48,6 +77,10 @@ export {
   contractAbbreviation,
   truncate,
   extractWords,
+  profanityFilter,
+  removeStopwords,
+  toFormal,
+  isAlay,
   compareStrings,
   similarity,
 } from './text';

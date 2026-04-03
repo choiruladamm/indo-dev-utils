@@ -5,6 +5,8 @@ export { slugify } from './slug';
 export { normalizeWhitespace, sanitize, removeAccents } from './sanitize';
 
 export { expandAbbreviation, contractAbbreviation } from './abbreviation';
+export { profanityFilter, removeStopwords } from './filter';
+export { toFormal, isAlay } from './normalization';
 
 export { truncate, extractWords } from './extract';
 

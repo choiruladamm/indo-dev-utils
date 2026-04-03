@@ -37,4 +37,11 @@ export { parseNIK } from './parse';
 
 export { formatNIK, maskNIK } from './format';
 
+export {
+  getAge,
+  formatBirthDate,
+  isValidForGender,
+  isValidForBirthDate,
+} from './utils';
+
 export type { NIKInfo, MaskOptions } from './types';

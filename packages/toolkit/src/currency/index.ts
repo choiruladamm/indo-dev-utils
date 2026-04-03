@@ -33,7 +33,12 @@ export { parseRupiah } from './parse';
 export { toWords } from './words';
 
 // Utility functions
-export { roundToClean } from './utils';
+export {
+  roundToClean,
+  formatAccounting,
+  calculateTax,
+  addRupiahSymbol,
+} from './utils';
 
 // Types
 export type { RupiahOptions, WordOptions, RoundUnit } from './types';

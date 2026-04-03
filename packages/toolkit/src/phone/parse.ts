@@ -146,6 +146,27 @@ export function getOperator(phone: string): string | null {
 }
 
 /**
+ * Checks if a phone number belongs to a specific provider.
+ *
+ * @param phone - The phone number to check
+ * @param providerName - The provider name to match (case-insensitive)
+ * @returns `true` if it matches, `false` otherwise
+ *
+ * @example
+ * ```typescript
+ * isProvider('081234567890', 'Telkomsel'); // true
+ * isProvider('081734567890', 'xl'); // true
+ * ```
+ */
+export function isProvider(phone: string, providerName: string): boolean {
+  const operator = getOperator(phone);
+  if (!operator) {
+    return false;
+  }
+  return operator.toLowerCase() === providerName.toLowerCase();
+}
+
+/**
  * Gets the region name for a landline number.
  *
  * @param phone - Landline phone number in national format
