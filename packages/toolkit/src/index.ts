@@ -52,6 +52,15 @@ export { validatePlate, getRegionFromPlate, formatPlate } from './plate';
 export { validateVIN } from './vin';
 export type { VINOptions, VINValidationResult } from './vin';
 
+// Email validator utilities
+export { validateEmail, normalizeEmail, maskEmail, getEmailInfo } from './email-validator';
+export type {
+  EmailValidationOptions,
+  EmailValidationResult,
+  EmailMaskOptions,
+  EmailInfo,
+} from './email-validator';
+
 export type { NPWPInfo, MaskOptions as NPWPMaskOptions } from './npwp';
 
 // Currency utilities

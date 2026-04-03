@@ -6,4 +6,5 @@ export default {
   npwp: 'NPWP',
   plate: 'Plate',
   vin: 'VIN',
+  'email-validator': 'Email Validator',
 };

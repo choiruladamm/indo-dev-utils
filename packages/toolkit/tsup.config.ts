@@ -10,6 +10,7 @@ export default defineConfig({
     'npwp/index': 'src/npwp/index.ts',
     'plate/index': 'src/plate/index.ts',
     'vin/index': 'src/vin/index.ts',
+    'email-validator/index': 'src/email-validator/index.ts',
   },
   format: ['cjs', 'esm'],
   dts: {
