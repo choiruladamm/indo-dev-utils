@@ -1,0 +1,7 @@
+[[policies]]
+name = "Protect Constants from Data Independence Violations"
+description = "Ensures no prohibited data (Bank lists, SWIFT codes, etc.) is added to constants files without explicit user confirmation."
+tools = ["replace", "write_file"]
+args = { file_path = ".*constants\\.ts$" }
+decision = "ask_user"
+prompt = "⚠️ Warning: You are modifying a constants file. Is this addition strictly data-independent and algorithmic? (Haram check: No Bank lists, SWIFT codes, or volatile data allowed)."
