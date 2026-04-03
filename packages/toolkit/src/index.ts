@@ -48,6 +48,10 @@ export { validateNPWP, formatNPWP, parseNPWP, maskNPWP } from './npwp';
 
 export { validatePlate, getRegionFromPlate, formatPlate } from './plate';
 
+// VIN (Vehicle Identification Number) utilities
+export { validateVIN } from './vin';
+export type { VINOptions, VINValidationResult } from './vin';
+
 export type { NPWPInfo, MaskOptions as NPWPMaskOptions } from './npwp';
 
 // Currency utilities

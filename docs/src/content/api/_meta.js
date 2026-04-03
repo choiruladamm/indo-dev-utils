@@ -5,4 +5,5 @@ export default {
   text: 'Text',
   npwp: 'NPWP',
   plate: 'Plate',
+  vin: 'VIN',
 };

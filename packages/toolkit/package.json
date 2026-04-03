@@ -77,6 +77,16 @@
         "types": "./dist/plate/index.d.cts",
         "default": "./dist/plate/index.cjs"
       }
+    },
+    "./vin": {
+      "import": {
+        "types": "./dist/vin/index.d.ts",
+        "default": "./dist/vin/index.js"
+      },
+      "require": {
+        "types": "./dist/vin/index.d.cts",
+        "default": "./dist/vin/index.cjs"
+      }
     }
   },
   "files": [
