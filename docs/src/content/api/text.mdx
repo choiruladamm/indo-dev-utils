@@ -22,6 +22,9 @@ The Text module provides a suite of tools for robust string manipulation, design
 - **Text Extraction**: Truncate text intelligently at word boundaries and extract words while preserving Indonesian hyphenated words (e.g., "anak-anak").
 - **Robust Comparison**: Compare strings with options to ignore case, whitespace, and accents for accurate searching and filtering.
 - **Sanitization**: Clean and normalize text input to prevent injection rendering issues and ensure consistency.
+- **Text Masking**: Privacy-compliant data display with `all`, `middle`, and `email` masking patterns.
+- **Case Converters**: Lightweight `toCamelCase`, `toPascalCase`, and `toSnakeCase` to replace Lodash dependency.
+- **Syllable Counting**: Algorithm-based syllable counter for Indonesian text with dipthong awareness.
 
 ## Installation
 
@@ -51,7 +54,7 @@ The Text module provides a suite of tools for robust string manipulation, design
 ## Quick Start
 
 ```typescript
-import { toTitleCase, slugify, truncate, compareStrings, expandAbbreviation } from '@indodev/toolkit/text';
+import { toTitleCase, slugify, truncate, compareStrings, expandAbbreviation, maskText, toCamelCase } from '@indodev/toolkit/text';
 
 // Title Case
 console.log(toTitleCase('laskar pelangi: kisah nyata'));
@@ -72,6 +75,14 @@ console.log(compareStrings('surabaya', 'SURABAYA'));
 // Abbreviation
 console.log(expandAbbreviation('Jl. Sudirman No. 1'));
 // 'Jalan Sudirman Nomor 1'
+
+// Mask Text
+console.log(maskText('08123456789', { pattern: 'middle', visibleStart: 4, visibleEnd: 3 }));
+// '0812***6789'
+
+// Case Converters
+console.log(toCamelCase('hello-world'));
+// 'helloWorld'
 
 // Profanity Filter
 console.log(profanityFilter('jangan bicara kasar anjing'));
@@ -519,6 +530,161 @@ function removeAccents(text: string): string;
 ```typescript
 removeAccents('Café'); // 'Cafe'
 removeAccents('Àpropos'); // 'Apropos'
+```
+
+---
+
+### maskText()
+
+Masks sensitive text based on predefined patterns for privacy-compliant data display.
+
+**Type Signature:**
+
+```typescript
+function maskText(text: string, options?: MaskOptions): string;
+```
+
+**Parameters:**
+
+| Name      | Type           | Description              |
+| --------- | -------------- | ------------------------ |
+| `text`    | `string`       | The text to mask         |
+| `options` | `MaskOptions`  | Masking configuration    |
+
+**Returns:**
+
+`string` - Masked text
+
+**MaskOptions:**
+
+```typescript
+interface MaskOptions {
+  pattern?: 'all' | 'middle' | 'email';
+  maskChar?: string;       // default: '*'
+  visibleStart?: number;   // default: 2
+  visibleEnd?: number;     // default: 2
+}
+```
+
+**Examples:**
+
+```typescript
+// Mask all characters (preserves spaces)
+maskText('Budi Santoso', { pattern: 'all' });
+// '**** *******'
+
+// Mask middle portion
+maskText('08123456789', { pattern: 'middle', visibleStart: 4, visibleEnd: 3 });
+// '0812****789'
+
+// Mask email (keeps first 2 chars of local part + domain)
+maskText('user@example.com', { pattern: 'email' });
+// 'us**@example.com'
+
+// Custom mask character
+maskText('123456789', { pattern: 'all', maskChar: '#' });
+// '#########'
+```
+
+---
+
+### toCamelCase()
+
+Converts text to camelCase format. Treats spaces, hyphens, and underscores as word boundaries.
+
+**Type Signature:**
+
+```typescript
+function toCamelCase(text: string): string;
+```
+
+**Examples:**
+
+```typescript
+toCamelCase('hello-world');     // 'helloWorld'
+toCamelCase('hello_world');     // 'helloWorld'
+toCamelCase('Hello World');     // 'helloWorld'
+toCamelCase('helloWorld');      // 'helloWorld'
+```
+
+---
+
+### toPascalCase()
+
+Converts text to PascalCase format. Treats spaces, hyphens, and underscores as word boundaries.
+
+**Type Signature:**
+
+```typescript
+function toPascalCase(text: string): string;
+```
+
+**Examples:**
+
+```typescript
+toPascalCase('hello_world');    // 'HelloWorld'
+toPascalCase('hello-world');    // 'HelloWorld'
+toPascalCase('hello world');    // 'HelloWorld'
+```
+
+---
+
+### toSnakeCase()
+
+Converts text to snake_case format. Handles camelCase, spaces, hyphens, and underscores.
+
+**Type Signature:**
+
+```typescript
+function toSnakeCase(text: string): string;
+```
+
+**Examples:**
+
+```typescript
+toSnakeCase('helloWorld');      // 'hello_world'
+toSnakeCase('Hello-World');     // 'hello_world'
+toSnakeCase('Hello World');     // 'hello_world'
+```
+
+---
+
+### countSyllables()
+
+Counts the number of syllables in an Indonesian word using algorithm-based vowel counting with dipthong awareness.
+
+**Type Signature:**
+
+```typescript
+function countSyllables(text: string): number;
+```
+
+**Returns:**
+
+`number` - Number of syllables
+
+**Syllable Rules:**
+
+- Each vowel group (a, i, u, e, o) counts as one syllable
+- Indonesian dipthongs (ai, au, oi) count as a single vowel sound
+- Minimum 1 syllable for any word with letters
+
+**Examples:**
+
+```typescript
+// Indonesian words
+countSyllables('buku');         // 2 (bu-ku)
+countSyllables('matahari');     // 4 (ma-ta-ha-ri)
+countSyllables('pulau');        // 2 (pu-lau, dipthong 'au')
+
+// English words
+countSyllables('hello');        // 2 (hel-lo)
+countSyllables('beautiful');    // 3 (beau-ti-ful)
+
+// Edge cases
+countSyllables('');             // 0
+countSyllables('a');            // 1
+countSyllables('rhythm');       // 1 (no vowels, minimum 1)
 ```
 
 ---

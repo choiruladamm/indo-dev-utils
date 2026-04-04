@@ -163,3 +163,31 @@ export interface TruncateOptions {
    */
   wordBoundary?: boolean;
 }
+
+/**
+ * Options for text masking
+ */
+export interface MaskOptions {
+  /**
+   * Masking pattern to apply
+   * - `all`: Mask all characters (preserves spaces)
+   * - `middle`: Keep start and end visible, mask middle
+   * - `email`: Keep first 2 chars of local part and full domain
+   */
+  pattern?: 'all' | 'middle' | 'email';
+
+  /**
+   * Character to use for masking (default: '*')
+   */
+  maskChar?: string;
+
+  /**
+   * Number of characters to keep visible at start (for 'middle' pattern, default: 2)
+   */
+  visibleStart?: number;
+
+  /**
+   * Number of characters to keep visible at end (for 'middle' pattern, default: 2)
+   */
+  visibleEnd?: number;
+}
