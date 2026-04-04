@@ -21,6 +21,9 @@ The Currency module provides type-safe utilities for formatting, parsing, and co
 - **Parsing**: Convert formatted strings back to numbers
 - **Terbilang**: Convert numbers to Indonesian words (for checks, invoices, receipts)
 - **Rounding**: Clean currency amounts for display
+- **Split Amounts**: Divide amounts into equal or custom-ratio parts
+- **Validation**: Check if a string is a valid Rupiah format
+- **Calculations**: Percentage, difference, and tax calculations
 - **Flexible**: Customizable separators, precision, and display options
 
 ### Why This Module?
@@ -61,19 +64,31 @@ Indonesian Rupiah formatting has unique requirements:
 ## Quick Start
 
 ```typescript
-import { formatRupiah, formatCompact, toWords, parseRupiah } from '@indodev/toolkit/currency';
+import { formatRupiah, formatCompact, toWords, parseRupiah, splitAmount, percentageOf, difference, validateRupiah } from '@indodev/toolkit/currency';
 
 // Format currency
 formatRupiah(1500000);
 // 'Rp 1.500.000'
 
+// Negative format (standard accounting)
+formatRupiah(-1500000);
+// '-Rp 1.500.000'
+
 // Compact format
 formatCompact(1500000);
 // 'Rp 1,5 juta'
 
+// Compact without symbol
+formatCompact(1500000, { symbol: false });
+// '1,5 juta'
+
 // Convert to words (terbilang)
 toWords(1500000);
 // 'satu juta lima ratus ribu rupiah'
+
+// Terbilang with decimals
+toWords(1500000.5, { withDecimals: true });
+// 'satu juta lima ratus ribu rupiah koma lima puluh'
 
 // Parse back to number
 parseRupiah('Rp 1.500.000');
@@ -83,9 +98,29 @@ parseRupiah('Rp 1.500.000');
 formatAccounting(-1500000);
 // '(Rp 1.500.000)'
 
-// Calculate tax
-calculateTax(1000000, 11);
+// Calculate tax (rate required)
+calculateTax(1000000, 0.11);
 // 110000
+
+// Split amount (equal)
+splitAmount(1500000, 3);
+// [500000, 500000, 500000]
+
+// Split amount (custom ratios)
+splitAmount(1000000, 2, { ratios: [70, 30] });
+// [700000, 300000]
+
+// Percentage calculation
+percentageOf(150000, 1000000);
+// 15
+
+// Difference calculation
+difference(1200000, 1000000);
+// { absolute: 200000, percentage: 20, direction: 'increase' }
+
+// Validate Rupiah format
+validateRupiah('Rp 1.500.000');
+// true
 ```
 
 ## API Reference
@@ -952,20 +987,20 @@ function allocateBudget(total: number, percentages: number[]) {
 
 ### calculateTax()
 
-Calculates tax (PPN) from a given amount and percentage.
+Calculates tax (PPN) from a given amount and rate.
 
 **Type Signature:**
 
 ```typescript
-function calculateTax(amount: number, percentage: number): number;
+function calculateTax(amount: number, rate: number): number;
 ```
 
 **Parameters:**
 
-| Name         | Type     | Description                           |
-| ------------ | -------- | ------------------------------------- |
-| `amount`     | `number` | The base amount                       |
-| `percentage` | `number` | The tax percentage (e.g., 11 for 11%) |
+| Name     | Type     | Description                              |
+| -------- | -------- | ---------------------------------------- |
+| `amount` | `number` | The base amount                          |
+| `rate`   | `number` | The tax rate (e.g., 0.11 for 11% PPN)    |
 
 **Returns:**
 
@@ -974,8 +1009,297 @@ function calculateTax(amount: number, percentage: number): number;
 **Examples:**
 
 ```typescript
-calculateTax(1000000, 11); // 110000
-calculateTax(500000, 10); // 50000
+calculateTax(1000000, 0.11); // 110000
+calculateTax(500000, 0.10);  // 50000
+calculateTax(0, 0.11);       // 0
+calculateTax(-1000000, 0.11);// -110000 (tax credit)
+```
+
+<Callout type="warning">
+  **Breaking Change (v0.3.5):** The `rate` parameter is now required. The previous default of `0.11` was removed because tax rates can change over time and violate the Data Independence mandate.
+</Callout>
+
+---
+
+### splitAmount()
+
+Splits an amount into equal or custom-ratio parts. Useful for split bills, installments, and budget allocation.
+
+**Type Signature:**
+
+```typescript
+function splitAmount(amount: number, parts: number, options?: SplitOptions): number[];
+```
+
+**Parameters:**
+
+| Name      | Type           | Description                    |
+| --------- | -------------- | ------------------------------ |
+| `amount`  | `number`       | The amount to split            |
+| `parts`   | `number`       | Number of parts to split into  |
+| `options` | `SplitOptions` | Optional split configuration   |
+
+**Returns:**
+
+`number[]` - Array of split amounts
+
+**SplitOptions:**
+
+```typescript
+interface SplitOptions {
+  ratios?: number[];   // Custom percentage ratios (must sum to 100)
+  roundTo?: RoundUnit; // Round each part to clean amount
+}
+```
+
+**Examples:**
+
+```typescript
+// Equal split
+splitAmount(1500000, 3);
+// [500000, 500000, 500000]
+
+// Remainder distributed to first parts
+splitAmount(10000, 3);
+// [3334, 3333, 3333]
+
+// Custom ratios
+splitAmount(1000000, 2, { ratios: [70, 30] });
+// [700000, 300000]
+
+// With rounding
+splitAmount(1234567, 3, { roundTo: 'ribu' });
+// [412000, 412000, 412000]
+
+// Negative amounts
+splitAmount(-1500000, 3);
+// [-500000, -500000, -500000]
+
+// Single part
+splitAmount(1000000, 1);
+// [1000000]
+```
+
+**Errors:**
+
+- Throws `InvalidSplitError` if `parts < 1`
+- Throws `InvalidSplitError` if `ratios` length doesn't match `parts`
+- Throws `InvalidSplitError` if `ratios` don't sum to 100
+
+---
+
+### percentageOf()
+
+Calculates what percentage a part is of a total.
+
+**Type Signature:**
+
+```typescript
+function percentageOf(part: number, total: number): number;
+```
+
+**Parameters:**
+
+| Name    | Type     | Description          |
+| ------- | -------- | -------------------- |
+| `part`  | `number` | The part value       |
+| `total` | `number` | The total value      |
+
+**Returns:**
+
+`number` - Percentage (e.g., 15 for 15%)
+
+**Examples:**
+
+```typescript
+percentageOf(150000, 1000000);  // 15
+percentageOf(500000, 1000000);  // 50
+percentageOf(0, 1000000);       // 0
+percentageOf(1000000, 1000000); // 100
+percentageOf(1500000, 1000000); // 150 (over 100%)
+percentageOf(100, 0);           // 0 (not NaN)
+percentageOf(-200000, 1000000); // -20
+percentageOf(-200000, -1000000);// 20 (signs cancel)
+```
+
+---
+
+### difference()
+
+Calculates absolute and percentage difference between two amounts with direction tracking.
+
+**Type Signature:**
+
+```typescript
+function difference(amount1: number, amount2: number): {
+  absolute: number;
+  percentage: number | null;
+  direction: 'increase' | 'decrease' | 'same';
+};
+```
+
+**Parameters:**
+
+| Name      | Type     | Description                  |
+| --------- | -------- | ---------------------------- |
+| `amount1` | `number` | The new/current amount       |
+| `amount2` | `number` | The original/reference amount|
+
+**Returns:**
+
+Object with `absolute`, `percentage`, and `direction`
+
+**Examples:**
+
+```typescript
+difference(1200000, 1000000);
+// { absolute: 200000, percentage: 20, direction: 'increase' }
+
+difference(800000, 1000000);
+// { absolute: -200000, percentage: -20, direction: 'decrease' }
+
+difference(1000000, 1000000);
+// { absolute: 0, percentage: 0, direction: 'same' }
+
+difference(0, 1000000);
+// { absolute: -1000000, percentage: null, direction: 'decrease' }
+
+difference(0, 0);
+// { absolute: 0, percentage: 0, direction: 'same' }
+```
+
+---
+
+### validateRupiah()
+
+Checks if a string is a valid Rupiah format.
+
+**Type Signature:**
+
+```typescript
+function validateRupiah(formatted: string): boolean;
+```
+
+**Parameters:**
+
+| Name        | Type     | Description                    |
+| ----------- | -------- | ------------------------------ |
+| `formatted` | `string` | The string to validate         |
+
+**Returns:**
+
+`boolean` - `true` if valid Rupiah format, `false` otherwise
+
+**Examples:**
+
+```typescript
+// Valid formats
+validateRupiah('Rp 1.500.000');    // true
+validateRupiah('1.500.000');       // true
+validateRupiah('Rp 1,5 juta');     // true
+validateRupiah('-Rp 1.500.000');   // true
+validateRupiah('Rp -1.500.000');   // true (legacy format)
+validateRupiah('  Rp 1.500.000  ');// true (trimmed)
+
+// Invalid formats
+validateRupiah('abc');             // false
+validateRupiah('');                // false
+validateRupiah('Rp abc');          // false
+validateRupiah('1.500.000abc');    // false
+validateRupiah('   ');             // false
+validateRupiah('Rp');              // false
+```
+
+---
+
+### toWords() — Decimal Support (Enhanced)
+
+The `toWords()` function now supports decimal terbilang via the `withDecimals` option.
+
+**Updated Type Signature:**
+
+```typescript
+function toWords(amount: number, options?: WordOptions): string;
+```
+
+**New Option:**
+
+```typescript
+interface WordOptions {
+  uppercase?: boolean;
+  withCurrency?: boolean;
+  withDecimals?: boolean; // NEW (default: false)
+}
+```
+
+**Examples:**
+
+```typescript
+// Default (no decimals)
+toWords(1500000.5);
+// 'satu juta lima ratus ribu rupiah'
+
+// With decimals
+toWords(1500000.5, { withDecimals: true });
+// 'satu juta lima ratus ribu rupiah koma lima puluh'
+
+toWords(1234.56, { withDecimals: true });
+// 'seribu dua ratus tiga puluh empat rupiah koma lima enam'
+
+toWords(1500000.5, { withDecimals: true, withCurrency: false });
+// 'satu juta lima ratus ribu koma lima puluh'
+
+// Negative with decimals
+toWords(-1500000.5, { withDecimals: true });
+// 'minus satu juta lima ratus ribu rupiah koma lima puluh'
+
+// Zero decimal part (no decimal words)
+toWords(1500000.0, { withDecimals: true });
+// 'satu juta lima ratus ribu rupiah'
+```
+
+---
+
+### formatCompact() — Enhanced with Options
+
+The `formatCompact()` function now accepts `CompactOptions` for customization.
+
+**Updated Type Signature:**
+
+```typescript
+function formatCompact(amount: number, options?: CompactOptions): string;
+```
+
+**CompactOptions:**
+
+```typescript
+interface CompactOptions {
+  symbol?: boolean;        // Show 'Rp' (default: true)
+  spaceAfterSymbol?: boolean; // Space after 'Rp' (default: true)
+}
+```
+
+**Examples:**
+
+```typescript
+// Default
+formatCompact(1500000);
+// 'Rp 1,5 juta'
+
+// Without symbol
+formatCompact(1500000, { symbol: false });
+// '1,5 juta'
+
+// Without space
+formatCompact(1500000, { spaceAfterSymbol: false });
+// 'Rp1,5 juta'
+
+// Negative (new format)
+formatCompact(-1500000);
+// '-Rp 1,5 juta'
+
+formatCompact(-1500000, { symbol: false });
+// '-1,5 juta'
 ```
 
 ---
@@ -1012,8 +1336,9 @@ Options for converting numbers to Indonesian words.
 
 ```typescript
 interface WordOptions {
-  uppercase?: boolean; // Capitalize first letter (default: false)
-  withCurrency?: boolean; // Add 'rupiah' suffix (default: true)
+  uppercase?: boolean;       // Capitalize first letter (default: false)
+  withCurrency?: boolean;    // Add 'rupiah' suffix (default: true)
+  withDecimals?: boolean;    // Include decimal words (default: false)
 }
 ```
 
@@ -1021,6 +1346,29 @@ interface WordOptions {
 
 - `uppercase`: For formal documents (invoices, contracts)
 - `withCurrency`: Omit when describing quantities, not money
+- `withDecimals`: Include decimal terbilang with "koma" separator
+
+### CompactOptions
+
+Options for compact currency formatting.
+
+```typescript
+interface CompactOptions {
+  symbol?: boolean;          // Show 'Rp' (default: true)
+  spaceAfterSymbol?: boolean;// Space after 'Rp' (default: true)
+}
+```
+
+### SplitOptions
+
+Options for splitting amounts.
+
+```typescript
+interface SplitOptions {
+  ratios?: number[];   // Custom percentage ratios (must sum to 100)
+  roundTo?: RoundUnit; // Round each part to clean amount
+}
+```
 
 ### RoundUnit
 

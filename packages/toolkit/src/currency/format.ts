@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 
-import type { RupiahOptions } from './types';
+import type { CompactOptions, RupiahOptions } from './types';
 
 /**
  * Formats a number as Indonesian Rupiah currency.
@@ -56,7 +56,7 @@ export function formatRupiah(amount: number, options?: RupiahOptions): string {
   const precision =
     options?.precision !== undefined ? options.precision : decimal ? 2 : 0;
 
-  const isNegative = amount < 0;
+  const isNegative = amount < 0 && amount !== 0;
   const absAmount = Math.abs(amount);
 
   let result: string;
@@ -70,7 +70,6 @@ export function formatRupiah(amount: number, options?: RupiahOptions): string {
       const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
       result = `${formattedInt}${decimalSeparator}${decPart}`;
     } else {
-      // Precision 0: no decimal separator needed
       const intPart = rounded.toString();
       result = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
     }
@@ -79,13 +78,15 @@ export function formatRupiah(amount: number, options?: RupiahOptions): string {
     result = intAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, separator);
   }
 
-  if (isNegative) {
-    result = `-${result}`;
-  }
-
   if (symbol) {
     const space = spaceAfterSymbol ? ' ' : '';
-    result = `Rp${space}${result}`;
+    if (isNegative) {
+      result = `-Rp${space}${result}`;
+    } else {
+      result = `Rp${space}${result}`;
+    }
+  } else if (isNegative) {
+    result = `-${result}`;
   }
 
   return result;
@@ -98,6 +99,7 @@ export function formatRupiah(amount: number, options?: RupiahOptions): string {
  * Follows Indonesian grammar rules (e.g., "1 juta" not "1,0 juta").
  *
  * @param amount - The amount to format
+ * @param options - Compact formatting options
  * @returns Compact formatted string
  *
  * @example
@@ -119,10 +121,21 @@ export function formatRupiah(amount: number, options?: RupiahOptions): string {
  * formatCompact(1500); // 'Rp 1.500'
  * ```
  *
+ * @example
+ * Without symbol:
+ * ```typescript
+ * formatCompact(1500000, { symbol: false }); // '1,5 juta'
+ * ```
+ *
  * @public
  */
-export function formatCompact(amount: number): string {
-  const isNegative = amount < 0;
+export function formatCompact(
+  amount: number,
+  options?: CompactOptions
+): string {
+  const { symbol = true, spaceAfterSymbol = true } = options || {};
+
+  const isNegative = amount < 0 && amount !== 0;
   const abs = Math.abs(amount);
 
   let result: string;
@@ -136,17 +149,23 @@ export function formatCompact(amount: number): string {
   } else if (abs >= 100_000) {
     result = formatCompactValue(abs / 1000, 'ribu');
   } else if (abs >= 1_000) {
-    // Below 100k: use standard formatting instead of "ribu"
     result = abs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   } else {
     result = abs.toString();
   }
 
-  if (isNegative) {
+  if (symbol) {
+    const space = spaceAfterSymbol ? ' ' : '';
+    if (isNegative) {
+      result = `-Rp${space}${result}`;
+    } else {
+      result = `Rp${space}${result}`;
+    }
+  } else if (isNegative) {
     result = `-${result}`;
   }
 
-  return `Rp ${result}`;
+  return result;
 }
 
 /**

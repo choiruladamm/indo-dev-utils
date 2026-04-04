@@ -146,6 +146,19 @@ export interface WordOptions {
    * ```
    */
   withCurrency?: boolean;
+
+  /**
+   * Whether to include decimal words with 'koma' separator.
+   *
+   * @defaultValue false
+   *
+   * @example
+   * ```typescript
+   * false // 'satu juta lima ratus ribu rupiah'
+   * true  // 'satu juta lima ratus ribu rupiah koma lima puluh'
+   * ```
+   */
+  withDecimals?: boolean;
 }
 
 /**
@@ -166,3 +179,66 @@ export interface WordOptions {
  * @public
  */
 export type RoundUnit = 'ribu' | 'ratus-ribu' | 'juta';
+
+/**
+ * Options for compact currency formatting.
+ *
+ * @example
+ * Default:
+ * ```typescript
+ * formatCompact(1500000); // 'Rp 1,5 juta'
+ * ```
+ *
+ * @example
+ * Without symbol:
+ * ```typescript
+ * formatCompact(1500000, { symbol: false }); // '1,5 juta'
+ * ```
+ *
+ * @public
+ */
+export interface CompactOptions {
+  /**
+   * Whether to show 'Rp' symbol.
+   *
+   * @defaultValue true
+   */
+  symbol?: boolean;
+
+  /**
+   * Whether to add space after 'Rp' symbol.
+   *
+   * @defaultValue true
+   */
+  spaceAfterSymbol?: boolean;
+}
+
+/**
+ * Options for splitting an amount into parts.
+ *
+ * @example
+ * Equal split:
+ * ```typescript
+ * splitAmount(1500000, 3); // [500000, 500000, 500000]
+ * ```
+ *
+ * @example
+ * Custom ratios:
+ * ```typescript
+ * splitAmount(1000000, 2, { ratios: [70, 30] }); // [700000, 300000]
+ * ```
+ *
+ * @public
+ */
+export interface SplitOptions {
+  /**
+   * Custom percentage ratios (must sum to 100).
+   * Length must match `parts` count.
+   */
+  ratios?: number[];
+
+  /**
+   * Round each part to a clean amount.
+   */
+  roundTo?: RoundUnit;
+}

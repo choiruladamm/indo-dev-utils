@@ -99,7 +99,11 @@ const TENS = [
  * @public
  */
 export function toWords(amount: number, options?: WordOptions): string {
-  const { uppercase = false, withCurrency = true } = options || {};
+  const {
+    uppercase = false,
+    withCurrency = true,
+    withDecimals = false,
+  } = options || {};
 
   if (amount === 0) {
     let result = 'nol';
@@ -108,16 +112,42 @@ export function toWords(amount: number, options?: WordOptions): string {
   }
 
   const isNegative = amount < 0;
-  const absAmount = Math.floor(Math.abs(amount));
+  const absAmount = Math.abs(amount);
+  const intPart = Math.floor(absAmount);
+
+  let words = convertInteger(intPart);
+
+  if (isNegative) {
+    words = 'minus ' + words;
+  }
+
+  if (withCurrency) {
+    words += ' rupiah';
+  }
+
+  if (withDecimals) {
+    const decimalPart = Math.round((absAmount - intPart) * 100);
+    if (decimalPart > 0) {
+      words += ' koma ' + convertDecimal(decimalPart);
+    }
+  }
+
+  return uppercase ? capitalize(words) : words;
+}
+
+/**
+ * Converts the integer part to Indonesian words.
+ */
+function convertInteger(num: number): string {
+  if (num === 0) return 'nol';
 
   let words = '';
 
-  // Break into groups: triliun, miliar, juta, ribu, sisa
-  const triliun = Math.floor(absAmount / 1_000_000_000_000);
-  const miliar = Math.floor((absAmount % 1_000_000_000_000) / 1_000_000_000);
-  const juta = Math.floor((absAmount % 1_000_000_000) / 1_000_000);
-  const ribu = Math.floor((absAmount % 1_000_000) / 1_000);
-  const sisa = absAmount % 1_000;
+  const triliun = Math.floor(num / 1_000_000_000_000);
+  const miliar = Math.floor((num % 1_000_000_000_000) / 1_000_000_000);
+  const juta = Math.floor((num % 1_000_000_000) / 1_000_000);
+  const ribu = Math.floor((num % 1_000_000) / 1_000);
+  const sisa = num % 1_000;
 
   if (triliun > 0) {
     words += convertGroup(triliun) + ' triliun';
@@ -135,7 +165,6 @@ export function toWords(amount: number, options?: WordOptions): string {
 
   if (ribu > 0) {
     if (words) words += ' ';
-    // Special rule: 1000 = "seribu" not "satu ribu"
     words += ribu === 1 ? 'seribu' : convertGroup(ribu) + ' ribu';
   }
 
@@ -144,15 +173,26 @@ export function toWords(amount: number, options?: WordOptions): string {
     words += convertGroup(sisa);
   }
 
-  if (isNegative) {
-    words = 'minus ' + words;
+  return words;
+}
+
+/**
+ * Converts decimal part (0-99) to Indonesian words.
+ */
+function convertDecimal(num: number): string {
+  if (num === 0) return '';
+  if (num < 10) return BASIC_NUMBERS[num];
+  if (num < 20) return TEENS[num - 10];
+
+  const tens = Math.floor(num / 10);
+  const ones = num % 10;
+
+  let result = TENS[tens];
+  if (ones > 0) {
+    result += ' ' + BASIC_NUMBERS[ones];
   }
 
-  if (withCurrency) {
-    words += ' rupiah';
-  }
-
-  return uppercase ? capitalize(words) : words;
+  return result;
 }
 
 /**

@@ -17,12 +17,24 @@ describe('Currency Utils', () => {
   });
 
   describe('calculateTax', () => {
-    it('should calculate 11% tax by default', () => {
-      expect(calculateTax(1000000)).toBe(110000);
+    it('should calculate 11% tax', () => {
+      expect(calculateTax(1000000, 0.11)).toBe(110000);
     });
 
     it('should calculate custom tax rate', () => {
       expect(calculateTax(1000000, 0.1)).toBe(100000);
+    });
+
+    it('should handle zero amount', () => {
+      expect(calculateTax(0, 0.11)).toBe(0);
+    });
+
+    it('should handle zero rate', () => {
+      expect(calculateTax(1000000, 0)).toBe(0);
+    });
+
+    it('should handle negative amount', () => {
+      expect(calculateTax(-1000000, 0.11)).toBe(-110000);
     });
   });
 
