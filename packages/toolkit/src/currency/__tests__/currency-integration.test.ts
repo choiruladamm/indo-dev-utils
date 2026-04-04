@@ -54,7 +54,7 @@ describe('end-to-end workflows', () => {
 
     it('should calculate and format tax', () => {
       const base = 1000000;
-      const tax = calculateTax(base);
+      const tax = calculateTax(base, 0.11);
 
       expect(tax).toBe(110000);
       expect(formatRupiah(base + tax)).toBe('Rp 1.110.000');

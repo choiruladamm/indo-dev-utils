@@ -82,15 +82,15 @@ export function formatAccounting(
  * Calculates tax (PPN) for a given amount.
  *
  * @param amount - The base amount
- * @param rate - The tax rate (default: 0.11 for 11%)
+ * @param rate - The tax rate (e.g., 0.11 for 11% PPN)
  * @returns The calculated tax amount
  *
  * @example
  * ```typescript
- * calculateTax(1000000); // 110000
+ * calculateTax(1000000, 0.11); // 110000
  * ```
  */
-export function calculateTax(amount: number, rate: number = 0.11): number {
+export function calculateTax(amount: number, rate: number): number {
   return amount * rate;
 }
 
@@ -103,11 +103,12 @@ export function calculateTax(amount: number, rate: number = 0.11): number {
  */
 export function addRupiahSymbol(amount: string | number): string {
   if (typeof amount === 'number') {
-    return `Rp ${amount.toLocaleString('id-ID')}`;
+    const formatted = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return `Rp ${formatted}`;
   }
 
   if (amount.trim().startsWith('Rp')) {
-    return amount;
+    return amount.trim();
   }
 
   return `Rp ${amount.trim()}`;

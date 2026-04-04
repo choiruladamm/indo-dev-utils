@@ -40,5 +40,22 @@ export {
   addRupiahSymbol,
 } from './utils';
 
+// Calculation functions
+export {
+  splitAmount,
+  percentageOf,
+  difference,
+  InvalidSplitError,
+} from './calc';
+
+// Validation functions
+export { validateRupiah } from './validate';
+
 // Types
-export type { RupiahOptions, WordOptions, RoundUnit } from './types';
+export type {
+  RupiahOptions,
+  WordOptions,
+  RoundUnit,
+  CompactOptions,
+  SplitOptions,
+} from './types';

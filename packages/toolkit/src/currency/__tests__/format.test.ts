@@ -24,7 +24,27 @@ describe('formatRupiah', () => {
     });
 
     it('should handle negative numbers', () => {
-      expect(formatRupiah(-1500000)).toBe('Rp -1.500.000');
+      expect(formatRupiah(-1500000)).toBe('-Rp 1.500.000');
+    });
+
+    it('should handle negative numbers without symbol', () => {
+      expect(formatRupiah(-1500000, { symbol: false })).toBe('-1.500.000');
+    });
+
+    it('should handle negative numbers without space', () => {
+      expect(formatRupiah(-1500000, { spaceAfterSymbol: false })).toBe(
+        '-Rp1.500.000'
+      );
+    });
+
+    it('should handle negative numbers with decimals', () => {
+      expect(formatRupiah(-1500000.5, { decimal: true })).toBe(
+        '-Rp 1.500.000,50'
+      );
+    });
+
+    it('should treat negative zero as positive', () => {
+      expect(formatRupiah(-0)).toBe('Rp 0');
     });
   });
 
@@ -188,7 +208,17 @@ describe('formatCompact', () => {
     });
 
     it('should handle negative numbers', () => {
-      expect(formatCompact(-1500000)).toBe('Rp -1,5 juta');
+      expect(formatCompact(-1500000)).toBe('-Rp 1,5 juta');
+    });
+
+    it('should handle negative numbers without symbol', () => {
+      expect(formatCompact(-1500000, { symbol: false })).toBe('-1,5 juta');
+    });
+
+    it('should handle negative numbers without space', () => {
+      expect(formatCompact(-1500000, { spaceAfterSymbol: false })).toBe(
+        '-Rp1,5 juta'
+      );
     });
 
     it('should handle numbers less than 1000', () => {
