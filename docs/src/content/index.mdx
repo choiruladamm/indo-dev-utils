@@ -3,23 +3,94 @@ title: Home
 description: TypeScript utilities for Indonesian data validation and formatting.
 ---
 
-import { Tabs, Steps } from 'nextra/components';
+import { Cards, Callout, Tabs } from 'nextra/components';
 
 # @indodev/toolkit
 
-TypeScript utilities for Indonesian data validation and formatting.  
-[Github](https://github.com/choiruladamm/indo-dev-utils) • [npm](https://npmjs.com/package/@indodev/toolkit)
+Build for Indonesian data. Zero dependencies. Type-safe.
 
-## Features
+Stop wrestling with NIK validation, Rupiah formatting, and phone normalization. This library handles Indonesian-specific rules so you can focus on building your product.
 
-- **NIK validation** - Verify Indonesian National Identity Numbers with province, date, and gender checks
-- **Phone formatting** - Support for all major operators and 200+ area codes
-- **Rupiah formatting** - Display currency with proper grammar rules (1,5 juta, not 1,0 juta)
-- **Text utilities** - Smart capitalization, slug generation, and abbreviation expansion
-- **Terbilang converter** - Numbers to Indonesian words (1500000 → "satu juta lima ratus ribu rupiah")
-- **Type-safe** - Full TypeScript support with proper type inference
-- **Well-tested** - 1060+ test cases with 95%+ coverage
-- **Zero dependencies** - Lightweight and tree-shakeable
+[Github](https://github.com/choiruladamm/indo-dev-utils) / [npm](https://npmjs.com/package/@indodev/toolkit)
+
+## Stats
+
+| Metric | Value |
+|--------|-------|
+| Test cases | 1324+ |
+| Coverage | 95%+ |
+| Dependencies | Zero |
+| Bundle size | {'<'}50KB (total) |
+| Modules | 8 |
+
+## Modules
+
+| Module | Description |
+|--------|-------------|
+| [NIK](/docs/identity/nik) | Validate and parse Indonesian National Identity Numbers |
+| [NPWP](/docs/identity/npwp) | Validate and format Tax Identification Numbers |
+| [Phone](/docs/contact/phone) | Format, validate, and parse phone numbers |
+| [Email](/docs/contact/email) | Validate email addresses with domain detection |
+| [Currency](/docs/financial/currency) | Format Rupiah, terbilang, split amounts |
+| [Text](/docs/text-utils/text) | Title case, slug, abbreviation, case conversion |
+| [Vehicle Plate](/docs/vehicles/plate) | Validate Indonesian license plates |
+| [VIN](/docs/vehicles/vin) | Validate and decode Vehicle Identification Numbers |
+
+## Before / After
+
+See the difference between manual validation and using this library.
+
+**Before: Manual validation with edge cases**
+
+```typescript
+// Does this NIK even make sense?
+const isValid = nik.length === 16 && parseInt(nik.slice(0, 2)) > 0;
+
+// What province is code 32? What about gender?
+// You'd need to look up a reference table...
+```
+
+**After: One line, full context**
+
+```typescript
+import { parseNIK } from '@indodev/toolkit/nik';
+
+const info = parseNIK('3201234567890123');
+// {
+//   province: { code: '32', name: 'Jawa Barat' },
+//   gender: 'Male',
+//   birthDate: 1990-01-01,
+//   uniqueCode: 1234
+// }
+```
+
+**Before: Rupiah formatting with toLocaleString**
+
+```typescript
+// Browser-dependent, inconsistent across environments
+const formatted = new Intl.NumberFormat('id-ID', {
+  style: 'currency',
+  currency: 'IDR',
+}).format(1500000);
+// 'Rp1.500.000,00' (no space, always shows decimals)
+```
+
+**After: Consistent, Indonesian grammar**
+
+```typescript
+import { formatRupiah, formatCompact } from '@indodev/toolkit/currency';
+
+formatRupiah(1500000);        // 'Rp 1.500.000'
+formatCompact(1500000);       // 'Rp 1,5 juta' (not '1,0 juta')
+toWords(1500000);             // 'satu juta lima ratus ribu rupiah'
+```
+
+## Why This Library
+
+- **Indonesian-specific rules baked in** -- NIK gender detection, Rupiah grammar ("1,5 juta" not "1,0 juta"), Indonesian conjunctions in slugs ("&" becomes "dan"), area code detection. All handled automatically.
+- **Zero dependencies, tree-shakeable** -- Import only what you need. Each module is independent. No moment.js, no lodash, no bloat.
+- **Pure functions, predictable output** -- Same input, same output. No side effects, no global state, no surprises.
+- **Full TypeScript support** -- Every function is typed. Every return value is typed. Every error case is documented.
 
 ## Installation
 
@@ -46,7 +117,7 @@ TypeScript utilities for Indonesian data validation and formatting.
   </Tabs.Tab>
 </Tabs>
 
-## Quick Example
+## Quick Start
 
 ```typescript
 import { validateNIK, parseNIK } from '@indodev/toolkit/nik';
@@ -54,33 +125,23 @@ import { formatPhoneNumber } from '@indodev/toolkit/phone';
 import { formatRupiah, formatCompact } from '@indodev/toolkit/currency';
 import { slugify } from '@indodev/toolkit/text';
 
-// NIK info
-const info = parseNIK('3201234567890123');
-console.log(info.province.name); // 'Jawa Barat'
+// NIK validation and parsing
+validateNIK('3201234567890123');     // true
+parseNIK('3201234567890123').province.name; // 'Jawa Barat'
 
 // Phone formatting
-formatPhoneNumber('081234567890', 'international');
-// '+62 812-3456-7890'
+formatPhoneNumber('081234567890', 'international'); // '+62 812-3456-7890'
 
-// Smart grammar (1,5 juta, not 1,0 juta)
+// Currency with proper grammar
 formatCompact(1500000); // 'Rp 1,5 juta'
-formatCompact(1000000); // 'Rp 1 juta'
+formatCompact(1000000); // 'Rp 1 juta' (not '1,0 juta')
 
 // Indonesian-aware slug
 slugify('Pria & Wanita'); // 'pria-dan-wanita'
 ```
 
-## Why @indodev/toolkit?
+## What's Next
 
-Building applications that handle Indonesian data? This library solves common challenges:
-
-- **Accuracy** - Handles specific Indonesian rules (e.g., gender detection in NIK, Rupiah grammar)
-- **Performance** - Zero dependencies and tree-shakeable for minimal bundle size
-- **Productivity** - Stop rewriting common validation and formatting logic
-- **Developer Experience** - Full TypeScript support with excellent type inference
-
-## What's Next?
-
-- **[🚀 Getting Started](/getting-started)** - Quick start guide with installation and configuration
-- **[📖 API Documentation](/docs/api/nik)** - Comprehensive API reference for all modules
-- **[🎯 Examples](https://github.com/choiruladamm/indo-dev-utils/tree/main/examples)** - Real-world usage patterns
+- **[Get Started](/docs/get-started)** - Installation, TypeScript configuration, and framework integration guides
+- **[Browse API](/docs/identity/nik)** - Complete API reference for all 8 modules with examples and edge cases
+- **[View on GitHub](https://github.com/choiruladamm/indo-dev-utils)** - Source code, issues, and contribution guidelines

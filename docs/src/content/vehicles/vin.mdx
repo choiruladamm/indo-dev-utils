@@ -1,0 +1,101 @@
+---
+title: VIN
+description: Vehicle Identification Number (VIN) validation and checksum utilities based on ISO 3779.
+---
+
+import { Callout, Tabs, Steps } from 'nextra/components';
+
+# VIN
+
+Utilities for working with Vehicle Identification Numbers (VIN) based on the ISO 3779 standard.
+
+## Overview
+
+The VIN module provides utilities to validate the 17-character unique identification code for motor vehicles. It includes checksum validation using the standard Modulus 11 algorithm.
+
+### Features
+
+- **Validation**: Check if a VIN is exactly 17 characters and follows ISO 3779 (excluding characters I, O, and Q).
+- **Checksum**: Automated checksum calculation and verification using the check digit at position 9.
+
+## Installation
+
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+  <Tabs.Tab>
+    ```bash
+    npm install @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    pnpm add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    yarn add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    bun add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Quick Start
+
+```typescript
+import { validateVIN } from '@indodev/toolkit/vin';
+
+// Validate a VIN (with correct checksum)
+validateVIN('1HGCM82633A004352'); // true
+
+// Invalid VIN (contains prohibited character 'I')
+validateVIN('1HBHA82I7ZB000001'); // false
+
+// Invalid VIN (incorrect checksum)
+validateVIN('1HGCM82633A004353'); // false
+```
+
+## API Reference
+
+### validateVIN()
+
+Validates a Vehicle Identification Number (VIN) based on ISO 3779 standards.
+
+**Type Signature:**
+
+```typescript
+function validateVIN(vin: string): boolean;
+```
+
+**Parameters:**
+
+| Name  | Type     | Description             |
+| ----- | -------- | ----------------------- |
+| `vin` | `string` | The VIN string to check |
+
+**Returns:**
+
+`boolean` - Returns `true` if valid, `false` otherwise.
+
+---
+
+## Constants
+
+### VIN_WEIGHTS
+
+Weights used in the VIN checksum calculation.
+
+```typescript
+import { VIN_WEIGHTS } from '@indodev/toolkit/vin';
+```
+
+### VIN_CHAR_VALUES
+
+Values assigned to each valid character for VIN calculation.
+
+```typescript
+import { VIN_CHAR_VALUES } from '@indodev/toolkit/vin';
+```
