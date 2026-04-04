@@ -12,6 +12,12 @@ export { truncate, extractWords } from './extract';
 
 export { compareStrings, similarity } from './compare';
 
+export { maskText } from './mask';
+
+export { toCamelCase, toPascalCase, toSnakeCase } from './case-converters';
+
+export { countSyllables } from './syllable';
+
 export type {
   TitleCaseOptions,
   SlugifyOptions,
@@ -19,6 +25,7 @@ export type {
   TruncateOptions,
   ExtractOptions,
   CompareOptions,
+  MaskOptions,
 } from './types';
 
 export { LOWERCASE_WORDS, ACRONYMS, ABBREVIATIONS } from './constants';
