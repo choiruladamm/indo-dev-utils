@@ -1,6 +1,6 @@
 ---
 title: Getting Started
-description: Get up and running with `@indodev/toolkit` in minutes.
+description: Get up and running with @indodev/toolkit in minutes.
 ---
 
 import { Callout, Tabs, Steps } from 'nextra/components';
@@ -41,13 +41,15 @@ Get up and running with `@indodev/toolkit` in minutes.
 The library uses **subpath imports** for optimal tree-shaking. This ensures your final bundle only includes the code you actually use.
 
 ```typescript
-// ✅ Recommended: Import from specific submodules
+// Recommended: Import from specific submodules
 import { validateNIK } from '@indodev/toolkit/nik';
 import { formatRupiah } from '@indodev/toolkit/currency';
 
-// ⚠️ Supported but not recommended for large apps
+// Supported but not recommended for large apps
 import { validateNIK, formatRupiah } from '@indodev/toolkit';
 ```
+
+<Callout type="warning">**Subpath imports not working?** Make sure your `tsconfig.json` has `"moduleResolution": "bundler"` (or `"node16"` / `"nodenext"`). See TypeScript Configuration below.</Callout>
 
 ## TypeScript Configuration
 
@@ -56,7 +58,7 @@ For the best developer experience, especially when using subpath imports, ensure
 ```json
 {
   "compilerOptions": {
-    "moduleResolution": "bundler", // or "node16" / "nodenext"
+    "moduleResolution": "bundler",
     "resolvePackageJsonExports": true
   }
 }
@@ -64,52 +66,288 @@ For the best developer experience, especially when using subpath imports, ensure
 
 This enables proper resolution of subpaths like `@indodev/toolkit/nik`.
 
+## Quick Examples
+
+### NIK Validation and Parsing
+
+```typescript
+import { validateNIK, parseNIK } from '@indodev/toolkit/nik';
+
+// Validate format and checksum
+validateNIK('3273051205900001');
+// true
+
+validateNIK('1234567890123456');
+// false (invalid checksum)
+
+// Parse to extract information
+const info = parseNIK('3273051205900001');
+// {
+//   province: { code: '32', name: 'Jawa Barat' },
+//   city: { code: '73', name: 'Kota Bandung' },
+//   gender: 'Male',
+//   birthDate: 1990-05-12T00:00:00.000Z,
+//   uniqueCode: 1
+// }
+
+info.province.name;
+// 'Jawa Barat'
+
+info.gender;
+// 'Male'
+
+info.birthDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+// '12 Mei 1990'
+```
+
+### Phone Number Handling
+
+```typescript
+import { validatePhone, formatPhoneNumber, parsePhone } from '@indodev/toolkit/phone';
+
+// Validate
+validatePhone('081234567890');
+// true
+
+validatePhone('099999999999');
+// false (invalid operator prefix)
+
+// Format in different styles
+formatPhoneNumber('081234567890', 'domestic');
+// '0812-3456-7890'
+
+formatPhoneNumber('081234567890', 'international');
+// '+62 812-3456-7890'
+
+formatPhoneNumber('081234567890', 'e164');
+// '+6281234567890'
+
+// Parse to extract details
+const phone = parsePhone('081234567890');
+// {
+//   countryCode: '+62',
+//   operator: { name: 'Telkomsel', code: '812' },
+//   type: 'mobile',
+//   nationalNumber: '81234567890'
+// }
+
+phone.operator.name;
+// 'Telkomsel'
+```
+
+### Currency Formatting
+
+```typescript
+import { formatRupiah, formatCompact, toWords, splitAmount } from '@indodev/toolkit/currency';
+
+// Standard formatting
+formatRupiah(1500000);
+// 'Rp 1.500.000'
+
+formatRupiah(-1500000);
+// '-Rp 1.500.000'
+
+formatRupiah(1500000.50, { decimal: true });
+// 'Rp 1.500.000,50'
+
+// Compact format (dashboard-friendly)
+formatCompact(1500000);
+// 'Rp 1,5 juta'
+
+formatCompact(1000000);
+// 'Rp 1 juta' (not 'Rp 1,0 juta')
+
+formatCompact(2500000000);
+// 'Rp 2,5 miliar'
+
+// Terbilang (number to words)
+toWords(1500000);
+// 'satu juta lima ratus ribu rupiah'
+
+toWords(1500000.50, { withDecimals: true });
+// 'satu juta lima ratus ribu rupiah koma lima puluh'
+
+// Split amounts (installments, split bills)
+splitAmount(1500000, 3);
+// [500000, 500000, 500000]
+
+splitAmount(10000, 3);
+// [3334, 3333, 3333] (remainder distributed to first parts)
+
+splitAmount(1000000, 2, { ratios: [70, 30] });
+// [700000, 300000]
+```
+
+### Text Utilities
+
+```typescript
+import { toTitleCase, slugify, maskText, toCamelCase } from '@indodev/toolkit/text';
+
+// Title case with Indonesian grammar
+toTitleCase('pt bank central asia tbk');
+// 'PT Bank Central Asia Tbk'
+
+toTitleCase('laskar pelangi: kisah nyata');
+// 'Laskar Pelangi: Kisah Nyata'
+
+// Slug generation with Indonesian conjunctions
+slugify('Pria & Wanita');
+// 'pria-dan-wanita'
+
+slugify('Baju Murah Jakarta');
+// 'baju-murah-jakarta'
+
+// Mask sensitive data
+maskText('08123456789', { pattern: 'middle', visibleStart: 4, visibleEnd: 3 });
+// '0812****789'
+
+maskText('user@example.com', { pattern: 'email' });
+// 'us**@example.com'
+
+// Case conversion
+toCamelCase('hello-world');
+// 'helloWorld'
+```
+
 ## Framework Integration
 
-`@indodev/toolkit` is framework-agnostic and works seamlessly with any modern UI library.
+### React / Next.js -- Invoice Component
 
-### React / Next.js
+A realistic invoice component combining currency formatting, terbilang, and date display:
 
 ```tsx
-import { parseNIK, validateNIK } from '@indodev/toolkit/nik';
-import { useState } from 'react';
+import { formatRupiah, toWords, calculateTax } from '@indodev/toolkit/currency';
+import { formatDate } from '@indodev/toolkit/datetime'; // future module
 
-export function NIKCard() {
-  const [nik, setNik] = useState('');
-  const info = validateNIK(nik) ? parseNIK(nik) : null;
+interface InvoiceProps {
+  items: { name: string; qty: number; price: number }[];
+  invoiceNumber: string;
+  customerName: string;
+}
+
+export function Invoice({ items, invoiceNumber, customerName }: InvoiceProps) {
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
+  const tax = calculateTax(subtotal, 0.11); // 11% PPN
+  const total = subtotal + tax;
 
   return (
-    <div className="card">
-      <input value={nik} onChange={(e) => setNik(e.target.value)} placeholder="Enter 16-digit NIK" />
-      {info && <div>Born in {info.province.name}</div>}
+    <div className="invoice">
+      <h1>Invoice {invoiceNumber}</h1>
+      <p>Customer: {customerName}</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item, i) => (
+            <tr key={i}>
+              <td>{item.name}</td>
+              <td>{item.qty}</td>
+              <td>{formatRupiah(item.price)}</td>
+              {/* formatRupiah(1500000) => 'Rp 1.500.000' */}
+              <td>{formatRupiah(item.price * item.qty)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="totals">
+        <p>Subtotal: {formatRupiah(subtotal)}</p>
+        <p>PPN (11%): {formatRupiah(tax)}</p>
+        <p className="total">Total: {formatRupiah(total)}</p>
+        {/* formatRupiah(1110000) => 'Rp 1.110.000' */}
+      </div>
+
+      <p className="terbilang">
+        Terbilang: {toWords(total).toUpperCase()}
+        {/* toWords(1110000) => 'SATU JUTA SERATUS SEPULUH RIBU RUPIAH' */}
+      </p>
     </div>
   );
 }
 ```
 
-### Vue 3
+### Vue 3 -- User Profile Card
+
+A profile card with NIK parsing, phone formatting, and masked display:
 
 ```vue
-<script setup icons>
+<script setup>
 import { ref, computed } from 'vue';
-import { formatRupiah } from '@indodev/toolkit/currency';
+import { validateNIK, parseNIK } from '@indodev/toolkit/nik';
+import { validatePhone, formatPhoneNumber } from '@indodev/toolkit/phone';
+import { maskText } from '@indodev/toolkit/text';
 
-const amount = ref(1000000);
-const formatted = computed(() => formatRupiah(amount.value));
+const nik = ref('3273051205900001');
+const phone = ref('081234567890');
+
+const nikValid = computed(() => validateNIK(nik.value));
+const nikInfo = computed(() => nikValid.value ? parseNIK(nik.value) : null);
+// nikInfo.value?.province.name => 'Jawa Barat'
+// nikInfo.value?.gender => 'Male'
+
+const phoneValid = computed(() => validatePhone(phone.value));
+const phoneFormatted = computed(() =>
+  phoneValid.value ? formatPhoneNumber(phone.value, 'international') : 'Invalid'
+);
+// phoneFormatted.value => '+62 812-3456-7890'
+
+const phoneMasked = computed(() =>
+  phoneValid.value ? maskText(phone.value, { pattern: 'middle', visibleStart: 4, visibleEnd: 3 }) : ''
+);
+// phoneMasked.value => '0812***7890'
 </script>
 
 <template>
-  <p>{{ formatted }}</p>
+  <div class="profile-card">
+    <div class="field">
+      <label>NIK</label>
+      <input v-model="nik" />
+      <span v-if="nikValid" class="valid">
+        {{ nikInfo?.province.name }} - {{ nikInfo?.gender }}
+      </span>
+      <span v-else class="error">NIK tidak valid</span>
+    </div>
+
+    <div class="field">
+      <label>Phone</label>
+      <input v-model="phone" />
+      <span v-if="phoneValid" class="valid">
+        {{ phoneFormatted }}
+      </span>
+      <span class="masked">
+        Display: {{ phoneMasked }}
+      </span>
+    </div>
+  </div>
 </template>
 ```
+
+## Coming From Other Libraries
+
+If you are migrating from common utilities, here is the mapping:
+
+| From | Use Instead | Example |
+|------|-------------|---------|
+| Lodash `camelCase` | `toCamelCase` from `@indodev/toolkit/text` | `toCamelCase('hello-world')` // 'helloWorld' |
+| Lodash `snakeCase` | `toSnakeCase` from `@indodev/toolkit/text` | `toSnakeCase('helloWorld')` // 'hello_world' |
+| numeral.js `format` | `formatRupiah` from `@indodev/toolkit/currency` | `formatRupiah(1500000)` // 'Rp 1.500.000' |
+| libphonenumber-js | `formatPhoneNumber` from `@indodev/toolkit/phone` | `formatPhoneNumber('081234567890', 'international')` // '+62 812-3456-7890' |
+| slugify | `slugify` from `@indodev/toolkit/text` | `slugify('Pria & Wanita')` // 'pria-dan-wanita' |
 
 ## Environment Support
 
 Works in all modern environments:
 
-- ✅ **Browsers**: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
-- ✅ **Node.js**: 18.x or newer
-- ✅ **Runtimes**: Deno, Bun, Cloudflare Workers
+- **Browsers**: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
+- **Node.js**: 18.x or newer
+- **Runtimes**: Deno, Bun, Cloudflare Workers
 
 ## Next Steps
 
@@ -119,10 +357,14 @@ Works in all modern environments:
 
 Dive into the specific documentation for each module:
 
-- [NIK Documentation](/docs/api/nik)
-- [Phone Documentation](/docs/api/phone)
-- [Currency Documentation](/docs/api/currency)
-- [Text Documentation](/docs/api/text)
+- [NIK Documentation](/docs/identity/nik)
+- [NPWP Documentation](/docs/identity/npwp)
+- [Phone Documentation](/docs/contact/phone)
+- [Email Documentation](/docs/contact/email)
+- [Currency Documentation](/docs/financial/currency)
+- [Text Documentation](/docs/text-utils/text)
+- [Vehicle Plate Documentation](/docs/vehicles/plate)
+- [VIN Documentation](/docs/vehicles/vin)
 
 ### Real-world Examples
 

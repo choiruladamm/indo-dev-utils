@@ -1,0 +1,186 @@
+---
+title: NPWP
+description: Indonesian Tax Identity Number (NPWP) validation, formatting, and masking utilities.
+---
+
+
+import { Callout, Tabs, Steps } from 'nextra/components';
+
+# NPWP
+
+Utilities for working with Indonesian Tax Identity Numbers (Nomor Pokok Wajib Pajak).
+
+## Overview
+
+The NPWP module provides utilities to validate, format, parse, and mask Indonesian Tax Identity Numbers. It follows the official 15-digit format and handles both formatted (with dots and dashes) and unformatted input.
+
+### Features
+
+- **Validation**: Check if an NPWP is valid based on its length and basic structure.
+- **Formatting**: Format raw 15-digit NPWP into the standard `00.000.000.0-000.000` pattern.
+- **Parsing**: Extract information from NPWP like identity code, serial number, and office code.
+- **Masking**: Mask NPWP for privacy while optionally preserving its format.
+
+## Installation
+
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+  <Tabs.Tab>
+    ```bash
+    npm install @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    pnpm add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    yarn add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    bun add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Quick Start
+
+```typescript
+import { validateNPWP, formatNPWP, parseNPWP, maskNPWP } from '@indodev/toolkit/npwp';
+
+// Validate NPWP
+validateNPWP('091234567012000'); // true
+
+// Format NPWP
+formatNPWP('091234567012000');
+// '09.123.456.7-012.000'
+
+// Parse NPWP
+const info = parseNPWP('09.123.456.7-012.000');
+console.log(info?.identityCode); // '09'
+
+// Mask NPWP
+maskNPWP('09.123.456.7-012.000');
+// '09.123.***.*-012.000'
+```
+
+## API Reference
+
+### validateNPWP()
+
+Validates an Indonesian NPWP string.
+
+**Type Signature:**
+
+```typescript
+function validateNPWP(npwp: string): boolean;
+```
+
+**Parameters:**
+
+| Name   | Type     | Description                 |
+| ------ | -------- | --------------------------- |
+| `npwp` | `string` | The NPWP string to validate |
+
+**Returns:**
+
+`boolean` - Returns `true` if valid, `false` otherwise.
+
+---
+
+### formatNPWP()
+
+Formats a 15-digit NPWP string into the standard `00.000.000.0-000.000` format.
+
+**Type Signature:**
+
+```typescript
+function formatNPWP(npwp: string): string;
+```
+
+**Parameters:**
+
+| Name   | Type     | Description              |
+| ------ | -------- | ------------------------ |
+| `npwp` | `string` | The 15-digit NPWP string |
+
+**Returns:**
+
+`string` - Formatted NPWP string, or the original if invalid.
+
+---
+
+### parseNPWP()
+
+Parses an NPWP string and extracts its components.
+
+**Type Signature:**
+
+```typescript
+function parseNPWP(npwp: string): NPWPInfo | null;
+```
+
+**Parameters:**
+
+| Name   | Type     | Description              |
+| ------ | -------- | ------------------------ |
+| `npwp` | `string` | The NPWP string to parse |
+
+**Returns:**
+
+`NPWPInfo | null` - Parsed NPWP information or `null` if invalid.
+
+---
+
+### maskNPWP()
+
+Masks an NPWP for privacy.
+
+**Type Signature:**
+
+```typescript
+function maskNPWP(npwp: string, options?: MaskOptions): string;
+```
+
+**Parameters:**
+
+| Name      | Type          | Description                    |
+| --------- | ------------- | ------------------------------ |
+| `npwp`    | `string`      | The NPWP to mask               |
+| `options` | `MaskOptions` | Optional masking configuration |
+
+**Returns:**
+
+`string` - Masked NPWP.
+
+---
+
+## Type Reference
+
+### NPWPInfo
+
+```typescript
+interface NPWPInfo {
+  identityCode: string;
+  serialNumber: string;
+  checkDigit: string;
+  officeCode: string;
+  branchCode: string;
+  formatted: string;
+  isValid: boolean;
+}
+```
+
+### MaskOptions
+
+```typescript
+interface MaskOptions {
+  start?: number; // Digits visible at start (default: 5)
+  end?: number; // Digits visible at end (default: 3)
+  char?: string; // Mask character (default: '*')
+  preserveFormat?: boolean; // Keep dots and dashes (default: true)
+}
+```

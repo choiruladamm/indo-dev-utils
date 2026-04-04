@@ -5,7 +5,7 @@
  */
 
 import { Footer, Layout, Navbar } from 'nextra-theme-docs';
-import { Head } from 'nextra/components';
+import { Banner, Head } from 'nextra/components';
 import { getPageMap } from 'nextra/page-map';
 import 'nextra-theme-docs/style.css';
 
@@ -15,10 +15,19 @@ export const metadata = {
     template: '%s – @indodev/toolkit',
     default: '@indodev/toolkit – Indonesian Developer Utilities',
   },
-  description: 'Type-safe Indonesian data validation and formatting utilities for TypeScript',
+  description:
+    'Type-safe Indonesian data validation and formatting utilities for TypeScript',
   applicationName: '@indodev/toolkit',
   generator: 'Next.js',
-  keywords: ['indonesia', 'typescript', 'validation', 'nik', 'phone', 'rupiah', 'utilities'],
+  keywords: [
+    'indonesia',
+    'typescript',
+    'validation',
+    'nik',
+    'phone',
+    'rupiah',
+    'utilities',
+  ],
   authors: [{ name: 'Choirul Adam', url: 'https://github.com/choiruladamm' }],
   creator: 'Choirul Adam',
   openGraph: {
@@ -26,7 +35,8 @@ export const metadata = {
     locale: 'en_US',
     url: 'https://toolkit.adamm.cloud',
     title: '@indodev/toolkit',
-    description: 'Type-safe Indonesian data validation and formatting utilities',
+    description:
+      'Type-safe Indonesian data validation and formatting utilities',
     siteName: '@indodev/toolkit',
     images: [
       {
@@ -40,7 +50,8 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: '@indodev/toolkit',
-    description: 'Type-safe Indonesian data validation and formatting utilities',
+    description:
+      'Type-safe Indonesian data validation and formatting utilities',
     creator: '@choiruladamm',
   },
 };
@@ -58,14 +69,30 @@ export default async function RootLayout({ children }) {
     />
   );
 
+  const footer = (
+    <Footer>
+      <div style={{ textAlign: 'center', color: '#666', fontSize: '0.875rem' }}>
+        MIT {new Date().getFullYear()} Choirul Adam
+      </div>
+    </Footer>
+  );
+
   const pageMap = await getPageMap();
 
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head faviconGlyph="🇮🇩" />
       <body>
+        <Banner storageKey="v0.3.4">
+          v0.3.4 released — Currency module enhancements with splitAmount,
+          percentageOf, and more.{' '}
+          <a href="/docs/changelog" style={{ textDecoration: 'underline' }}>
+            Read changelog
+          </a>
+        </Banner>
         <Layout
           navbar={navbar}
+          footer={footer}
           editLink="Edit this page on GitHub"
           docsRepositoryBase="https://github.com/choiruladamm/indo-dev-utils/tree/main/docs/content"
           sidebar={{
