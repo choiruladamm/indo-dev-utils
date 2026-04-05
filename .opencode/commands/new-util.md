@@ -28,9 +28,17 @@ Update the following registration files:
 
 ## STEP 3: DOCUMENTATION
 
-1. Create `docs/src/content/api/$ARGUMENTS.mdx` using standard format
-2. Register in `docs/src/content/api/_meta.js`
-3. Add entry to `docs/src/content/changelog.mdx` under latest version
+**Choose appropriate category**: identity, contact, vehicles, or utilities
+
+1. Create folder `docs/src/content/{category}/$ARGUMENTS/` with:
+   - `index.mdx` - Main documentation using standard format
+   - `_meta.js` - Folder metadata
+2. Update category `docs/src/content/{category}/_meta.js`
+3. Register category in `docs/src/content/_meta.js` (if new category)
+4. Update `docs/src/content/index.mdx` (stats, module count, table)
+5. Update `docs/src/content/get-started.mdx` (examples, API links)
+6. Add entry to `docs/src/content/changelog.mdx` under latest version
+7. Update `CHANGELOG.md` (root)
 
 ## QUALITY GATES
 

@@ -83,9 +83,9 @@ export default async function RootLayout({ children }) {
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head faviconGlyph="🇮🇩" />
       <body>
-        <Banner storageKey="v0.3.4">
-          v0.3.4 released — Currency module enhancements with splitAmount,
-          percentageOf, and more.{' '}
+        <Banner storageKey="v0.4.0">
+          v0.4.0 released — New DateTime module with Indonesian date formatting,
+          relative time, age calculation, and timezone support.{' '}
           <a href="/docs/changelog" style={{ textDecoration: 'underline' }}>
             Read changelog
           </a>

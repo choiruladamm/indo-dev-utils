@@ -15,7 +15,7 @@ Generate MDX documentation for: `$ARGUMENTS`
    - Edge cases
    - Related functions
 
-3. Check if docs already exist at `docs/src/content/api/{module}.mdx`
+3. Check if docs already exist at `docs/src/content/{module}/index.mdx`
 4. If exists, show diff; if not, create new section
 
 Output ready-to-paste MDX snippet.

@@ -16,7 +16,8 @@
     "format": "pnpm --filter @indodev/toolkit format",
     "format:check": "pnpm --filter @indodev/toolkit format:check",
     "typecheck": "pnpm --filter @indodev/toolkit typecheck",
-    "release": "pnpm --filter @indodev/toolkit release"
+    "release": "pnpm --filter @indodev/toolkit release",
+    "start:docs": "pnpm --filter docs start"
   },
   "keywords": [
     "monorepo",

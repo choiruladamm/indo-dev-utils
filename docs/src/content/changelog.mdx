@@ -3,6 +3,26 @@ title: Changelog
 description: Latest updates and changes to the @indodev/toolkit library.
 ---
 
+## v0.4.0 - April 5, 2026
+
+### New Features
+
+#### DateTime Module
+
+A comprehensive new module for Indonesian date/time operations:
+
+- `formatDate()` - Format dates with Indonesian locale (6 styles: full, long, medium, short, weekday, month)
+- `formatDateRange()` - Smart date range formatting with automatic redundancy removal
+- `parseDate()` - Strict DD-MM-YYYY parser with ISO format auto-detection and leap year validation
+- `toRelativeTime()` - Relative time in Indonesian ("X menit yang lalu", "Kemarin", "Besok", etc.)
+- `getAge()` - Age calculation with years, months, days support (object or string output)
+- `getIndonesianTimezone()` - Map IANA timezone names and UTC offsets to WIB/WITA/WIT
+- `isLeapYear()` - Leap year validation with proper Gregorian calendar rules
+- `daysInMonth()` - Days in month calculation accounting for leap years
+- `isValidDate()` - Type guard for validating Date objects
+- `isWeekend()` / `isWorkingDay()` - Weekend and working day detection
+- `InvalidDateError` / `InvalidDateRangeError` - Custom error classes with error codes for programmatic handling
+
 ## v0.3.4 - April 4, 2026
 
 ### Breaking Changes

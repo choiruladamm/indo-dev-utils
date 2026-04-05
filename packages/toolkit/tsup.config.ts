@@ -11,6 +11,7 @@ export default defineConfig({
     'plate/index': 'src/plate/index.ts',
     'vin/index': 'src/vin/index.ts',
     'email-validator/index': 'src/email-validator/index.ts',
+    'datetime/index': 'src/datetime/index.ts',
   },
   format: ['cjs', 'esm'],
   dts: {

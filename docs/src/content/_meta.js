@@ -17,20 +17,14 @@ export default {
       collapsed: true,
     },
   },
-  financial: {
-    title: 'Financial',
-    theme: {
-      collapsed: true,
-    },
-  },
   vehicles: {
     title: 'Vehicles',
     theme: {
       collapsed: true,
     },
   },
-  'text-utils': {
-    title: 'Text',
+  utilities: {
+    title: 'Utilities',
     theme: {
       collapsed: true,
     },
@@ -69,8 +63,5 @@ export default {
     theme: {
       copyPage: false,
     },
-  },
-  api: {
-    display: 'hidden',
   },
 };

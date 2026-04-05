@@ -49,7 +49,7 @@ Every public function **MUST** have:
 
 ## Documentation
 
-- Location: `docs/src/content/api/{module}.mdx`
+- Location: `docs/src/content/{module}/index.mdx`
 - Format: MDX (Nextra)
 - Must include: Description, API, Examples, Error Handling
 
