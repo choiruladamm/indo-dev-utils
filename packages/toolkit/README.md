@@ -9,7 +9,7 @@
 
 </div>
 
-TypeScript utilities for Indonesian data. Handles Rupiah formatting, terbilang, NIK validation, phone normalization, and text rules that generic libraries don't cover.
+TypeScript utilities for Indonesian data. Handles Rupiah formatting, terbilang, NIK validation, phone normalization, date formatting, and text rules that generic libraries don't cover.
 
 ## Install
 
@@ -64,18 +64,34 @@ toTitleCase('pt bank central asia tbk'); // 'PT Bank Central Asia Tbk'
 slugify('Pria & Wanita'); // 'pria-dan-wanita'
 ```
 
+Format dates with Indonesian locale:
+
+```typescript
+import {
+  formatDate,
+  parseDate,
+  toRelativeTime,
+} from '@indodev/toolkit/datetime';
+
+formatDate(new Date('2026-01-02'), 'long'); // '2 Januari 2026'
+parseDate('02-01-2026'); // Date(2026, 0, 2)
+toRelativeTime(new Date(Date.now() - 3600000)); // '1 jam yang lalu'
+```
+
 ## Modules
 
 | Module                                                          | Description                                                    |
 | --------------------------------------------------------------- | -------------------------------------------------------------- |
-| [Currency](https://toolkit.adamm.cloud/docs/financial/currency) | Format Rupiah, terbilang, split amounts, percentages           |
-| [Text](https://toolkit.adamm.cloud/docs/text-utils/text)        | Title case, slugs, abbreviations, case conversion, masking     |
+| [Currency](https://toolkit.adamm.cloud/docs/utilities/currency) | Format Rupiah, terbilang, split amounts, percentages           |
+| [Text](https://toolkit.adamm.cloud/docs/utilities/text)         | Title case, slugs, abbreviations, case conversion, masking     |
+| [DateTime](https://toolkit.adamm.cloud/docs/utilities/datetime) | Indonesian date formatting, relative time, age calculation     |
 | [NIK](https://toolkit.adamm.cloud/docs/identity/nik)            | Validate, parse, and mask Indonesian National Identity Numbers |
 | [NPWP](https://toolkit.adamm.cloud/docs/identity/npwp)          | Validate and format Tax Identification Numbers                 |
 | [Phone](https://toolkit.adamm.cloud/docs/contact/phone)         | Format, validate, and detect mobile operators                  |
 | [Email](https://toolkit.adamm.cloud/docs/contact/email)         | Validate emails with disposable domain detection               |
 | [Plate](https://toolkit.adamm.cloud/docs/vehicles/plate)        | Validate license plates with region detection                  |
 | [VIN](https://toolkit.adamm.cloud/docs/vehicles/vin)            | Validate Vehicle Identification Numbers (ISO 3779)             |
+
 
 Full docs, examples, and API reference at [toolkit.adamm.cloud](https://toolkit.adamm.cloud/docs)
 
