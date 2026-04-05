@@ -1,77 +1,27 @@
-# AGENTS.md — Project Conventions & Learnings
+# AGENTS.md — Project Conventions
 
-## Project Overview
+`@indodev/toolkit` — Zero-dependency TypeScript utility library for Indonesian developers.
 
-`@indodev/toolkit` — Zero-dependency TypeScript utility library for Indonesian developers. Monorepo (pnpm workspaces) with `packages/toolkit/` (main library) and `docs/` (Next.js + Nextra).
+**Monorepo**: pnpm workspaces with `packages/toolkit/` (main library) and `docs/` (Next.js + Nextra).
 
-## Core Mandates (from `.gemini/rules/`)
+## Quick Reference
 
-### 1. Data Independence
+| Topic                 | Location                          |
+| --------------------- | --------------------------------- |
+| **Core Mandates**     | `.opencode/rules/mandates.md`     |
+| **Architecture**      | `.opencode/rules/architecture.md` |
+| **Tech Standards**    | `.opencode/rules/standards.md`    |
+| **Module Guidelines** | `guide/MODULE_GUIDELINES.md`      |
+| **Philosophy**        | `guide/PHILOSOPHY.md`             |
 
-- **FORBIDDEN**: Bank lists, SWIFT codes, regional data, tax rates, PTKP, holiday lists
-- **ACCEPTED**: Pure algorithms (NIK, NPWP, Currency to Words, etc.) that remain valid 5+ years without updates
-- Static constants (month names, day names) are OK — they don't change
+## Key Principles
 
-### 2. Pure Functions
+1. **Data Independence** — No external datasets (bank lists, tax rates, etc.)
+2. **Pure Functions** — No side effects
+3. **Surgical Changes** — Minimal, targeted updates
+4. **>90% Test Coverage** — Mandatory
 
-- Input → Output only. No side effects
-- No `console.log`, API calls, global state mutations
-
-### 3. Surgical Changes
-
-- Minimal, targeted updates only
-- Don't refactor unrelated code
-
-### 4. Early Returns
-
-- Flat logic, max nesting 2 levels
-
-## Tech Stack & Conventions
-
-| Aspect     | Rule                                                                          |
-| ---------- | ----------------------------------------------------------------------------- |
-| TypeScript | Strict mode, prefer `unknown` over `any`                                      |
-| Testing    | Vitest, >90% coverage mandatory                                               |
-| JSDoc      | **MANDATORY** for every public function (desc, params, return, @example)      |
-| Naming     | Modules `kebab-case`, Functions `camelCase`, Types `PascalCase`               |
-| Docs       | Update `docs/` with MDX for every change                                      |
-| Changelog  | Record in `changelog.mdx` for every change                                    |
-| Test cases | Cover: Happy Path, Error Cases, Edge Cases (empty, null, undefined, boundary) |
-
-## Module Structure
-
-```
-src/{module}/
-├── index.ts          # Barrel exports
-├── {feature}.ts      # Implementation
-├── types.ts          # TypeScript interfaces + custom error classes
-├── constants.ts      # Static constants (if needed)
-├── utils.ts          # Internal helpers
-└── __tests__/
-    └── {feature}.test.ts
-```
-
-## Custom Error Classes
-
-- Define in `types.ts` (NOT separate `errors.ts`)
-- Extend standard `Error` class
-- Example: `export class InvalidSplitError extends Error { ... }`
-
-## PRD Process
-
-- PRDs live in `packages/toolkit/prd/`
-- Must follow minimum requirements (7 sections: Document Info, Executive Summary, Functional Requirements, Non-Functional Requirements, Module Structure, Error Handling Strategy, Testing Strategy)
-- Every function needs: signature, defaults, rules, edge cases, error handling
-- Use `/suggest-tags` command to generate commit/tag suggestions
-
-## Git Conventions
-
-- Branch: `{type}/{module}` — types: feat, fix, refactor, chore
-- Commit: conventional commits, lowercase only, bullets use `-`
-- Tags: `v{semver}` (e.g., `v0.3.5`)
-- Version bump: patch = fix/enhancement, minor = new module, major = breaking API
-
-## Quality Gates (run before every commit)
+## Quality Gates
 
 ```bash
 pnpm --filter @indodev/toolkit test:run
@@ -80,19 +30,24 @@ pnpm --filter @indodev/toolkit lint:fix
 pnpm --filter @indodev/toolkit build
 ```
 
-## Private Files
+## Common Pitfalls
 
-- `packages/toolkit/prd/` is gitignored (private docs)
-- Uncomment in `.gitignore` to track locally
+| Pitfall                   | Fix                                      |
+| ------------------------- | ---------------------------------------- |
+| Missing default values    | Always specify `default = 'X'`           |
+| Vague range boundaries    | Specify "inclusive" or "exclusive"       |
+| Using `toLocaleString`    | Use internal formatting                  |
+| Hardcoded regulatory data | Remove defaults, require explicit params |
+| Negative currency format  | Sign before symbol: `-Rp 1.500.000`      |
 
-## Common Pitfalls to Avoid
+## OpenCode Tools
 
-| Pitfall                       | Fix                                                       |
-| ----------------------------- | --------------------------------------------------------- |
-| Missing default values in PRD | Always specify `default = 'X'`                            |
-| Inconsistent error handling   | Define per-function in Error Handling table               |
-| Vague range boundaries        | Specify "inclusive" or "exclusive"                        |
-| Custom error undefined        | Define in `types.ts`, extend `Error`                      |
-| Using `toLocaleString`        | Use internal formatting for consistency                   |
-| Hardcoded regulatory data     | Remove defaults, require explicit params                  |
-| Negative format inconsistency | Always place sign before currency symbol: `-Rp 1.500.000` |
+| Path                                         | Description                             |
+| -------------------------------------------- | --------------------------------------- |
+| `.opencode/commands/new-util.md`             | `/new-util {module}` — Scaffold module  |
+| `.opencode/commands/quality-gate.md`         | `/quality-gate` — Run all quality gates |
+| `.opencode/commands/coverage.md`             | `/coverage` — Check test coverage       |
+| `.opencode/agents/prd-reviewer.md`           | `@prd-reviewer` — Review PRD            |
+| `.opencode/agents/docs-writer.md`            | `@docs-writer` — Help with docs         |
+| `.opencode/skills/module-checklist/SKILL.md` | Module validation                       |
+| `.opencode/skills/release/SKILL.md`          | Release workflow                        |
