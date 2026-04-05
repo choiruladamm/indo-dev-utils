@@ -17,11 +17,11 @@ Stop wrestling with NIK validation, Rupiah formatting, and phone normalization. 
 
 | Metric | Value |
 |--------|-------|
-| Test cases | 1324+ |
+| Test cases | 1512+ |
 | Coverage | 95%+ |
 | Dependencies | Zero |
 | Bundle size | {'<'}50KB (total) |
-| Modules | 8 |
+| Modules | 9 |
 
 ## Modules
 
@@ -31,10 +31,11 @@ Stop wrestling with NIK validation, Rupiah formatting, and phone normalization. 
 | [NPWP](/docs/identity/npwp) | Validate and format Tax Identification Numbers |
 | [Phone](/docs/contact/phone) | Format, validate, and parse phone numbers |
 | [Email](/docs/contact/email) | Validate email addresses with domain detection |
-| [Currency](/docs/financial/currency) | Format Rupiah, terbilang, split amounts |
-| [Text](/docs/text-utils/text) | Title case, slug, abbreviation, case conversion |
 | [Vehicle Plate](/docs/vehicles/plate) | Validate Indonesian license plates |
 | [VIN](/docs/vehicles/vin) | Validate and decode Vehicle Identification Numbers |
+| [Currency](/docs/utilities/currency) | Format Rupiah, terbilang, split amounts |
+| [Text](/docs/utilities/text) | Title case, slug, abbreviation, case conversion |
+| [DateTime](/docs/utilities/datetime) | Indonesian date formatting, relative time, age calculation, timezones |
 
 ## Before / After
 
@@ -138,10 +139,14 @@ formatCompact(1000000); // 'Rp 1 juta' (not '1,0 juta')
 
 // Indonesian-aware slug
 slugify('Pria & Wanita'); // 'pria-dan-wanita'
-```
+
+// Date formatting in Indonesian
+import { formatDate, parseDate } from '@indodev/toolkit/datetime';
+formatDate(new Date('2026-01-02'), 'long'); // '2 Januari 2026'
+parseDate('02-01-2026'); // Date(2026, 0, 2)
 
 ## What's Next
 
 - **[Get Started](/docs/get-started)** - Installation, TypeScript configuration, and framework integration guides
-- **[Browse API](/docs/identity/nik)** - Complete API reference for all 8 modules with examples and edge cases
+- **[Browse API](/docs/identity/nik)** - Complete API reference for all 9 modules with examples and edge cases
 - **[View on GitHub](https://github.com/choiruladamm/indo-dev-utils)** - Source code, issues, and contribution guidelines

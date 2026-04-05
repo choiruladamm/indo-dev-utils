@@ -1,0 +1,1187 @@
+---
+title: DateTime
+description: Indonesian date/time formatting, parsing, and calculation utilities with timezone support
+---
+
+import { Callout, Tabs, Steps } from 'nextra/components';
+
+# DateTime
+
+Comprehensive utilities for working with Indonesian date/time formats, relative time, age calculations, and timezone mappings.
+
+## Overview
+
+The DateTime module provides type-safe utilities for Indonesian date/time operations. Built with zero dependencies and designed to handle common Indonesian formatting needs including DD-MM-YYYY date parsing, relative time expressions ("X menit yang lalu"), and WIB/WITA/WIT timezone support.
+
+### Features
+
+- **Date Formatting**: Display dates with Indonesian month/day names (6 styles available)
+- **Smart Date Ranges**: Format ranges with automatic redundancy removal
+- **Strict Parsing**: DD-MM-YYYY parser with leap year validation
+- **Relative Time**: Human-readable relative expressions in Indonesian
+- **Age Calculation**: Calculate age with years, months, and days
+- **Timezone Mapping**: Convert IANA names to Indonesian abbreviations
+- **Date Utilities**: Leap year checks, days in month, weekend/working day detection
+- **Type Safety**: Full TypeScript support with custom error classes
+
+### Why This Module?
+
+Indonesian date/time handling has unique requirements:
+
+- Date format is DD-MM-YYYY (not MM-DD-YYYY like US)
+- Month and day names are in Indonesian (Januari, Februari, etc.)
+- Timezones use WIB/WITA/WIT abbreviations (not just UTC offsets)
+- Relative time uses Indonesian expressions ("Kemarin", "Besok", "Baru saja")
+- Age calculations are commonly needed for forms and verification
+
+## Installation
+
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+  <Tabs.Tab>
+    ```bash
+    npm install @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    pnpm add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    yarn add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    bun add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Quick Start
+
+```typescript
+import {
+  formatDate,
+  parseDate,
+  toRelativeTime,
+  getAge,
+  getIndonesianTimezone,
+  isLeapYear,
+} from '@indodev/toolkit/datetime';
+
+// Format date
+formatDate(new Date('2026-01-02'), 'long');
+// '2 Januari 2026'
+
+// Parse Indonesian date
+parseDate('02-01-2026');
+// Date(2026, 0, 2)
+
+// Relative time
+toRelativeTime(new Date(Date.now() - 3600000));
+// '1 jam yang lalu'
+
+// Calculate age
+getAge('1990-06-15', { asString: true });
+// '35 Tahun 9 Bulan'
+
+// Timezone mapping
+getIndonesianTimezone('Asia/Jakarta');
+// 'WIB'
+
+// Leap year check
+isLeapYear(2024);
+// true
+```
+
+## API Reference
+
+### formatDate()
+
+Formats a date with Indonesian locale.
+
+**Type Signature:**
+
+```typescript
+function formatDate(
+  date: Date | string | number,
+  style: 'full' | 'long' | 'medium' | 'short' | 'weekday' | 'month' = 'long'
+): string;
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `date` | `Date \| string \| number` | - | Date to format (Date object, string, or timestamp) |
+| `style` | `DateStyle` | `'long'` | Formatting style |
+
+**Date Styles:**
+
+| Style | Format | Example |
+|-------|--------|---------|
+| `'full'` | Weekday + Date | `'Jumat, 2 Januari 2026'` |
+| `'long'` | Date only | `'2 Januari 2026'` |
+| `'medium'` | Short month | `'2 Jan 2026'` |
+| `'short'` | DD/MM/YYYY | `'02/01/2026'` |
+| `'weekday'` | Day name only | `'Jumat'` |
+| `'month'` | Month name only | `'Januari'` |
+
+**Returns:**
+
+`string` - Formatted date string
+
+**Examples:**
+
+```typescript
+import { formatDate } from '@indodev/toolkit/datetime';
+
+// Different styles
+formatDate(new Date('2026-01-02'), 'full');
+// 'Jumat, 2 Januari 2026'
+
+formatDate(new Date('2026-01-02'), 'long');
+// '2 Januari 2026'
+
+formatDate(new Date('2026-01-02'), 'medium');
+// '2 Jan 2026'
+
+formatDate(new Date('2026-01-02'), 'short');
+// '02/01/2026'
+
+formatDate(new Date('2026-01-02'), 'weekday');
+// 'Jumat'
+
+formatDate(new Date('2026-01-02'), 'month');
+// 'Januari'
+
+// Input flexibility
+formatDate('2026-01-02'); // ISO string
+formatDate(1704153600000); // Timestamp
+formatDate(new Date()); // Date object
+
+// All months
+formatDate(new Date('2026-02-15'), 'long'); // '15 Februari 2026'
+formatDate(new Date('2026-03-15'), 'long'); // '15 Maret 2026'
+formatDate(new Date('2026-12-15'), 'long'); // '15 Desember 2026'
+```
+
+**Use Cases:**
+
+```typescript
+// Display formatted dates in UI
+function EventCard({ event }: { event: { name: string; date: Date } }) {
+  return (
+    <div className="event-card">
+      <h3>{event.name}</h3>
+      <p>{formatDate(event.date, 'full')}</p>
+    </div>
+  );
+}
+
+// Formatted date range display
+function EventDuration({ start, end }: { start: Date; end: Date }) {
+  return (
+    <div>
+      <span>{formatDate(start, 'medium')}</span>
+      <span> - </span>
+      <span>{formatDate(end, 'medium')}</span>
+    </div>
+  );
+}
+
+// Calendar header
+function CalendarHeader({ date }: { date: Date }) {
+  return (
+    <div className="calendar-header">
+      <h2>{formatDate(date, 'month')} {date.getFullYear()}</h2>
+      <p>{formatDate(date, 'weekday')}</p>
+    </div>
+  );
+}
+```
+
+---
+
+### formatDateRange()
+
+Formats a date range with smart redundancy removal.
+
+**Type Signature:**
+
+```typescript
+function formatDateRange(
+  start: Date,
+  end: Date,
+  style: 'full' | 'long' | 'medium' | 'short' = 'long'
+): string;
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `start` | `Date` | - | Start date |
+| `end` | `Date` | - | End date |
+| `style` | `'full' \| 'long' \| 'medium' \| 'short'` | `'long'` | Formatting style |
+
+**Smart Formatting Rules:**
+
+| Scenario | Output |
+|----------|--------|
+| Same day | `'2 Januari 2026'` |
+| Same month & year | `'2 - 5 Januari 2026'` |
+| Same year | `'30 Januari - 2 Februari 2026'` |
+| Different year | `'30 Desember 2025 - 2 Januari 2026'` |
+
+**Returns:**
+
+`string` - Formatted date range
+
+**Throws:**
+
+- `InvalidDateRangeError` - If end date is before start date
+
+**Examples:**
+
+```typescript
+import { formatDateRange } from '@indodev/toolkit/datetime';
+
+// Same day
+formatDateRange(
+  new Date('2026-01-02'),
+  new Date('2026-01-02')
+);
+// '2 Januari 2026'
+
+// Same month
+formatDateRange(
+  new Date('2026-01-02'),
+  new Date('2026-01-05')
+);
+// '2 - 5 Januari 2026'
+
+// Same year, different month
+formatDateRange(
+  new Date('2026-01-30'),
+  new Date('2026-02-02')
+);
+// '30 Januari - 2 Februari 2026'
+
+// Different year
+formatDateRange(
+  new Date('2025-12-30'),
+  new Date('2026-01-02')
+);
+// '30 Desember 2025 - 2 Januari 2026'
+
+// Full style
+formatDateRange(
+  new Date('2026-01-02'),
+  new Date('2026-01-05'),
+  'full'
+);
+// 'Jumat, 2 Januari 2026 - Senin, 5 Januari 2026'
+
+// Short style (no redundancy removal)
+formatDateRange(
+  new Date('2026-01-02'),
+  new Date('2026-01-05'),
+  'short'
+);
+// '02/01/2026 - 05/01/2026'
+```
+
+**Use Cases:**
+
+```typescript
+// Event duration display
+function EventRange({ event }: { event: { start: Date; end: Date } }) {
+  return (
+    <div className="event-range">
+      <span>📅 {formatDateRange(event.start, event.end, 'medium')}</span>
+    </div>
+  );
+}
+
+// Hotel booking dates
+function BookingSummary({ checkIn, checkOut }: { checkIn: Date; checkOut: Date }) {
+  return (
+    <div className="booking-summary">
+      <h4>Booking Details</h4>
+      <p>{formatDateRange(checkIn, checkOut)}</p>
+      <p>{calculateNights(checkIn, checkOut)} malam</p>
+    </div>
+  );
+}
+
+// Project timeline
+function ProjectTimeline({ start, end }: { start: Date; end: Date }) {
+  return (
+    <div className="timeline">
+      <div className="date-range">{formatDateRange(start, end, 'full')}</div>
+      <div className="duration">{calculateDuration(start, end)}</div>
+    </div>
+  );
+}
+```
+
+---
+
+### parseDate()
+
+Parses a date string in Indonesian format (DD-MM-YYYY) or ISO format (YYYY-MM-DD).
+
+**Type Signature:**
+
+```typescript
+function parseDate(dateStr: string): Date | null;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `dateStr` | `string` | Date string to parse |
+
+**Supported Formats:**
+
+- DD-MM-YYYY (Indonesian): `'02-01-2026'`, `'02/01/2026'`, `'02.01.2026'`
+- YYYY-MM-DD (ISO auto-detect): `'2026-01-02'`
+
+**Validation:**
+
+- Strict format checking
+- Leap year validation (Feb 29 only in leap years)
+- Month length validation
+- Rejects 2-digit years
+- Rejects time components
+
+**Returns:**
+
+`Date | null` - Parsed Date object, or `null` if invalid
+
+**Examples:**
+
+```typescript
+import { parseDate } from '@indodev/toolkit/datetime';
+
+// Indonesian format (DD-MM-YYYY)
+parseDate('02-01-2026');
+// Date(2026, 0, 2)
+
+parseDate('02/01/2026');
+// Date(2026, 0, 2)
+
+parseDate('02.01.2026');
+// Date(2026, 0, 2)
+
+// ISO format auto-detection
+parseDate('2026-01-02');
+// Date(2026, 0, 2)
+
+// Leap year validation
+parseDate('29-02-2024'); // ✅ Leap year
+// Date(2024, 1, 29)
+
+parseDate('29-02-2023'); // ❌ Not a leap year
+// null
+
+// Month length validation
+parseDate('31-04-2026'); // ❌ April has 30 days
+// null
+
+// Invalid inputs
+parseDate('02-01-26'); // ❌ 2-digit year
+// null
+
+parseDate('02-01-2026 14:30:00'); // ❌ Time component
+// null
+
+parseDate('invalid');
+// null
+```
+
+**Use Cases:**
+
+```typescript
+// Form validation
+function handleDateInput(input: string) {
+  const date = parseDate(input);
+
+  if (date === null) {
+    return { error: 'Format tanggal tidak valid (DD-MM-YYYY)' };
+  }
+
+  return { date };
+}
+
+// Import from CSV
+function importDates(csvData: string[]) {
+  return csvData
+    .map(parseDate)
+    .filter((date): date is Date => date !== null);
+}
+
+// Date comparison
+function isExpired(dateStr: string) {
+  const date = parseDate(dateStr);
+  if (!date) return false;
+
+  return date < new Date();
+}
+```
+
+<Callout type="info">
+  **Auto-Detection**: The function automatically detects ISO format (YYYY-MM-DD) when the first segment is a 4-digit number greater than 31.
+</Callout>
+
+---
+
+### toRelativeTime()
+
+Formats a date as relative time in Indonesian.
+
+**Type Signature:**
+
+```typescript
+function toRelativeTime(
+  date: Date | string | number,
+  baseDate?: Date
+): string;
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `date` | `Date \| string \| number` | - | Date to format |
+| `baseDate` | `Date` | `new Date()` | Reference date for comparison |
+
+**Relative Time Ranges:**
+
+| Range | Past | Future |
+|-------|------|--------|
+| Exact match | `'Sekarang'` | `'Sekarang'` |
+| < 1 minute | `'Baru saja'` | `'Baru saja'` |
+| < 60 minutes | `'X menit yang lalu'` | `'X menit lagi'` |
+| < 24 hours | `'X jam yang lalu'` | `'X jam lagi'` |
+| 1 day | `'Kemarin'` | `'Besok'` |
+| 2-30 days | `'X hari yang lalu'` | `'X hari lagi'` |
+| > 30 days | Full date | Full date |
+
+**Returns:**
+
+`string` - Relative time string
+
+**Throws:**
+
+- `InvalidDateError` - If date parameter is invalid
+
+**Examples:**
+
+```typescript
+import { toRelativeTime } from '@indodev/toolkit/datetime';
+
+// Assuming baseDate is 2026-01-15 12:00:00
+const baseDate = new Date('2026-01-15T12:00:00');
+
+// Past times
+toRelativeTime(new Date('2026-01-15T11:59:00'), baseDate);
+// 'Baru saja'
+
+toRelativeTime(new Date('2026-01-15T11:00:00'), baseDate);
+// '1 jam yang lalu'
+
+toRelativeTime(new Date('2026-01-15T09:30:00'), baseDate);
+// '2 jam yang lalu'
+
+toRelativeTime(new Date('2026-01-14T12:00:00'), baseDate);
+// 'Kemarin'
+
+toRelativeTime(new Date('2026-01-10T12:00:00'), baseDate);
+// '5 hari yang lalu'
+
+toRelativeTime(new Date('2025-12-15T12:00:00'), baseDate);
+// '15 Desember 2025' (falls back to full date)
+
+// Future times
+toRelativeTime(new Date('2026-01-15T13:00:00'), baseDate);
+// '1 jam lagi'
+
+toRelativeTime(new Date('2026-01-16T12:00:00'), baseDate);
+// 'Besok'
+
+toRelativeTime(new Date('2026-01-20T12:00:00'), baseDate);
+// '5 hari lagi'
+
+// Default baseDate (now)
+toRelativeTime(new Date()); // 'Sekarang'
+```
+
+**Use Cases:**
+
+```typescript
+// Activity feed
+function ActivityItem({ activity }: { activity: { action: string; timestamp: Date } }) {
+  return (
+    <div className="activity-item">
+      <span>{activity.action}</span>
+      <span className="time">{toRelativeTime(activity.timestamp)}</span>
+    </div>
+  );
+}
+
+// Message timestamp
+function MessageBubble({ message }: { message: { text: string; sentAt: Date } }) {
+  return (
+    <div className="message">
+      <p>{message.text}</p>
+      <span className="timestamp">{toRelativeTime(message.sentAt)}</span>
+    </div>
+  );
+}
+
+// Notification list
+function NotificationItem({ notification }: { notification: { title: string; createdAt: Date } }) {
+  return (
+    <div className="notification">
+      <h4>{notification.title}</h4>
+      <span>{toRelativeTime(notification.createdAt)}</span>
+    </div>
+  );
+}
+```
+
+---
+
+### getAge()
+
+Calculates age from a birth date.
+
+**Type Signature:**
+
+```typescript
+function getAge(
+  birthDate: Date | string | number,
+  options?: { fromDate?: Date | string | number; asString?: boolean }
+): { years: number; months: number; days: number } | string;
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `birthDate` | `Date \| string \| number` | - | Birth date |
+| `options.fromDate` | `Date \| string \| number` | `new Date()` | Reference date |
+| `options.asString` | `boolean` | `false` | Return as formatted string |
+
+**Returns:**
+
+Object `{ years, months, days }` or formatted string (if `asString: true`)
+
+**String Format:**
+
+Zero components are omitted:
+- `'25 Tahun 3 Bulan 2 Hari'`
+- `'25 Tahun'` (if months and days are 0)
+- `'3 Bulan 2 Hari'` (if years is 0)
+- `'15 Hari'` (if only days)
+
+**Throws:**
+
+- `InvalidDateError` - If dates are invalid or birth date is in the future
+
+**Examples:**
+
+```typescript
+import { getAge } from '@indodev/toolkit/datetime';
+
+// As object (default)
+getAge('1990-06-15', { fromDate: new Date('2024-06-15') });
+// { years: 34, months: 0, days: 0 }
+
+getAge('1990-06-15', { fromDate: new Date('2024-09-20') });
+// { years: 34, months: 3, days: 5 }
+
+// As string
+getAge('1990-06-15', { fromDate: new Date('2024-09-20'), asString: true });
+// '34 Tahun 3 Bulan 5 Hari'
+
+// Omit zero components
+getAge('2020-01-01', { fromDate: new Date('2020-01-15'), asString: true });
+// '14 Hari'
+
+getAge('2024-01-15', { fromDate: new Date('2024-06-20'), asString: true });
+// '5 Bulan 5 Hari'
+
+// Leap year birthday
+getAge('2020-02-29', { fromDate: new Date('2024-02-29'), asString: true });
+// '4 Tahun'
+
+// Default fromDate (now)
+getAge('1990-06-15'); // Uses current date
+```
+
+**Use Cases:**
+
+```typescript
+// Age verification
+function isAdult(birthDate: string): boolean {
+  const age = getAge(birthDate) as { years: number };
+  return age.years >= 17; // Indonesian adult age
+}
+
+// Display age
+function UserProfile({ user }: { user: { name: string; birthDate: Date } }) {
+  return (
+    <div className="profile">
+      <h3>{user.name}</h3>
+      <p>Usia: {getAge(user.birthDate, { asString: true })}</p>
+    </div>
+  );
+}
+
+// Form validation
+function validateAge(birthDate: string, minAge: number): boolean {
+  const age = getAge(birthDate) as { years: number };
+  return age.years >= minAge;
+}
+
+// Age at specific date
+function ageAtEvent(birthDate: string, eventDate: Date) {
+  return getAge(birthDate, { fromDate: eventDate, asString: true });
+}
+```
+
+---
+
+### getIndonesianTimezone()
+
+Maps IANA timezone names or UTC offsets to Indonesian abbreviations.
+
+**Type Signature:**
+
+```typescript
+function getIndonesianTimezone(input: string | number): 'WIB' | 'WITA' | 'WIT' | null;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `input` | `string \| number` | IANA timezone name or UTC offset |
+
+**Supported Inputs:**
+
+**IANA Names:**
+- `'Asia/Jakarta'` → `'WIB'`
+- `'Asia/Pontianak'` → `'WIB'`
+- `'Asia/Makassar'` → `'WITA'`
+- `'Asia/Denpasar'` → `'WITA'`
+- `'Asia/Jayapura'` → `'WIT'`
+
+**Offset Numbers:**
+- `7` → `'WIB'`
+- `8` → `'WITA'`
+- `9` → `'WIT'`
+
+**Offset Strings:**
+- `'+07:00'` → `'WIB'`
+- `'+0700'` → `'WIB'`
+- `'+08:00'` → `'WITA'`
+
+**Returns:**
+
+`'WIB' | 'WITA' | 'WIT' | null` - Indonesian timezone abbreviation or null
+
+**Examples:**
+
+```typescript
+import { getIndonesianTimezone } from '@indodev/toolkit/datetime';
+
+// IANA timezone names
+getIndonesianTimezone('Asia/Jakarta');
+// 'WIB'
+
+getIndonesianTimezone('Asia/Makassar');
+// 'WITA'
+
+getIndonesianTimezone('Asia/Jayapura');
+// 'WIT'
+
+// Offset as number
+getIndonesianTimezone(7);
+// 'WIB'
+
+getIndonesianTimezone(8);
+// 'WITA'
+
+getIndonesianTimezone(9);
+// 'WIT'
+
+// Offset as string
+getIndonesianTimezone('+07:00');
+// 'WIB'
+
+getIndonesianTimezone('+0800');
+// 'WITA'
+
+// Non-Indonesian timezones
+getIndonesianTimezone('America/New_York');
+// null
+
+getIndonesianTimezone(-5);
+// null
+
+getIndonesianTimezone('Europe/London');
+// null
+```
+
+**Use Cases:**
+
+```typescript
+// Display local timezone
+function TimezoneDisplay({ timezone }: { timezone: string }) {
+  const indonesianTz = getIndonesianTimezone(timezone);
+
+  return (
+    <span>
+      {indonesianTz || timezone}
+    </span>
+  );
+}
+
+// Convert UTC offset
+function getLocalTimezone(offset: number) {
+  return getIndonesianTimezone(offset) || `UTC${offset >= 0 ? '+' : ''}${offset}`;
+}
+
+// Filter Indonesian users
+function isIndonesianTimezone(timezone: string): boolean {
+  return getIndonesianTimezone(timezone) !== null;
+}
+```
+
+---
+
+### isLeapYear()
+
+Checks if a year is a leap year.
+
+**Type Signature:**
+
+```typescript
+function isLeapYear(year: number): boolean;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `year` | `number` | Year to check |
+
+**Returns:**
+
+`boolean` - `true` if leap year, `false` otherwise
+
+**Examples:**
+
+```typescript
+import { isLeapYear } from '@indodev/toolkit/datetime';
+
+isLeapYear(2024); // true
+isLeapYear(2023); // false
+isLeapYear(2000); // true (divisible by 400)
+isLeapYear(1900); // false (divisible by 100, not 400)
+isLeapYear(NaN); // false
+isLeapYear(2024.5); // false (non-integer)
+```
+
+---
+
+### daysInMonth()
+
+Gets the number of days in a month.
+
+**Type Signature:**
+
+```typescript
+function daysInMonth(month: number, year: number): number;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `month` | `number` | Month (1-12) |
+| `year` | `number` | Full year |
+
+**Returns:**
+
+`number` - Days in month (28-31), or 0 for invalid inputs
+
+**Examples:**
+
+```typescript
+import { daysInMonth } from '@indodev/toolkit/datetime';
+
+daysInMonth(1, 2026); // 31 (January)
+daysInMonth(2, 2024); // 29 (February, leap year)
+daysInMonth(2, 2023); // 28 (February, non-leap)
+daysInMonth(4, 2026); // 30 (April)
+daysInMonth(13, 2026); // 0 (invalid month)
+```
+
+---
+
+### isValidDate()
+
+Type guard to check if a value is a valid Date object.
+
+**Type Signature:**
+
+```typescript
+function isValidDate(date: unknown): date is Date;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `date` | `unknown` | Value to check |
+
+**Returns:**
+
+`boolean` - `true` if valid Date object
+
+**Examples:**
+
+```typescript
+import { isValidDate } from '@indodev/toolkit/datetime';
+
+isValidDate(new Date()); // true
+isValidDate(new Date('invalid')); // false
+isValidDate(null); // false
+isValidDate('2024-01-01'); // false (string)
+isValidDate(1704067200000); // false (number)
+```
+
+---
+
+### isWeekend()
+
+Checks if a date falls on a weekend.
+
+**Type Signature:**
+
+```typescript
+function isWeekend(date: Date): boolean;
+```
+
+**Returns:**
+
+`boolean` - `true` if Saturday or Sunday
+
+**Examples:**
+
+```typescript
+import { isWeekend } from '@indodev/toolkit/datetime';
+
+isWeekend(new Date('2026-01-03')); // true (Saturday)
+isWeekend(new Date('2026-01-04')); // true (Sunday)
+isWeekend(new Date('2026-01-05')); // false (Monday)
+```
+
+---
+
+### isWorkingDay()
+
+Checks if a date falls on a working day (Monday-Friday).
+
+**Type Signature:**
+
+```typescript
+function isWorkingDay(date: Date): boolean;
+```
+
+**Returns:**
+
+`boolean` - `true` if Monday-Friday
+
+**Examples:**
+
+```typescript
+import { isWorkingDay } from '@indodev/toolkit/datetime';
+
+isWorkingDay(new Date('2026-01-05')); // true (Monday)
+isWorkingDay(new Date('2026-01-03')); // false (Saturday)
+isWorkingDay(new Date('2026-01-04')); // false (Sunday)
+```
+
+<Callout type="warning">
+  **Note**: `isWorkingDay()` only checks Monday-Friday. It does not account for national holidays.
+</Callout>
+
+---
+
+## Type Reference
+
+### DateStyle
+
+Union type for date formatting styles.
+
+```typescript
+type DateStyle = 'full' | 'long' | 'medium' | 'short' | 'weekday' | 'month';
+```
+
+### AgeResult
+
+Object returned by `getAge()`.
+
+```typescript
+interface AgeResult {
+  years: number;
+  months: number;
+  days: number;
+}
+```
+
+### AgeOptions
+
+Options for `getAge()`.
+
+```typescript
+interface AgeOptions {
+  fromDate?: Date | string | number;
+  asString?: boolean;
+}
+```
+
+### InvalidDateError
+
+Custom error thrown for invalid date operations.
+
+```typescript
+class InvalidDateError extends Error {
+  readonly code = 'INVALID_DATE';
+}
+```
+
+### InvalidDateRangeError
+
+Custom error thrown for invalid date ranges.
+
+```typescript
+class InvalidDateRangeError extends Error {
+  readonly code = 'INVALID_DATE_RANGE';
+}
+```
+
+---
+
+## Common Use Cases
+
+### Form Date Input with Validation
+
+```typescript
+import { parseDate, formatDate } from '@indodev/toolkit/datetime';
+
+function DateInput() {
+  const [value, setValue] = useState('');
+  const [error, setError] = useState('');
+
+  const handleChange = (input: string) => {
+    setValue(input);
+
+    const date = parseDate(input);
+    if (date === null && input.length === 10) {
+      setError('Format: DD-MM-YYYY');
+    } else {
+      setError('');
+    }
+  };
+
+  const handleBlur = () => {
+    const date = parseDate(value);
+    if (date) {
+      setValue(formatDate(date, 'short')); // Format as DD/MM/YYYY
+    }
+  };
+
+  return (
+    <div>
+      <input
+        value={value}
+        onChange={(e) => handleChange(e.target.value)}
+        onBlur={handleBlur}
+        placeholder="DD-MM-YYYY"
+      />
+      {error && <span className="error">{error}</span>}
+    </div>
+  );
+}
+```
+
+### Age Verification System
+
+```typescript
+import { getAge, parseDate } from '@indodev/toolkit/datetime';
+
+function verifyAge(birthDateStr: string, minAge: number): boolean {
+  const birthDate = parseDate(birthDateStr);
+  if (!birthDate) return false;
+
+  const age = getAge(birthDate) as { years: number };
+  return age.years >= minAge;
+}
+
+// Usage
+if (verifyAge(userBirthDate, 17)) {
+  // Allow access
+} else {
+  // Require parent consent
+}
+```
+
+### Event Calendar
+
+```typescript
+import { formatDate, formatDateRange, isWeekend } from '@indodev/toolkit/datetime';
+
+function EventCard({ event }: { event: { name: string; start: Date; end: Date } }) {
+  const isWeekendEvent = isWeekend(event.start);
+
+  return (
+    <div className={`event-card ${isWeekendEvent ? 'weekend' : ''}`}>
+      <h3>{event.name}</h3>
+      <p>{formatDateRange(event.start, event.end, 'full')}</p>
+      {isWeekendEvent && <span className="badge">Weekend</span>}
+    </div>
+  );
+}
+```
+
+### Activity Feed
+
+```typescript
+import { toRelativeTime } from '@indodev/toolkit/datetime';
+
+function ActivityFeed({ activities }: { activities: { action: string; timestamp: Date }[] }) {
+  return (
+    <div className="activity-feed">
+      {activities.map((activity, i) => (
+        <div key={i} className="activity-item">
+          <span>{activity.action}</span>
+          <span className="timestamp">
+            {toRelativeTime(activity.timestamp)}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+---
+
+## Best Practices
+
+### 1. Use parseDate for User Input
+
+```typescript
+// ✅ Good: Parse and validate user input
+const date = parseDate(userInput);
+if (date) {
+  // Process valid date
+}
+
+// ❌ Bad: Direct Date construction
+const date = new Date(userInput); // May interpret as MM-DD-YYYY
+```
+
+### 2. Handle Errors Gracefully
+
+```typescript
+// ✅ Good: Try-catch for throwing functions
+try {
+  const formatted = formatDateRange(start, end);
+} catch (error) {
+  if (error instanceof InvalidDateRangeError) {
+    // Handle invalid range
+  }
+}
+
+// ✅ Good: Null check for parseDate
+const date = parseDate(input);
+if (date === null) {
+  // Handle invalid date
+}
+```
+
+### 3. Format Consistently
+
+```typescript
+// ✅ Good: Use consistent style throughout app
+const dateStyle = 'long'; // Choose one style
+formatDate(date1, dateStyle);
+formatDate(date2, dateStyle);
+
+// ❌ Bad: Mixing styles
+formatDate(date1, 'short');
+formatDate(date2, 'full');
+```
+
+---
+
+## Troubleshooting
+
+**Q: Why does parseDate return null?**
+
+A: Common reasons:
+- Wrong format (not DD-MM-YYYY or YYYY-MM-DD)
+- Invalid date (e.g., 31-02-2026)
+- 2-digit year
+- Time component included
+
+```typescript
+parseDate('02-01-2026'); // ✅ Valid
+parseDate('01-02-2026'); // ❌ Wrong format (MM-DD-YYYY)
+parseDate('02-01-26'); // ❌ 2-digit year
+parseDate('31-02-2026'); // ❌ Invalid date
+```
+
+**Q: How to handle timezone display?**
+
+A: Use getIndonesianTimezone with fallback:
+
+```typescript
+function displayTimezone(timezone: string) {
+  return getIndonesianTimezone(timezone) || timezone;
+}
+```
+
+**Q: Can I parse dates with time?**
+
+A: parseDate doesn't support time. Parse date and time separately:
+
+```typescript
+const date = parseDate('02-01-2026');
+const time = '14:30'; // Parse separately
+```
+
+---
+
+## Data Standards
+
+All formatting follows Indonesian standards:
+
+- **Date Format**: DD-MM-YYYY
+- **Day Names**: Senin, Selasa, Rabu, Kamis, Jumat, Sabtu, Minggu
+- **Month Names**: Januari, Februari, Maret, April, Mei, Juni, Juli, Agustus, September, Oktober, November, Desember
+- **Timezones**: WIB (UTC+7), WITA (UTC+8), WIT (UTC+9)
+- **Relative Time**: Indonesian expressions ("Kemarin", "Besok", "Baru saja")
+
+<Callout type="info">The library follows Indonesian locale standards and common business practices in Indonesia.</Callout>

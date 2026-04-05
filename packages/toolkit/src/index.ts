@@ -53,7 +53,12 @@ export { validateVIN } from './vin';
 export type { VINOptions, VINValidationResult } from './vin';
 
 // Email validator utilities
-export { validateEmail, normalizeEmail, maskEmail, getEmailInfo } from './email-validator';
+export {
+  validateEmail,
+  normalizeEmail,
+  maskEmail,
+  getEmailInfo,
+} from './email-validator';
 export type {
   EmailValidationOptions,
   EmailValidationResult,
@@ -106,3 +111,36 @@ export type {
   ExtractOptions,
   CompareOptions,
 } from './text';
+
+// DateTime utilities
+export {
+  // Errors
+  InvalidDateError,
+  InvalidDateRangeError,
+  // Constants
+  MONTH_NAMES,
+  MONTH_NAMES_SHORT,
+  DAY_NAMES,
+  DAY_NAMES_SHORT,
+  TIMEZONE_MAP,
+  VALID_UTC_OFFSETS,
+  // Calculations
+  isLeapYear,
+  daysInMonth,
+  isValidDate,
+  isWeekend,
+  isWorkingDay,
+  // Parsing
+  parseDate,
+  // Formatting
+  formatDate,
+  formatDateRange,
+  // Relative time
+  toRelativeTime,
+  // Calculations (expanded)
+  getAge as getAgeFromDate,
+  // Timezone
+  getIndonesianTimezone,
+} from './datetime';
+
+export type { DateStyle, AgeOptions, AgeResult } from './datetime';

@@ -3,6 +3,7 @@
   "instructions": [
     ".opencode/rules/mandates.md",
     ".opencode/rules/architecture.md",
-    ".opencode/rules/standards.md"
+    ".opencode/rules/standards.md",
+    ".opencode/rules/workflow.md"
   ]
 }

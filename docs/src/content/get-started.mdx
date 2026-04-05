@@ -209,6 +209,40 @@ toCamelCase('hello-world');
 // 'helloWorld'
 ```
 
+### DateTime Utilities
+
+```typescript
+import { formatDate, parseDate, toRelativeTime, getAge } from '@indodev/toolkit/datetime';
+
+// Format dates with Indonesian locale
+formatDate(new Date('2026-01-02'), 'long');
+// '2 Januari 2026'
+
+formatDate(new Date('2026-01-02'), 'full');
+// 'Jumat, 2 Januari 2026'
+
+// Parse Indonesian date format (DD-MM-YYYY)
+parseDate('02-01-2026');
+// Date(2026, 0, 2)
+
+parseDate('02/01/2026');
+// Date(2026, 0, 2)
+
+// Relative time in Indonesian
+toRelativeTime(new Date(Date.now() - 3600000));
+// '1 jam yang lalu'
+
+toRelativeTime(new Date(Date.now() + 86400000));
+// 'Besok'
+
+// Calculate age
+getAge('1990-06-15', { asString: true });
+// '35 Tahun 9 Bulan'
+
+getAge(new Date('1990-06-15'));
+// { years: 35, months: 9, days: 0 }
+```
+
 ## Framework Integration
 
 ### React / Next.js -- Invoice Component
@@ -217,7 +251,7 @@ A realistic invoice component combining currency formatting, terbilang, and date
 
 ```tsx
 import { formatRupiah, toWords, calculateTax } from '@indodev/toolkit/currency';
-import { formatDate } from '@indodev/toolkit/datetime'; // future module
+import { formatDate } from '@indodev/toolkit/datetime';
 
 interface InvoiceProps {
   items: { name: string; qty: number; price: number }[];
@@ -361,10 +395,11 @@ Dive into the specific documentation for each module:
 - [NPWP Documentation](/docs/identity/npwp)
 - [Phone Documentation](/docs/contact/phone)
 - [Email Documentation](/docs/contact/email)
-- [Currency Documentation](/docs/financial/currency)
-- [Text Documentation](/docs/text-utils/text)
 - [Vehicle Plate Documentation](/docs/vehicles/plate)
 - [VIN Documentation](/docs/vehicles/vin)
+- [Currency Documentation](/docs/utilities/currency)
+- [Text Documentation](/docs/utilities/text)
+- [DateTime Documentation](/docs/utilities/datetime)
 
 ### Real-world Examples
 

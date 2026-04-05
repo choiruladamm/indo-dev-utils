@@ -30,7 +30,7 @@ Use Nextra components:
 
 ## File Locations
 
-- API docs: `docs/src/content/api/{module}.mdx`
+- API docs: `docs/src/content/{module}/index.mdx`
 - Feature guides: `docs/src/content/features/`
 - Changelog: `docs/src/content/changelog.mdx`
 
