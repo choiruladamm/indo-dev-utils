@@ -13,6 +13,8 @@ import { validatePhoneNumber } from './validate';
  * generateWALink('081234567890', 'Halo!');
  * // 'https://wa.me/6281234567890?text=Halo%21'
  * ```
+ *
+ * @public
  */
 export function generateWALink(phone: string, message?: string): string {
   if (!validatePhoneNumber(phone)) {
@@ -41,6 +43,8 @@ export function generateWALink(phone: string, message?: string): string {
  * generateSmsLink('081234567890', 'Pesan ini');
  * // 'sms:+6281234567890?body=Pesan%20ini'
  * ```
+ *
+ * @public
  */
 export function generateSmsLink(phone: string, body?: string): string {
   if (!validatePhoneNumber(phone)) {
@@ -68,6 +72,8 @@ export function generateSmsLink(phone: string, body?: string): string {
  * generateTelLink('081234567890');
  * // 'tel:+6281234567890'
  * ```
+ *
+ * @public
  */
 export function generateTelLink(phone: string): string {
   if (!validatePhoneNumber(phone)) {

@@ -57,6 +57,24 @@
  * toE164(phone);          // '6281234567890'
  * ```
  *
+ * @example
+ * Compare phone numbers:
+ * ```typescript
+ * import { comparePhones } from '@indodev/toolkit/phone';
+ *
+ * comparePhones('081234567890', '+6281234567890'); // true
+ * comparePhones('0212345678', '+62212345678'); // true
+ * ```
+ *
+ * @example
+ * Get landline region:
+ * ```typescript
+ * import { getLandlineRegion } from '@indodev/toolkit/phone';
+ *
+ * getLandlineRegion('0212345678'); // 'Jakarta'
+ * getLandlineRegion('0221234567'); // 'Bandung'
+ * ```
+ *
  * @module phone
  * @packageDocumentation
  */
@@ -80,4 +98,15 @@ export { generateWALink, generateSmsLink, generateTelLink } from './links';
 
 export { parsePhoneNumber, getOperator, isProvider } from './parse';
 
-export type { PhoneInfo, PhoneFormat, MaskOptions } from './types';
+export {
+  getLandlineRegion,
+  comparePhones,
+  normalizePhoneNumber,
+} from './utils';
+
+export type {
+  PhoneInfo,
+  PhoneFormat,
+  MaskOptions,
+  OperatorName,
+} from './types';

@@ -83,9 +83,9 @@ export default async function RootLayout({ children }) {
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head faviconGlyph="🇮🇩" />
       <body>
-        <Banner storageKey="v0.4.0">
-          v0.4.0 released — New DateTime module with Indonesian date formatting,
-          relative time, age calculation, and timezone support.{' '}
+        <Banner storageKey="v0.4.1">
+          v0.4.1 released — Phone module enhancements: new comparePhones,
+          getLandlineRegion, and 620 bug fix.{' '}
           <a href="/docs/changelog" style={{ textDecoration: 'underline' }}>
             Read changelog
           </a>

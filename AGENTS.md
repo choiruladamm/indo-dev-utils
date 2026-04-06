@@ -30,6 +30,16 @@ pnpm --filter @indodev/toolkit lint:fix
 pnpm --filter @indodev/toolkit build
 ```
 
+## Docs Check (Every Release)
+
+**IMPORTANT**: Before releasing, check if existing module docs need updates:
+
+- New functions → Add API docs
+- Bug fixes → Update existing docs
+- Type changes → Update type references
+
+Docs location: `docs/src/content/{category}/{module}/index.mdx`
+
 ## Common Pitfalls
 
 | Pitfall                   | Fix                                      |

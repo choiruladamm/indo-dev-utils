@@ -1,5 +1,5 @@
-import { OPERATOR_PREFIXES, AREA_CODES } from './constants';
-import { PhoneInfo } from './types';
+import { OPERATOR_PREFIXES } from './constants';
+import { PhoneInfo, OperatorName } from './types';
 import {
   cleanPhoneNumber,
   toInternational,
@@ -7,6 +7,7 @@ import {
   toE164,
 } from './format';
 import { validatePhoneNumber, isMobileNumber } from './validate';
+import { normalizePhoneNumber, getLandlineRegion } from './utils';
 
 /**
  * Parses an Indonesian phone number and extracts all information.
@@ -61,7 +62,7 @@ export function parsePhoneNumber(phone: string): PhoneInfo | null {
   }
 
   const cleaned = cleanPhoneNumber(phone);
-  const normalized = normalizeToNational(cleaned);
+  const normalized = normalizePhoneNumber(cleaned);
 
   if (!normalized) {
     return null;
@@ -72,13 +73,13 @@ export function parsePhoneNumber(phone: string): PhoneInfo | null {
   const isMobile = normalized.startsWith('08');
   const isLandline = !isMobile;
 
-  let operator: string | null = null;
+  let operator: OperatorName | null = null;
   let region: string | null = null;
 
   if (isMobile) {
     operator = getOperator(normalized);
   } else {
-    region = getRegion(normalized);
+    region = getLandlineRegion(normalized);
   }
 
   return {
@@ -129,13 +130,13 @@ export function parsePhoneNumber(phone: string): PhoneInfo | null {
  *
  * @public
  */
-export function getOperator(phone: string): string | null {
+export function getOperator(phone: string): OperatorName | null {
   if (!isMobileNumber(phone)) {
     return null;
   }
 
   const cleaned = cleanPhoneNumber(phone);
-  const normalized = normalizeToNational(cleaned);
+  const normalized = normalizePhoneNumber(cleaned);
 
   if (!normalized || normalized.length < 4) {
     return null;
@@ -157,6 +158,8 @@ export function getOperator(phone: string): string | null {
  * isProvider('081234567890', 'Telkomsel'); // true
  * isProvider('081734567890', 'xl'); // true
  * ```
+ *
+ * @public
  */
 export function isProvider(phone: string, providerName: string): boolean {
   const operator = getOperator(phone);
@@ -164,49 +167,4 @@ export function isProvider(phone: string, providerName: string): boolean {
     return false;
   }
   return operator.toLowerCase() === providerName.toLowerCase();
-}
-
-/**
- * Gets the region name for a landline number.
- *
- * @param phone - Landline phone number in national format
- * @returns Region name, or null if not found
- * @internal
- */
-function getRegion(phone: string): string | null {
-  if (!phone.startsWith('0')) {
-    return null;
-  }
-
-  // Check 4-digit area code
-  const areaCode4 = phone.substring(0, 4);
-  if (AREA_CODES[areaCode4]) {
-    return AREA_CODES[areaCode4];
-  }
-
-  // Check 3-digit area code
-  const areaCode3 = phone.substring(0, 3);
-  if (AREA_CODES[areaCode3]) {
-    return AREA_CODES[areaCode3];
-  }
-
-  return null;
-}
-
-/**
- * Normalizes a phone number to national format (08xx).
- *
- * @param phone - Cleaned phone number
- * @returns Phone number in 08xx format
- * @internal
- */
-function normalizeToNational(phone: string): string {
-  if (phone.startsWith('+62')) {
-    return '0' + phone.substring(3);
-  } else if (phone.startsWith('62')) {
-    return '0' + phone.substring(2);
-  } else if (phone.startsWith('0')) {
-    return phone;
-  }
-  return '';
 }

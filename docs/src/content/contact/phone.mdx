@@ -22,6 +22,8 @@ The Phone module provides type-safe utilities for validating, formatting, parsin
 - **Area Code Mapping**: Recognize 200+ Indonesian area codes for landlines
 - **Parsing**: Extract all information from phone numbers in a single call
 - **Masking**: Protect privacy while maintaining partial visibility
+- **Comparison**: Compare phone numbers regardless of format
+- **Region Detection**: Get landline region name from area code
 - **Flexible Input**: Accepts multiple formats with or without separators
 
 ### Supported Operators
@@ -72,7 +74,14 @@ The Phone module provides type-safe utilities for validating, formatting, parsin
 ## Quick Start
 
 ```typescript
-import { validatePhoneNumber, formatPhoneNumber, parsePhoneNumber, getOperator } from '@indodev/toolkit/phone';
+import {
+  validatePhoneNumber,
+  formatPhoneNumber,
+  parsePhoneNumber,
+  getOperator,
+  comparePhones,
+  getLandlineRegion
+} from '@indodev/toolkit/phone';
 
 // Validate
 const isValid = validatePhoneNumber('081234567890');
@@ -90,6 +99,12 @@ console.log(operator); // 'Telkomsel'
 const info = parsePhoneNumber('081234567890');
 console.log(info.operator); // 'Telkomsel'
 console.log(info.formatted.international); // '+62 812-3456-7890'
+
+// Compare phones (same number, different formats)
+comparePhones('081234567890', '+6281234567890'); // true
+
+// Get landline region
+getLandlineRegion('0212345678'); // 'Jakarta'
 ```
 
 ## API Reference
@@ -1060,6 +1075,164 @@ generateTelLink('081234567890');
 
 ---
 
+### normalizePhoneNumber()
+
+Normalizes a cleaned phone number to national format (0xxx).
+
+**Type Signature:**
+
+```typescript
+function normalizePhoneNumber(phone: string): string;
+```
+
+**Parameters:**
+
+| Name    | Type     | Description                        |
+| ------- | -------- | --------------------------------- |
+| `phone` | `string` | Cleaned phone number (digits only) |
+
+**Returns:**
+
+`string` - Phone number in 08xx format, or empty string if invalid
+
+<Callout type="info">
+  Input should be pre-cleaned (digits only, optional leading +). Use `cleanPhoneNumber()` first if input may contain separators.
+</Callout>
+
+**Examples:**
+
+```typescript
+// Basic normalization
+normalizePhoneNumber('+6281234567890'); // '081234567890'
+normalizePhoneNumber('6281234567890');  // '081234567890'
+normalizePhoneNumber('081234567890'); // '081234567890'
+
+// Invalid inputs return empty string
+normalizePhoneNumber('620812345678'); // '' (620 is not valid country code)
+normalizePhoneNumber('invalid');      // ''
+normalizePhoneNumber('');            // ''
+```
+
+---
+
+### comparePhones()
+
+Compares two phone numbers regardless of format.
+
+**Type Signature:**
+
+```typescript
+function comparePhones(phoneA: string, phoneB: string): boolean;
+```
+
+**Parameters:**
+
+| Name     | Type     | Description          |
+| -------- | -------- | -------------------- |
+| `phoneA` | `string` | First phone number   |
+| `phoneB` | `string` | Second phone number  |
+
+**Returns:**
+
+`boolean` - `true` if both represent the same number, `false` otherwise
+
+**Examples:**
+
+```typescript
+// Same number in different formats
+comparePhones('081234567890', '+6281234567890'); // true
+comparePhones('0812-3456-7890', '6281234567890'); // true
+comparePhones('0212345678', '+62212345678'); // true (landline)
+
+// Different numbers
+comparePhones('081234567890', '081234567891'); // false
+comparePhones('0212345678', '0221234567'); // false
+
+// Invalid inputs return false
+comparePhones('invalid', '081234567890'); // false
+comparePhones('', ''); // false
+```
+
+**Use Cases:**
+
+```typescript
+// Check for duplicates in user input
+function hasDuplicatePhone(newPhone: string, existingPhones: string[]): boolean {
+  return existingPhones.some(existing => comparePhones(newPhone, existing));
+}
+
+// Validate phone matches stored format
+function isSamePhone(input: string, stored: string): boolean {
+  return comparePhones(input, stored);
+}
+```
+
+---
+
+### getLandlineRegion()
+
+Gets the region name from a landline phone number's area code.
+
+**Type Signature:**
+
+```typescript
+function getLandlineRegion(phone: string): string | null;
+```
+
+**Parameters:**
+
+| Name    | Type     | Description               |
+| ------- | -------- | ------------------------- |
+| `phone` | `string` | Phone number in any format |
+
+**Returns:**
+
+`string | null` - Region name (e.g., 'Jakarta', 'Bandung') or `null` if not a landline
+
+**Examples:**
+
+```typescript
+// Landline region detection
+getLandlineRegion('0212345678');      // 'Jakarta'
+getLandlineRegion('0221234567');    // 'Bandung'
+getLandlineRegion('0311234567');    // 'Surabaya'
+getLandlineRegion('0274123456');    // 'Yogyakarta'
+
+// International format works
+getLandlineRegion('+62212345678'); // 'Jakarta'
+getLandlineRegion('62212345678');   // 'Jakarta'
+
+// Mobile numbers return null
+getLandlineRegion('081234567890'); // null
+
+// Invalid input returns null
+getLandlineRegion('invalid'); // null
+getLandlineRegion(''); // null
+```
+
+**Use Cases:**
+
+```typescript
+// Display landline region
+function LandlineCard({ phone }: { phone: string }) {
+  const region = getLandlineRegion(phone);
+  return region ? (
+    <div>Region: {region}</div>
+  ) : null;
+}
+
+// Route by region
+function routeToRegion(phone: string) {
+  const region = getLandlineRegion(phone);
+  if (region === 'Jakarta') {
+    return jakartaOffice.route(phone);
+  }
+  // ...
+}
+```
+
+---
+
 ## Type Reference
 
 ### PhoneInfo
@@ -1069,7 +1242,7 @@ Information extracted from a valid phone number.
 ```typescript
 interface PhoneInfo {
   countryCode: string; // Always '62' for Indonesia
-  operator: string | null; // Mobile operator name
+  operator: OperatorName | null; // Mobile operator name
   number: string; // Raw number without country code/zero
   formatted: {
     international: string; // '+62 812-3456-7890'
@@ -1081,6 +1254,14 @@ interface PhoneInfo {
   isLandline: boolean; // Is landline number
   region?: string | null; // Region for landlines
 }
+```
+
+### OperatorName
+
+Union type for valid mobile operator names.
+
+```typescript
+type OperatorName = 'Telkomsel' | 'XL' | 'Indosat' | 'Smartfren' | 'Axis';
 ```
 
 ### PhoneFormat

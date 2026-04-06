@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parsePhoneNumber, getOperator, isProvider } from '../parse';
+import { getLandlineRegion } from '../utils';
 
 describe('getOperator', () => {
   describe('Telkomsel detection', () => {
@@ -210,6 +211,11 @@ describe('getOperator', () => {
     it('should return null for unknown prefix', () => {
       expect(getOperator('080012345678')).toBe(null);
       expect(getOperator('090012345678')).toBe(null);
+    });
+
+    it('should return null for short number', () => {
+      expect(getOperator('081')).toBe(null);
+      expect(getOperator('0812')).toBe(null);
     });
   });
 });
@@ -426,5 +432,67 @@ describe('isProvider', () => {
   it('should return false for invalid number', () => {
     expect(isProvider('1234', 'Telkomsel')).toBe(false);
     expect(isProvider('', 'Telkomsel')).toBe(false);
+  });
+
+  it('should return false for empty provider name', () => {
+    expect(isProvider('081234567890', '')).toBe(false);
+  });
+});
+
+describe('getLandlineRegion', () => {
+  describe('valid landline numbers (happy path)', () => {
+    it('should return Jakarta for 021', () => {
+      expect(getLandlineRegion('0212345678')).toBe('Jakarta');
+    });
+
+    it('should return Bandung for 022', () => {
+      expect(getLandlineRegion('0221234567')).toBe('Bandung');
+    });
+
+    it('should return Surabaya for 031', () => {
+      expect(getLandlineRegion('0311234567')).toBe('Surabaya');
+    });
+
+    it('should return Yogyakarta for 0274', () => {
+      expect(getLandlineRegion('0274123456')).toBe('Yogyakarta');
+    });
+
+    it('should return Medan for 061', () => {
+      expect(getLandlineRegion('0611234567')).toBe('Medan');
+    });
+
+    it('should return Jakarta for +62 format', () => {
+      expect(getLandlineRegion('+62212345678')).toBe('Jakarta');
+    });
+
+    it('should return Jakarta for 62 format without +', () => {
+      expect(getLandlineRegion('62212345678')).toBe('Jakarta');
+    });
+  });
+
+  describe('mobile and invalid numbers (edge cases)', () => {
+    it('should return null for mobile numbers', () => {
+      expect(getLandlineRegion('081234567890')).toBe(null);
+    });
+
+    it('should return null for unknown area code', () => {
+      expect(getLandlineRegion('0991234567')).toBe(null);
+    });
+
+    it('should return null for invalid input', () => {
+      expect(getLandlineRegion('invalid')).toBe(null);
+    });
+
+    it('should return null for empty string', () => {
+      expect(getLandlineRegion('')).toBe(null);
+    });
+
+    it('should return null for null input', () => {
+      expect(getLandlineRegion(null as any)).toBe(null);
+    });
+
+    it('should return null for undefined input', () => {
+      expect(getLandlineRegion(undefined as any)).toBe(null);
+    });
   });
 });

@@ -119,5 +119,10 @@ describe('maskPhoneNumber', () => {
       expect(masked.startsWith('+628')).toBe(true);
       expect(masked).toContain('*');
     });
+
+    it('should return empty string for empty input', () => {
+      const masked = maskPhoneNumber('');
+      expect(masked).toBe('');
+    });
   });
 });

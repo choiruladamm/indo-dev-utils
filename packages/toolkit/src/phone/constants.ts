@@ -1,3 +1,5 @@
+import { OperatorName } from './types';
+
 /**
  * Phone number constants for Indonesian operators and area codes.
  *
@@ -31,7 +33,7 @@
  *
  * @internal
  */
-export const OPERATOR_PREFIXES: Record<string, string> = {
+export const OPERATOR_PREFIXES: Record<string, OperatorName> = {
   // Telkomsel (Halo, Simpati, by.U)
   '0811': 'Telkomsel',
   '0812': 'Telkomsel',
@@ -83,7 +85,7 @@ export const OPERATOR_PREFIXES: Record<string, string> = {
   '0832': 'Axis',
   '0833': 'Axis',
   '0838': 'Axis',
-};
+} as const;
 
 /**
  * Landline area code mapping.
@@ -497,7 +499,7 @@ export const AREA_CODES: Record<string, string> = {
   '0979': 'Tembagapura',
   '0981': 'Jayapura',
   '0986': 'Wamena',
-};
+} as const;
 
 /**
  * Valid mobile number prefixes (first 4 digits after country code).

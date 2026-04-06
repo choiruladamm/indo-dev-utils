@@ -1,6 +1,7 @@
 import { AREA_CODES } from './constants';
 import { PhoneFormat, MaskOptions } from './types';
 import { validatePhoneNumber } from './validate';
+import { normalizePhoneNumber } from './utils';
 
 /**
  * Formats an Indonesian phone number to the specified format.
@@ -45,13 +46,9 @@ export function formatPhoneNumber(
 
   const cleaned = cleanPhoneNumber(phone);
 
-  let normalized: string;
-  if (cleaned.startsWith('+62')) {
-    normalized = '0' + cleaned.substring(3);
-  } else if (cleaned.startsWith('62') && !cleaned.startsWith('620')) {
-    normalized = '0' + cleaned.substring(2);
-  } else {
-    normalized = cleaned;
+  const normalized = normalizePhoneNumber(cleaned);
+  if (!normalized) {
+    return phone;
   }
 
   switch (format) {
@@ -94,7 +91,7 @@ export function toInternational(phone: string): string {
     return phone;
   }
 
-  const normalized = normalizeToNational(cleaned);
+  const normalized = normalizePhoneNumber(cleaned);
   if (!normalized) {
     return phone;
   }
@@ -147,7 +144,7 @@ export function toNational(phone: string): string {
     return phone;
   }
 
-  const normalized = normalizeToNational(cleaned);
+  const normalized = normalizePhoneNumber(cleaned);
   if (!normalized) {
     return phone;
   }
@@ -201,7 +198,7 @@ export function toE164(phone: string): string {
     return phone;
   }
 
-  const normalized = normalizeToNational(cleaned);
+  const normalized = normalizePhoneNumber(cleaned);
   if (!normalized) {
     return phone;
   }
@@ -235,24 +232,6 @@ export function cleanPhoneNumber(phone: string): string {
   }
 
   return phone.replace(/[^\d+]/g, '');
-}
-
-/**
- * Normalizes a phone number to national format (08xx).
- *
- * @param phone - Cleaned phone number
- * @returns Phone number in 08xx format
- * @internal
- */
-function normalizeToNational(phone: string): string {
-  if (phone.startsWith('+62')) {
-    return '0' + phone.substring(3);
-  } else if (phone.startsWith('62') && !phone.startsWith('620')) {
-    return '0' + phone.substring(2);
-  } else if (phone.startsWith('0')) {
-    return phone;
-  }
-  return '';
 }
 
 /**
@@ -332,7 +311,7 @@ export function maskPhoneNumber(
   if (isInternational) {
     toMask = cleaned;
   } else {
-    const normalized = normalizeToNational(cleaned);
+    const normalized = normalizePhoneNumber(cleaned);
     toMask = normalized || cleaned;
   }
 
