@@ -283,7 +283,7 @@ function getAreaCodeLength(normalized: string): number {
  * @example
  * Custom mask character:
  * ```typescript
- * maskPhoneNumber('081234567890', { char: 'X' });
+ * maskPhoneNumber('081234567890', { maskChar: 'X' });
  * // '0812XXXX7890'
  * ```
  *
@@ -319,33 +319,58 @@ export function maskPhoneNumber(
     return phone;
   }
 
-  const { char = '*', separator } = options;
-  let { start = 4, end = 4 } = options;
+  const { maskChar, separator, visibleStart, visibleEnd, start, end, char } =
+    options;
 
-  if (start + end >= toMask.length) {
-    // Auto-adjust for short numbers to ensure masking happens
+  const hasLegacyOptions =
+    start !== undefined || end !== undefined || char !== undefined;
+
+  if (hasLegacyOptions) {
+    console.warn(
+      '[DEPRECATED] Mask options start/end/char are deprecated. ' +
+        'Use visibleStart/visibleEnd/maskChar instead. ' +
+        'These old names will be removed in v1.0.0.'
+    );
+  }
+
+  const effectiveStart =
+    visibleStart !== undefined ? visibleStart : start !== undefined ? start : 4;
+  const effectiveEnd =
+    visibleEnd !== undefined ? visibleEnd : end !== undefined ? end : 4;
+  const effectiveChar =
+    maskChar !== undefined ? maskChar : char !== undefined ? char : '*';
+
+  if (effectiveStart + effectiveEnd >= toMask.length) {
     if (toMask.length < 10) {
       const minMaskLength = 1;
       const availableForVisible = toMask.length - minMaskLength;
 
       if (availableForVisible >= 2) {
-        start = Math.floor(availableForVisible / 2);
-        end = availableForVisible - start;
+        const newStart = Math.floor(availableForVisible / 2);
+        const newEnd = availableForVisible - newStart;
+
+        const startPart = toMask.substring(0, newStart);
+        const endPart = toMask.substring(toMask.length - newEnd);
+        const masked = startPart + effectiveChar + endPart;
+
+        if (separator) {
+          return `${startPart}${separator}${effectiveChar}${separator}${endPart}`;
+        }
+        return masked;
       } else {
         return toMask;
       }
-    } else {
-      return toMask;
     }
+    return toMask;
   }
 
-  const startPart = toMask.substring(0, start);
-  const endPart = toMask.substring(toMask.length - end);
-  const maskLength = toMask.length - start - end;
-  const masked = startPart + char.repeat(maskLength) + endPart;
+  const startPart = toMask.substring(0, effectiveStart);
+  const endPart = toMask.substring(toMask.length - effectiveEnd);
+  const maskLength = toMask.length - effectiveStart - effectiveEnd;
+  const masked = startPart + effectiveChar.repeat(maskLength) + endPart;
 
   if (separator) {
-    return `${masked.substring(0, start)}${separator}${masked.substring(start, masked.length - end)}${separator}${masked.substring(masked.length - end)}`;
+    return `${masked.substring(0, effectiveStart)}${separator}${masked.substring(effectiveStart, masked.length - effectiveEnd)}${separator}${masked.substring(masked.length - effectiveEnd)}`;
   }
 
   return masked;

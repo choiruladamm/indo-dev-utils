@@ -83,9 +83,10 @@ export default async function RootLayout({ children }) {
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head faviconGlyph="🇮🇩" />
       <body>
-        <Banner storageKey="v0.6.0">
-          v0.6.0 released — Breaking: getAge() now returns object. New:
-          cleanNIK(), compareNIK(), isAdult(), validateNIKDetailed().{' '}
+        <Banner storageKey="v0.7.0">
+          v0.7.0 released — Breaking: mask options renamed
+          (visibleStart/visibleEnd/maskChar). New: parseVIN(), parsePlate(),
+          InvalidXxxError classes.{' '}
           <a href="/docs/changelog" style={{ textDecoration: 'underline' }}>
             Read changelog
           </a>

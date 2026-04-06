@@ -43,14 +43,24 @@ export type {
   MaskOptions as PhoneMaskOptions,
 } from './phone';
 
+export { InvalidPhoneError } from './phone';
+
 // NPWP (Taxpayer Identification Number) utilities
 export { validateNPWP, formatNPWP, parseNPWP, maskNPWP } from './npwp';
 
-export { validatePlate, getRegionFromPlate, formatPlate } from './plate';
+export {
+  validatePlate,
+  getRegionFromPlate,
+  formatPlate,
+  parsePlate,
+} from './plate';
+export { InvalidPlateError } from './plate';
+export type { PlateInfo } from './plate';
 
 // VIN (Vehicle Identification Number) utilities
-export { validateVIN } from './vin';
-export type { VINOptions, VINValidationResult } from './vin';
+export { validateVIN, parseVIN } from './vin';
+export { InvalidVINError } from './vin';
+export type { VINOptions, VINValidationResult, VINInfo } from './vin';
 
 // Email validator utilities
 export {
@@ -66,7 +76,11 @@ export type {
   EmailInfo,
 } from './email-validator';
 
+export { InvalidEmailError } from './email-validator';
+
 export type { NPWPInfo, MaskOptions as NPWPMaskOptions } from './npwp';
+
+export { InvalidNPWPError } from './npwp';
 
 // Currency utilities
 export {
@@ -101,6 +115,7 @@ export {
   isAlay,
   compareStrings,
   similarity,
+  maskText,
 } from './text';
 
 export type {
@@ -110,6 +125,7 @@ export type {
   TruncateOptions,
   ExtractOptions,
   CompareOptions,
+  MaskOptions as TextMaskOptions,
 } from './text';
 
 // DateTime utilities

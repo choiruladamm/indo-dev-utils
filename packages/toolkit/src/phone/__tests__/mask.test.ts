@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { maskPhoneNumber } from '../format';
 
 describe('maskPhoneNumber', () => {
@@ -20,41 +20,62 @@ describe('maskPhoneNumber', () => {
 
   describe('custom mask character', () => {
     it('should mask with custom character', () => {
-      expect(maskPhoneNumber(testPhone, { char: 'X' })).toBe('0812XXXX7890');
+      expect(maskPhoneNumber(testPhone, { maskChar: 'X' })).toBe(
+        '0812XXXX7890'
+      );
     });
 
     it('should mask with dot', () => {
-      expect(maskPhoneNumber(testPhone, { char: '.' })).toBe('0812....7890');
+      expect(maskPhoneNumber(testPhone, { maskChar: '.' })).toBe(
+        '0812....7890'
+      );
     });
 
     it('should mask with dash', () => {
-      expect(maskPhoneNumber(testPhone, { char: '-' })).toBe('0812----7890');
+      expect(maskPhoneNumber(testPhone, { maskChar: '-' })).toBe(
+        '0812----7890'
+      );
     });
   });
 
-  describe('custom start and end', () => {
-    it('should mask with custom start', () => {
-      const masked = maskPhoneNumber(testPhone, { start: 3, end: 4 });
+  describe('custom visibleStart and visibleEnd', () => {
+    it('should mask with custom visibleStart', () => {
+      const masked = maskPhoneNumber(testPhone, {
+        visibleStart: 3,
+        visibleEnd: 4,
+      });
       expect(masked).toBe('081*****7890');
     });
 
-    it('should mask with custom end', () => {
-      const masked = maskPhoneNumber(testPhone, { start: 4, end: 3 });
+    it('should mask with custom visibleEnd', () => {
+      const masked = maskPhoneNumber(testPhone, {
+        visibleStart: 4,
+        visibleEnd: 3,
+      });
       expect(masked).toBe('0812*****890');
     });
 
     it('should mask with both custom', () => {
-      const masked = maskPhoneNumber(testPhone, { start: 5, end: 3 });
+      const masked = maskPhoneNumber(testPhone, {
+        visibleStart: 5,
+        visibleEnd: 3,
+      });
       expect(masked).toBe('08123****890');
     });
 
     it('should mask showing more characters', () => {
-      const masked = maskPhoneNumber(testPhone, { start: 6, end: 4 });
+      const masked = maskPhoneNumber(testPhone, {
+        visibleStart: 6,
+        visibleEnd: 4,
+      });
       expect(masked).toBe('081234**7890');
     });
 
     it('should mask showing less characters', () => {
-      const masked = maskPhoneNumber(testPhone, { start: 2, end: 2 });
+      const masked = maskPhoneNumber(testPhone, {
+        visibleStart: 2,
+        visibleEnd: 2,
+      });
       expect(masked).toBe('08********90');
     });
   });
@@ -70,9 +91,9 @@ describe('maskPhoneNumber', () => {
       expect(masked).toBe('0812 **** 7890');
     });
 
-    it('should combine separator with custom char', () => {
+    it('should combine separator with custom maskChar', () => {
       const masked = maskPhoneNumber(testPhone, {
-        char: 'X',
+        maskChar: 'X',
         separator: '-',
       });
       expect(masked).toBe('0812-XXXX-7890');
@@ -80,9 +101,9 @@ describe('maskPhoneNumber', () => {
 
     it('should combine all options', () => {
       const masked = maskPhoneNumber(testPhone, {
-        start: 3,
-        end: 3,
-        char: '•',
+        visibleStart: 3,
+        visibleEnd: 3,
+        maskChar: '•',
         separator: ' ',
       });
       expect(masked).toBe('081 •••••• 890');
@@ -90,27 +111,32 @@ describe('maskPhoneNumber', () => {
   });
 
   describe('edge cases', () => {
-    it('should return original if start + end >= length', () => {
-      const masked = maskPhoneNumber(testPhone, { start: 6, end: 6 });
+    it('should return original if visibleStart + visibleEnd >= length', () => {
+      const masked = maskPhoneNumber(testPhone, {
+        visibleStart: 6,
+        visibleEnd: 6,
+      });
       expect(masked).toBe(testPhone);
     });
 
     it('should handle short numbers', () => {
-      const masked = maskPhoneNumber('0812345678', { start: 4, end: 4 });
+      const masked = maskPhoneNumber('0812345678', {
+        visibleStart: 4,
+        visibleEnd: 4,
+      });
       expect(masked).toBe('0812**5678');
     });
 
     it('should handle minimum masking (1 char masked)', () => {
       const masked = maskPhoneNumber('081234567890', {
-        start: 5,
-        end: 6,
+        visibleStart: 5,
+        visibleEnd: 6,
       });
       expect(masked).toBe('08123*567890');
     });
 
     it('should handle invalid phone gracefully', () => {
       const masked = maskPhoneNumber('1234');
-      // Should still mask even if invalid
       expect(masked).toContain('*');
     });
 
@@ -123,6 +149,17 @@ describe('maskPhoneNumber', () => {
     it('should return empty string for empty input', () => {
       const masked = maskPhoneNumber('');
       expect(masked).toBe('');
+    });
+  });
+
+  describe('backward compatibility (deprecated)', () => {
+    it('should still support old option names with deprecation warning', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      expect(maskPhoneNumber(testPhone, { start: 3, end: 4 })).toBe(
+        '081*****7890'
+      );
+      expect(warnSpy).toHaveBeenCalled();
+      warnSpy.mockRestore();
     });
   });
 });

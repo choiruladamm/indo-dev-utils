@@ -77,7 +77,7 @@ export function formatNIK(nik: string, separator: string = '-'): string {
  * @example
  * Custom mask character:
  * ```typescript
- * maskNIK('3201234567890123', { char: 'X' });
+ * maskNIK('3201234567890123', { maskChar: 'X' });
  * // '3201XXXXXXXX0123'
  * ```
  *
@@ -89,9 +89,9 @@ export function formatNIK(nik: string, separator: string = '-'): string {
  * ```
  *
  * @example
- * Custom start and end:
+ * Custom visibleStart and visibleEnd:
  * ```typescript
- * maskNIK('3201234567890123', { start: 6, end: 4 });
+ * maskNIK('3201234567890123', { visibleStart: 6, visibleEnd: 4 });
  * // '320123******0123'
  * ```
  *
@@ -102,48 +102,56 @@ export function maskNIK(nik: string, options: MaskOptions = {}): string {
     return nik;
   }
 
-  const { start = 4, end = 4, char = '*', separator } = options;
+  const { visibleStart, visibleEnd, maskChar, separator, start, end, char } =
+    options;
 
-  if (start + end >= 16) {
+  const hasLegacyOptions =
+    start !== undefined || end !== undefined || char !== undefined;
+
+  if (hasLegacyOptions) {
+    console.warn(
+      '[DEPRECATED] Mask options start/end/char are deprecated. ' +
+        'Use visibleStart/visibleEnd/maskChar instead. ' +
+        'These old names will be removed in v1.0.0.'
+    );
+  }
+
+  const effectiveStart =
+    visibleStart !== undefined ? visibleStart : start !== undefined ? start : 4;
+  const effectiveEnd =
+    visibleEnd !== undefined ? visibleEnd : end !== undefined ? end : 4;
+  const effectiveChar =
+    maskChar !== undefined ? maskChar : char !== undefined ? char : '*';
+
+  if (effectiveStart + effectiveEnd >= 16) {
     return nik;
   }
 
   if (separator) {
-    // Format with separator first, then apply masking
     const formatted = formatNIK(nik, separator);
     const parts = formatted.split(separator);
 
-    // Calculate which parts to mask
-    // Format: PP-KK-DD-YY-MM-DD-XXXX (7 parts)
-    // Mask parts based on character positions
     let charCount = 0;
     const maskedParts = parts.map((part) => {
       const partStart = charCount;
       const partEnd = charCount + part.length;
       charCount += part.length;
 
-      // Check if this part should be fully/partially masked
-      if (partEnd <= start) {
-        // Fully visible (before start)
+      if (partEnd <= effectiveStart) {
         return part;
-      } else if (partStart >= 16 - end) {
-        // Fully visible (after end)
+      } else if (partStart >= 16 - effectiveEnd) {
         return part;
-      } else if (partStart >= start && partEnd <= 16 - end) {
-        // Fully masked
-        return char.repeat(part.length);
+      } else if (partStart >= effectiveStart && partEnd <= 16 - effectiveEnd) {
+        return effectiveChar.repeat(part.length);
       } else {
-        // Partially masked - This branch is theoretically possible for variable-width
-        // parts, but with fixed 2-char NIK segments it cannot be triggered since
-        // no 2-char part can span both the start-visible and end-visible boundaries.
         return part
           .split('')
           .map((ch, idx) => {
             const pos = partStart + idx;
-            if (pos < start || pos >= 16 - end) {
+            if (pos < effectiveStart || pos >= 16 - effectiveEnd) {
               return ch;
             }
-            return char;
+            return effectiveChar;
           })
           .join('');
       }
@@ -152,9 +160,8 @@ export function maskNIK(nik: string, options: MaskOptions = {}): string {
     return maskedParts.join(separator);
   }
 
-  // Without separator: simple masking
-  const startPart = nik.substring(0, start);
-  const endPart = nik.substring(16 - end);
-  const maskLength = 16 - start - end;
-  return startPart + char.repeat(maskLength) + endPart;
+  const startPart = nik.substring(0, effectiveStart);
+  const endPart = nik.substring(16 - effectiveEnd);
+  const maskLength = 16 - effectiveStart - effectiveEnd;
+  return startPart + effectiveChar.repeat(maskLength) + endPart;
 }
