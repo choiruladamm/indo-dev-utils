@@ -79,8 +79,10 @@ describe('generateWALink', () => {
       expect(generateWALink('+1234567890')).toBe('');
     });
 
-    it('should work with landline', () => {
-      expect(generateWALink('0212345678')).toBe('https://wa.me/62212345678');
+    it('should return empty string for landlines (WA does not work on landlines)', () => {
+      expect(generateWALink('0212345678')).toBe('');
+      expect(generateWALink('+62212345678')).toBe('');
+      expect(generateWALink('62212345678')).toBe('');
     });
   });
 });
@@ -133,6 +135,11 @@ describe('generateSmsLink', () => {
 
     it('should return empty string for wrong country code', () => {
       expect(generateSmsLink('+1234567890')).toBe('');
+    });
+
+    it('should return empty string for landlines (SMS does not work on landlines)', () => {
+      expect(generateSmsLink('0212345678')).toBe('');
+      expect(generateSmsLink('+62212345678')).toBe('');
     });
   });
 });
