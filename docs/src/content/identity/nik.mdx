@@ -83,20 +83,47 @@ A valid NIK consists of 16 digits organized as follows:
 ## Quick Start
 
 ```typescript
-import { validateNIK, parseNIK, formatNIK, maskNIK } from '@indodev/toolkit/nik';
+import { 
+  validateNIK, 
+  parseNIK, 
+  formatNIK, 
+  maskNIK,
+  cleanNIK,
+  compareNIK,
+  isAdult,
+  getAge,
+  validateNIKDetailed
+} from '@indodev/toolkit/nik';
 
 // Validate a NIK
 const isValid = validateNIK('3201018901310123');
 console.log(isValid); // true
 
+// Clean NIK (remove separators)
+const cleaned = cleanNIK('3201-2345-6789-0123'); // '3201234567890123'
+
+// Compare two NIKs
+const isSamePerson = compareNIK('3201018901310123', '3201-01-89-01-31-0123'); // true
+
+// Check if adult (17+ by default)
+const canHaveKTP = isAdult('3201950101950123'); // true
+
+// Get detailed age
+const age = getAge('3201018901310123');
+console.log(age); // { years: 35, months: 2, days: 6 }
+
+// Or as formatted string
+const ageStr = getAge('3201018901310123', { asString: true });
+console.log(ageStr); // '35 Tahun 2 Bulan 6 Hari'
+
+// Detailed validation with errors
+const result = validateNIKDetailed('1234');
+console.log(result.errors[0].code); // 'INVALID_FORMAT'
+
 // Extract information from NIK
 const info = parseNIK('3201018901310123');
 console.log(info?.province.name); // 'Jawa Barat'
 console.log(info?.gender); // 'male'
-
-// Get age and formatted birth date
-const age = getAge('3201018901310123'); // e.g., 35
-const birthDateStr = formatBirthDate('3201018901310123'); // '31 Januari 1989'
 
 // Format for display
 const formatted = formatNIK('3201018901310123');
@@ -349,12 +376,18 @@ function filterByProvince(niks: string[], provinceCode: string) {
 
 ### getAge()
 
-Calculates age from a NIK as of a given reference date (defaults to today).
+Calculates age from a NIK as of a given reference date (defaults to today). Returns detailed age breakdown with years, months, and days, or a formatted Indonesian string.
 
 **Type Signature:**
 
 ```typescript
-function getAge(nik: string, referenceDate?: Date): number | null;
+function getAge(
+  nik: string,
+  options?: {
+    referenceDate?: Date;
+    asString?: boolean;
+  }
+): { years: number; months: number; days: number } | string | null;
 ```
 
 **Parameters:**
@@ -362,17 +395,32 @@ function getAge(nik: string, referenceDate?: Date): number | null;
 | Name            | Type     | Description                                 |
 | --------------- | -------- | ------------------------------------------- |
 | `nik`           | `string` | The 16-digit NIK string                     |
-| `referenceDate` | `Date`   | Optional reference date for age calculation |
+| `options`       | `object` | Optional configuration object                 |
+| `options.referenceDate` | `Date` | Reference date for age calculation (default: today) |
+| `options.asString` | `boolean` | Return formatted Indonesian string (default: false) |
 
 **Returns:**
 
-`number | null` - Calculated age in years, or `null` if the NIK is invalid.
+`{ years, months, days } | string | null` - Age object, formatted string, or `null` if invalid.
+
+<Callout type="warning">
+**Breaking Change in v0.6.0:** The return type changed from `number | null` to `{ years, months, days } | string | null`. Use `age.years` for year comparison.
+</Callout>
 
 **Examples:**
 
 ```typescript
+// Returns object by default
 const age = getAge('3201018901310123');
-console.log(age); // e.g., 35 (if today is 2024)
+console.log(age); // { years: 35, months: 2, days: 6 }
+
+// Returns formatted string with asString option
+const ageStr = getAge('3201018901310123', { asString: true });
+console.log(ageStr); // '35 Tahun 2 Bulan 6 Hari'
+
+// Custom reference date
+const ageAtDate = getAge('3201018901310123', { referenceDate: new Date('2025-01-01') });
+console.log(ageAtDate); // { years: 35, months: 11, days: 1 }
 ```
 
 ---
@@ -627,6 +675,194 @@ function exportUserData(users: User[]) {
 
 ---
 
+### cleanNIK()
+
+Cleans a NIK by removing all non-digit characters (separators like `.`, `-`, ` `).
+
+**Type Signature:**
+
+```typescript
+function cleanNIK(nik: string): string;
+```
+
+**Parameters:**
+
+| Name  | Type     | Description                     |
+| ----- | -------- | ------------------------------- |
+| `nik` | `string` | NIK in any format with separators |
+
+**Returns:**
+
+`string` - Clean 16-digit NIK, or empty string if invalid.
+
+**Examples:**
+
+```typescript
+// Clean various formats
+cleanNIK('32-01-01-89-01-31-0123'); // '3201018901310123'
+cleanNIK('3201.01.89.01.31.0123');   // '3201018901310123'
+cleanNIK('3201 01 89 01 31 0123');   // '3201018901310123'
+cleanNIK('32-01.01.89-01-31-0123');  // '3201018901310123'
+
+// Invalid inputs return empty string
+cleanNIK('1234');      // ''
+cleanNIK('invalid');   // ''
+cleanNIK('');          // ''
+```
+
+---
+
+### compareNIK()
+
+Compares two NIKs to check if they belong to the same person.
+
+**Type Signature:**
+
+```typescript
+function compareNIK(nik1: string, nik2: string): boolean;
+```
+
+**Parameters:**
+
+| Name  | Type     | Description                     |
+| ----- | -------- | ------------------------------- |
+| `nik1` | `string` | First NIK (any format)         |
+| `nik2` | `string` | Second NIK (any format)        |
+
+**Returns:**
+
+`boolean` - `true` if both NIKs belong to the same person, `false` otherwise.
+
+**Comparison Criteria:**
+- Province code (pos 1-2)
+- Regency code (pos 3-4)
+- District code (pos 5-6)
+- Birth date (year + month + day)
+- Gender (derived from day encoding)
+- Serial number (pos 13-16)
+
+**Examples:**
+
+```typescript
+// Same person, same format
+compareNIK('3201018901310123', '3201018901310123'); // true
+
+// Same person, different format
+compareNIK('3201018901310123', '3201-01-89-01-31-0123'); // true
+
+// Different serial number
+compareNIK('3201018901310123', '3201018901310124'); // false
+
+// Invalid inputs return false
+compareNIK('invalid', '3201018901310123'); // false
+```
+
+---
+
+### isAdult()
+
+Checks if a person is an adult based on their NIK. Default threshold is 17 years (Indonesian KTP eligibility age).
+
+**Type Signature:**
+
+```typescript
+function isAdult(nik: string, minAge?: number): boolean;
+```
+
+**Parameters:**
+
+| Name     | Type     | Default | Description                     |
+| -------- | -------- | ------- | ------------------------------- |
+| `nik`    | `string` | -       | The 16-digit NIK string         |
+| `minAge` | `number` | `17`    | Minimum age threshold            |
+
+**Returns:**
+
+`boolean` - `true` if the person is at least minAge years old, `false` otherwise.
+
+**Examples:**
+
+```typescript
+// Born 1995-01-01, reference 2026-04-06 (age 31)
+isAdult('3201950101950123');        // true (31 >= 17)
+isAdult('3201950101950123', 21);    // true (31 >= 21)
+isAdult('3201950101950123', 35);    // false (31 < 35)
+
+// Born 2010-01-01, reference 2026-04-06 (age 16)
+isAdult('3210010101950123');        // false (16 < 17)
+isAdult('3210010101950123', 16);    // true (16 >= 16)
+
+// Invalid NIK returns false
+isAdult('invalid');                 // false
+```
+
+---
+
+### validateNIKDetailed()
+
+Validates a NIK and returns detailed error information for form validation.
+
+**Type Signature:**
+
+```typescript
+function validateNIKDetailed(nik: string): NIKValidationResult;
+
+interface NIKValidationResult {
+  isValid: boolean;
+  errors: NIKValidationError[];
+  nik: string | null;
+}
+
+interface NIKValidationError {
+  code: NIKErrorCode;
+  message: string;
+}
+
+type NIKErrorCode =
+  | 'INVALID_FORMAT'
+  | 'INVALID_PROVINCE'
+  | 'INVALID_MONTH'
+  | 'INVALID_DAY'
+  | 'INVALID_DATE'
+  | 'FUTURE_DATE';
+```
+
+**Parameters:**
+
+| Name  | Type     | Description                     |
+| ----- | -------- | ------------------------------- |
+| `nik` | `string` | NIK to validate (any format)   |
+
+**Returns:**
+
+`NIKValidationResult` - Structured validation result with `isValid`, `errors[]`, and `nik`.
+
+**Examples:**
+
+```typescript
+// Valid NIK
+const result = validateNIKDetailed('3201018901310123');
+// { isValid: true, errors: [], nik: '3201018901310123' }
+
+// Invalid NIK
+const result = validateNIKDetailed('1234');
+// {
+//   isValid: false,
+//   errors: [{ code: 'INVALID_FORMAT', message: 'NIK must be exactly 16 digits' }],
+//   nik: null
+// }
+
+// Multiple errors
+const result = validateNIKDetailed('9999999999999999');
+// {
+//   isValid: false,
+//   errors: [{ code: 'INVALID_PROVINCE', message: 'Province code 99 not found' }],
+//   nik: null
+// }
+```
+
+---
+
 ## Type Reference
 
 ### NIKInfo
@@ -685,6 +921,66 @@ interface MaskOptions {
 - **separator**: If provided, formats the NIK with separators before masking
 
 <Callout type="warning">**Constraint:** `start + end` must be less than 16, otherwise the NIK is returned unmodified.</Callout>
+
+### NIKValidationResult
+
+Result of detailed NIK validation with structured error reporting.
+
+```typescript
+interface NIKValidationResult {
+  isValid: boolean;      // Whether the NIK is valid
+  errors: NIKValidationError[];  // List of validation errors
+  nik: string | null;   // Cleaned 16-digit NIK if valid, null otherwise
+}
+```
+
+### NIKValidationError
+
+A single validation error with code and message.
+
+```typescript
+interface NIKValidationError {
+  code: NIKErrorCode;   // Error code for programmatic handling
+  message: string;      // Human-readable error message
+}
+```
+
+### NIKErrorCode
+
+Error codes for detailed NIK validation.
+
+```typescript
+type NIKErrorCode =
+  | 'INVALID_FORMAT'    // Not 16 digits
+  | 'INVALID_PROVINCE'  // Province code not found
+  | 'INVALID_MONTH'     // Month not in 01-12
+  | 'INVALID_DAY'       // Day value invalid
+  | 'INVALID_DATE'      // Date doesn't exist (e.g., Feb 30)
+  | 'FUTURE_DATE';     // Birth date in the future
+```
+
+### Age
+
+Age result object with years, months, and days.
+
+```typescript
+interface Age {
+  years: number;   // Full years
+  months: number;  // Remaining months after full years
+  days: number;    // Remaining days after full months
+}
+```
+
+### GetAgeOptions
+
+Options for getAge function.
+
+```typescript
+interface GetAgeOptions {
+  referenceDate?: Date;  // Date to calculate age from (default: today)
+  asString?: boolean;   // Return formatted Indonesian string
+}
+```
 
 ---
 
