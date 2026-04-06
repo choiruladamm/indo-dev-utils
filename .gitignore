@@ -49,6 +49,9 @@ guide/
 # AGENTS.md (internal - project-specific agent configs)
 AGENTS.md
 
+# opencode.json (internal - project-specific opencode config)
+opencode.json
+
 # PRD (internal docs)
 packages/toolkit/prd/
 
