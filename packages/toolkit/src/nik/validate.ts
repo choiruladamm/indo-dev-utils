@@ -1,4 +1,7 @@
 import { PROVINCES } from './constants';
+import { parseNIKDate, validateNIKDateComponents } from './utils/date';
+
+const NIK_PATTERN = /^\d{16}$/;
 
 /**
  * Validates a NIK (Nomor Induk Kependudukan) format.
@@ -26,7 +29,7 @@ import { PROVINCES } from './constants';
  * @public
  */
 export function validateNIK(nik: string): boolean {
-  if (!/^\d{16}$/.test(nik)) {
+  if (!NIK_PATTERN.test(nik)) {
     return false;
   }
 
@@ -35,39 +38,19 @@ export function validateNIK(nik: string): boolean {
     return false;
   }
 
-  const yearStr = nik.substring(6, 8);
-  const monthStr = nik.substring(8, 10);
-  const dayStr = nik.substring(10, 12);
-
-  const year = parseInt(yearStr, 10);
-  const fullYear = year > 30 ? 1900 + year : 2000 + year;
-
-  const month = parseInt(monthStr, 10);
-  let day = parseInt(dayStr, 10);
-
-  if (day > 40) {
-    day = day - 40;
-  }
-
-  if (month < 1 || month > 12) {
+  const parsed = parseNIKDate(nik);
+  if (!parsed) {
     return false;
   }
 
-  if (day < 1 || day > 31) {
-    return false;
-  }
+  const { fullYear, month, day } = parsed;
 
-  const testDate = new Date(fullYear, month - 1, day);
-  if (
-    testDate.getFullYear() !== fullYear ||
-    testDate.getMonth() !== month - 1 ||
-    testDate.getDate() !== day
-  ) {
+  if (!validateNIKDateComponents(fullYear, month, day)) {
     return false;
   }
 
   const now = new Date();
-  if (testDate > now || testDate < new Date(1900, 0, 1)) {
+  if (new Date(fullYear, month - 1, day) > now || fullYear < 1900) {
     return false;
   }
 

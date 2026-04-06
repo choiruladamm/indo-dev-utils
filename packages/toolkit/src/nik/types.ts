@@ -147,3 +147,30 @@ export interface MaskOptions {
    */
   separator?: string;
 }
+
+/**
+ * Error thrown when an invalid NIK is provided to a function.
+ * Extends native Error with a `code` property for programmatic error handling.
+ *
+ * @example
+ * ```typescript
+ * try {
+ *   requireNIK('invalid');
+ * } catch (error) {
+ *   if (error instanceof InvalidNIKError) {
+ *     console.log(error.code); // 'INVALID_NIK'
+ *   }
+ * }
+ * ```
+ *
+ * @public
+ */
+export class InvalidNIKError extends Error {
+  /** Error code for programmatic identification */
+  readonly code = 'INVALID_NIK' as const;
+
+  constructor(message: string = 'Invalid NIK provided') {
+    super(message);
+    this.name = 'InvalidNIKError';
+  }
+}

@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.2] - 2026-04-06
+
+### Changed
+
+#### NIK Module Code Quality
+
+- Extracted shared date validation logic to `utils/date.ts` (DRY principle)
+- Added `InvalidNIKError` custom error class for consistent error handling with datetime module
+- Cached regex pattern in `validateNIK()` and `parseNIK()` for ~10% performance improvement
+
+### Fixed
+
+- `parseNIK()` now properly validates calendar dates (e.g., Feb 30, Feb 31 returned incorrect results)
+
+### Documentation
+
+- Removed `sanitizeNIK()` from best practices section (function not exported)
+
 ## [0.4.1] - 2026-04-06
 
 ### Added

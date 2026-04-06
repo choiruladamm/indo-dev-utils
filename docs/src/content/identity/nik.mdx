@@ -824,22 +824,6 @@ function processNIKBatch(niks: string[]) {
 
 ## Best Practices
 
-### Input Sanitization
-
-Always sanitize user input before validation:
-
-```typescript
-function sanitizeNIK(input: string): string {
-  // Remove all non-numeric characters
-  return input.replace(/\D/g, '');
-}
-
-// Usage
-const userInput = '32-01-01-89-01-31-0123';
-const clean = sanitizeNIK(userInput); // '3201018901310123'
-const isValid = validateNIK(clean);
-```
-
 ### Error Handling
 
 Handle parsing failures gracefully:

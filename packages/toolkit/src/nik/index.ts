@@ -45,3 +45,5 @@ export {
 } from './utils';
 
 export type { NIKInfo, MaskOptions } from './types';
+
+export { InvalidNIKError } from './types';

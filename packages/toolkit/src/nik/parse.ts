@@ -1,5 +1,8 @@
 import { PROVINCES, REGENCIES } from './constants';
 import { NIKInfo } from './types';
+import { parseNIKDate, validateNIKDateComponents } from './utils/date';
+
+const NIK_PATTERN = /^\d{16}$/;
 
 /**
  * Parses a NIK and extracts all embedded information.
@@ -44,16 +47,13 @@ import { NIKInfo } from './types';
  * @public
  */
 export function parseNIK(nik: string): NIKInfo | null {
-  if (!/^\d{16}$/.test(nik)) {
+  if (!NIK_PATTERN.test(nik)) {
     return null;
   }
 
   const provinceCode = nik.substring(0, 2);
   const regencyCode = nik.substring(2, 4);
   const districtCode = nik.substring(4, 6);
-  const yearStr = nik.substring(6, 8);
-  const monthStr = nik.substring(8, 10);
-  const dayStr = nik.substring(10, 12);
   const serialNumber = nik.substring(12, 16);
 
   const province = PROVINCES[provinceCode];
@@ -64,28 +64,18 @@ export function parseNIK(nik: string): NIKInfo | null {
   const regencies = REGENCIES[provinceCode] || {};
   const regency = regencies[regencyCode] || 'Unknown';
 
-  let day = parseInt(dayStr, 10);
-  const month = parseInt(monthStr, 10);
-  const year = parseInt(yearStr, 10);
-
-  let gender: 'male' | 'female' | null = null;
-  if (day > 40) {
-    gender = 'female';
-    day -= 40;
-  } else {
-    gender = 'male';
-  }
-
-  const fullYear = year > 30 ? 1900 + year : 2000 + year;
-
-  const birthDate = new Date(fullYear, month - 1, day);
-  if (
-    birthDate.getFullYear() !== fullYear ||
-    birthDate.getMonth() !== month - 1 ||
-    birthDate.getDate() !== day
-  ) {
+  const parsed = parseNIKDate(nik);
+  if (!parsed) {
     return null;
   }
+
+  const { fullYear, month, day, gender } = parsed;
+
+  if (!validateNIKDateComponents(fullYear, month, day)) {
+    return null;
+  }
+
+  const birthDate = new Date(fullYear, month - 1, day);
 
   return {
     province: {
