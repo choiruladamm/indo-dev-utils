@@ -563,8 +563,19 @@ interface MaskOptions {
   maskChar?: string;       // default: '*'
   visibleStart?: number;   // default: 2
   visibleEnd?: number;     // default: 2
+  separator?: string;       // default: none (added in v0.7.0)
+  /** @deprecated Use visibleStart instead. Deprecated in v0.7.0. */
+  start?: number;
+  /** @deprecated Use visibleEnd instead. Deprecated in v0.7.0. */
+  end?: number;
+  /** @deprecated Use maskChar instead. Deprecated in v0.7.0. */
+  char?: string;
 }
 ```
+
+<Callout type="warning">
+  **Breaking Change (v0.7.0):** Options renamed to `visibleStart`, `visibleEnd`, `maskChar`. Added `separator` option. Old names still work with deprecation warnings. Will be removed in v1.0.0.
+</Callout>
 
 **Examples:**
 
@@ -584,6 +595,10 @@ maskText('user@example.com', { pattern: 'email' });
 // Custom mask character
 maskText('123456789', { pattern: 'all', maskChar: '#' });
 // '#########'
+
+// With separator
+maskText('08123456789', { pattern: 'middle', visibleStart: 3, visibleEnd: 4, separator: '-' });
+// '081-****-6789'
 ```
 
 ---

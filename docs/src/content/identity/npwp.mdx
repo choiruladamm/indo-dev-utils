@@ -184,3 +184,30 @@ interface MaskOptions {
   preserveFormat?: boolean; // Keep dots and dashes (default: true)
 }
 ```
+
+### InvalidNPWPError
+
+Error class for invalid NPWP with error code for programmatic handling.
+
+```typescript
+class InvalidNPWPError extends Error {
+  readonly code = 'INVALID_NPWP';
+  constructor(message?: string);
+}
+```
+
+**Example:**
+
+```typescript
+import { InvalidNPWPError, validateNPWP } from '@indodev/toolkit/npwp';
+
+try {
+  if (!validateNPWP(npwp)) {
+    throw new InvalidNPWPError('Invalid NPWP format');
+  }
+} catch (error) {
+  if (error instanceof InvalidNPWPError) {
+    console.log(error.code); // 'INVALID_NPWP'
+  }
+}
+```

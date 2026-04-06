@@ -3,6 +3,51 @@ title: Changelog
 description: Latest updates and changes to the @indodev/toolkit library.
 ---
 
+## v0.7.0 - April 6, 2026
+
+### New Features
+
+#### Error Classes
+
+Custom error classes with `code` property for programmatic error handling:
+
+- `InvalidPhoneError` - Error for invalid phone numbers
+- `InvalidNPWPError` - Error for invalid NPWP
+- `InvalidEmailError` - Error for invalid email addresses
+- `InvalidPlateError` - Error for invalid vehicle plates
+- `InvalidVINError` - Error for invalid VINs
+
+#### Parse Functions
+
+- `parseVIN()` - Extract VIN components (WMI, VDS, check digit, model year, plant code, serial number)
+- `parsePlate()` - Extract plate components (prefix, number, suffix, type, formatted)
+
+### Breaking Changes with Deprecation
+
+#### Mask Options Standardization
+
+Standardized mask option names across all modules:
+
+| Old Name | New Name |
+|----------|----------|
+| `start` | `visibleStart` |
+| `end` | `visibleEnd` |
+| `char` | `maskChar` |
+
+**Migration:** Old names still work but emit deprecation warnings in console. Support will be removed in v1.0.0.
+
+#### NIK Module
+
+- `maskNIK()` - Now uses `visibleStart`, `visibleEnd`, `maskChar` options
+
+#### Phone Module
+
+- `maskPhoneNumber()` - Now uses `visibleStart`, `visibleEnd`, `maskChar` options
+
+#### Text Module
+
+- `maskText()` - Now uses `visibleStart`, `visibleEnd`, `maskChar` options, added `separator` support
+
 ## v0.6.0 - April 6, 2026
 
 ### New Features

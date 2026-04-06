@@ -894,12 +894,22 @@ function maskPhoneNumber(phone: string, options?: MaskOptions): string;
 
 ```typescript
 interface MaskOptions {
-  start?: number; // Digits to show at start (default: 4)
-  end?: number; // Digits to show at end (default: 4)
-  char?: string; // Mask character (default: '*')
+  visibleStart?: number; // Digits to show at start (default: 4)
+  visibleEnd?: number; // Digits to show at end (default: 4)
+  maskChar?: string; // Mask character (default: '*')
   separator?: string; // Optional separator (default: none)
+  /** @deprecated Use visibleStart instead. Deprecated in v0.7.0. */
+  start?: number;
+  /** @deprecated Use visibleEnd instead. Deprecated in v0.7.0. */
+  end?: number;
+  /** @deprecated Use maskChar instead. Deprecated in v0.7.0. */
+  char?: string;
 }
 ```
+
+<Callout type="warning">
+  **Breaking Change (v0.7.0):** Mask options renamed to `visibleStart`, `visibleEnd`, `maskChar`. Old names (`start`, `end`, `char`) still work but emit deprecation warnings. Will be removed in v1.0.0.
+</Callout>
 
 **Examples:**
 
@@ -909,17 +919,17 @@ maskPhoneNumber('081234567890');
 // '0812****7890'
 
 // Custom visible digits
-maskPhoneNumber('081234567890', { start: 6, end: 4 });
+maskPhoneNumber('081234567890', { visibleStart: 6, visibleEnd: 4 });
 // '081234**7890'
 
-maskPhoneNumber('081234567890', { start: 2, end: 2 });
+maskPhoneNumber('081234567890', { visibleStart: 2, visibleEnd: 2 });
 // '08********90'
 
 // Custom mask character
-maskPhoneNumber('081234567890', { char: 'X' });
+maskPhoneNumber('081234567890', { maskChar: 'X' });
 // '0812XXXX7890'
 
-maskPhoneNumber('081234567890', { char: '•' });
+maskPhoneNumber('081234567890', { maskChar: '•' });
 // '0812••••7890'
 
 // With separator
@@ -927,9 +937,9 @@ maskPhoneNumber('081234567890', { separator: '-' });
 // '0812-****-7890'
 
 maskPhoneNumber('081234567890', {
-  start: 6,
-  end: 4,
-  char: 'X',
+  visibleStart: 6,
+  visibleEnd: 4,
+  maskChar: 'X',
   separator: '-',
 });
 // '081234-XX-7890'
@@ -958,9 +968,9 @@ function displayPhone(phone: string, userRole: string) {
     case 'admin':
       return formatPhoneNumber(phone) // Full visibility
     case 'staff':
-      return maskPhoneNumber(phone, { start: 6, end: 4 })
+      return maskPhoneNumber(phone, { visibleStart: 6, visibleEnd: 4 })
     default:
-      return maskPhoneNumber(phone, { start: 4, end: 0 })
+      return maskPhoneNumber(phone, { visibleStart: 4, visibleEnd: 0 })
   }
 }
 
@@ -1299,10 +1309,47 @@ Configuration for masking phone numbers.
 
 ```typescript
 interface MaskOptions {
-  start?: number; // Digits visible at start (default: 4)
-  end?: number; // Digits visible at end (default: 4)
-  char?: string; // Mask character (default: '*')
+  visibleStart?: number; // Digits visible at start (default: 4)
+  visibleEnd?: number; // Digits visible at end (default: 4)
+  maskChar?: string; // Mask character (default: '*')
   separator?: string; // Optional separator (default: none)
+  /** @deprecated Use visibleStart instead. Deprecated in v0.7.0. */
+  start?: number;
+  /** @deprecated Use visibleEnd instead. Deprecated in v0.7.0. */
+  end?: number;
+  /** @deprecated Use maskChar instead. Deprecated in v0.7.0. */
+  char?: string;
+}
+```
+
+<Callout type="warning">
+  **Breaking Change (v0.7.0):** Options renamed to `visibleStart`, `visibleEnd`, `maskChar`. Old names still work with deprecation warnings.
+</Callout>
+
+### InvalidPhoneError
+
+Error class for invalid phone numbers with error code for programmatic handling.
+
+```typescript
+class InvalidPhoneError extends Error {
+  readonly code = 'INVALID_PHONE';
+  constructor(message?: string);
+}
+```
+
+**Example:**
+
+```typescript
+import { InvalidPhoneError, validatePhoneNumber } from '@indodev/toolkit/phone';
+
+try {
+  if (!validatePhoneNumber(phone)) {
+    throw new InvalidPhoneError('Invalid phone number format');
+  }
+} catch (error) {
+  if (error instanceof InvalidPhoneError) {
+    console.log(error.code); // 'INVALID_PHONE'
+  }
 }
 ```
 
@@ -1593,7 +1640,7 @@ function exportUserData(users: User[], privacyLevel: 'public' | 'internal' | 'ad
     switch (privacyLevel) {
       case 'public':
         // Minimal visibility
-        phone = maskPhoneNumber(user.phone, { start: 4, end: 0 });
+        phone = maskPhoneNumber(user.phone, { visibleStart: 4, visibleEnd: 0 });
         break;
       case 'internal':
         // Partial visibility

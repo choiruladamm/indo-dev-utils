@@ -63,19 +63,48 @@ export function maskText(text: string, options?: MaskOptions): string {
 
   const {
     pattern = 'middle',
-    maskChar = '*',
-    visibleStart = 2,
-    visibleEnd = 2,
+    maskChar,
+    visibleStart,
+    visibleEnd,
+    separator,
+    start,
+    end,
+    char,
   } = options || {};
 
-  switch (pattern) {
+  const hasLegacyOptions =
+    start !== undefined || end !== undefined || char !== undefined;
+
+  if (hasLegacyOptions) {
+    console.warn(
+      '[DEPRECATED] Mask options start/end/char are deprecated. ' +
+        'Use visibleStart/visibleEnd/maskChar instead. ' +
+        'These old names will be removed in v1.0.0.'
+    );
+  }
+
+  const effectivePattern = pattern || 'middle';
+  const effectiveStart =
+    visibleStart !== undefined ? visibleStart : start !== undefined ? start : 2;
+  const effectiveEnd =
+    visibleEnd !== undefined ? visibleEnd : end !== undefined ? end : 2;
+  const effectiveChar =
+    maskChar !== undefined ? maskChar : char !== undefined ? char : '*';
+
+  switch (effectivePattern) {
     case 'all':
-      return maskAll(text, maskChar);
+      return maskAll(text, effectiveChar);
     case 'email':
-      return maskEmail(text, maskChar);
+      return maskEmail(text, effectiveChar);
     case 'middle':
     default:
-      return maskMiddle(text, maskChar, visibleStart, visibleEnd);
+      return maskMiddle(
+        text,
+        effectiveChar,
+        effectiveStart,
+        effectiveEnd,
+        separator
+      );
   }
 }
 
@@ -96,7 +125,8 @@ function maskMiddle(
   text: string,
   maskChar: string,
   visibleStart: number,
-  visibleEnd: number
+  visibleEnd: number,
+  separator?: string
 ): string {
   const length = text.length;
   const totalVisible = visibleStart + visibleEnd;
@@ -108,6 +138,10 @@ function maskMiddle(
   const start = text.slice(0, visibleStart);
   const middle = maskChar.repeat(length - totalVisible);
   const end = text.slice(length - visibleEnd);
+
+  if (separator) {
+    return `${start}${separator}${middle}${separator}${end}`;
+  }
 
   return start + middle + end;
 }

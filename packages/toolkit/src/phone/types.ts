@@ -126,14 +126,14 @@ export interface PhoneInfo {
  * @example
  * Default masking:
  * ```typescript
- * { start: 4, end: 4, char: '*' }
+ * { visibleStart: 4, visibleEnd: 4, maskChar: '*' }
  * // '0812****7890'
  * ```
  *
  * @example
  * With separator:
  * ```typescript
- * { start: 4, end: 4, char: '*', separator: '-' }
+ * { visibleStart: 4, visibleEnd: 4, maskChar: '*', separator: '-' }
  * // '0812-****-7890'
  * ```
  *
@@ -145,21 +145,21 @@ export interface MaskOptions {
    *
    * @defaultValue 4
    */
-  start?: number;
+  visibleStart?: number;
 
   /**
    * Number of digits to show at the end.
    *
    * @defaultValue 4
    */
-  end?: number;
+  visibleEnd?: number;
 
   /**
    * Character to use for masking hidden digits.
    *
    * @defaultValue '*'
    */
-  char?: string;
+  maskChar?: string;
 
   /**
    * Optional separator to add between groups of digits.
@@ -167,4 +167,19 @@ export interface MaskOptions {
    * @defaultValue undefined
    */
   separator?: string;
+
+  /**
+   * @deprecated Use `visibleStart` instead. Deprecated in v0.7.0.
+   */
+  start?: number;
+
+  /**
+   * @deprecated Use `visibleEnd` instead. Deprecated in v0.7.0.
+   */
+  end?: number;
+
+  /**
+   * @deprecated Use `maskChar` instead. Deprecated in v0.7.0.
+   */
+  char?: string;
 }

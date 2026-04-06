@@ -576,12 +576,22 @@ function maskNIK(nik: string, options?: MaskOptions): string;
 
 ```typescript
 interface MaskOptions {
-  start?: number; // Characters to show at start (default: 4)
-  end?: number; // Characters to show at end (default: 4)
-  char?: string; // Mask character (default: '*')
+  visibleStart?: number; // Characters to show at start (default: 4)
+  visibleEnd?: number; // Characters to show at end (default: 4)
+  maskChar?: string; // Mask character (default: '*')
   separator?: string; // Optional separator (default: none)
+  /** @deprecated Use visibleStart instead. Deprecated in v0.7.0. */
+  start?: number;
+  /** @deprecated Use visibleEnd instead. Deprecated in v0.7.0. */
+  end?: number;
+  /** @deprecated Use maskChar instead. Deprecated in v0.7.0. */
+  char?: string;
 }
 ```
+
+<Callout type="warning">
+  **Breaking Change (v0.7.0):** Options renamed to `visibleStart`, `visibleEnd`, `maskChar`. Old names still work with deprecation warnings. Will be removed in v1.0.0.
+</Callout>
 
 **Examples:**
 
@@ -591,17 +601,17 @@ maskNIK('3201018901310123');
 // '3201********0123'
 
 // Custom visible characters
-maskNIK('3201018901310123', { start: 6, end: 4 });
+maskNIK('3201018901310123', { visibleStart: 6, visibleEnd: 4 });
 // '320101******0123'
 
-maskNIK('3201018901310123', { start: 2, end: 2 });
+maskNIK('3201018901310123', { visibleStart: 2, visibleEnd: 2 });
 // '32************23'
 
 // Custom mask character
-maskNIK('3201018901310123', { char: 'X' });
+maskNIK('3201018901310123', { maskChar: 'X' });
 // '3201XXXXXXXX0123'
 
-maskNIK('3201018901310123', { char: '•' });
+maskNIK('3201018901310123', { maskChar: '•' });
 // '3201••••••••0123'
 
 // With separator
@@ -613,15 +623,15 @@ maskNIK('3201018901310123', { separator: ' ' });
 
 // Combined options
 maskNIK('3201018901310123', {
-  start: 6,
-  end: 4,
-  char: 'X',
+  visibleStart: 6,
+  visibleEnd: 4,
+  maskChar: 'X',
   separator: '-',
 });
 // '32-01-01-XX-XX-XX-0123'
 
 // Complete masking
-maskNIK('3201018901310123', { start: 0, end: 0 });
+maskNIK('3201018901310123', { visibleStart: 0, visibleEnd: 0 });
 // '****************'
 
 // Invalid NIK returns as-is
@@ -906,21 +916,27 @@ Configuration options for masking NIKs.
 
 ```typescript
 interface MaskOptions {
-  start?: number; // Characters to show at start (default: 4)
-  end?: number; // Characters to show at end (default: 4)
-  char?: string; // Mask character (default: '*')
+  visibleStart?: number; // Characters to show at start (default: 4)
+  visibleEnd?: number; // Characters to show at end (default: 4)
+  maskChar?: string; // Mask character (default: '*')
   separator?: string; // Optional separator (default: none)
+  /** @deprecated Use visibleStart instead. Deprecated in v0.7.0. */
+  start?: number;
+  /** @deprecated Use visibleEnd instead. Deprecated in v0.7.0. */
+  end?: number;
+  /** @deprecated Use maskChar instead. Deprecated in v0.7.0. */
+  char?: string;
 }
 ```
 
 **Option Details:**
 
-- **start**: Number of characters visible at the beginning
-- **end**: Number of characters visible at the end
-- **char**: Character used for masking (single character)
+- **visibleStart**: Number of characters visible at the beginning
+- **visibleEnd**: Number of characters visible at the end
+- **maskChar**: Character used for masking (single character)
 - **separator**: If provided, formats the NIK with separators before masking
 
-<Callout type="warning">**Constraint:** `start + end` must be less than 16, otherwise the NIK is returned unmodified.</Callout>
+<Callout type="warning">**Constraint:** `visibleStart + visibleEnd` must be less than 16, otherwise the NIK is returned unmodified.</Callout>
 
 ### NIKValidationResult
 
@@ -1075,7 +1091,7 @@ function NIKDisplay({ nik, context }: { nik: string; context: string }) {
     case 'profile':
       return maskNIK(nik, { separator: '-' }); // Partial: '32-01-**-**-**-**-0123'
     case 'public':
-      return maskNIK(nik, { start: 2, end: 2 }); // Minimal: '32************23'
+      return maskNIK(nik, { visibleStart: 2, visibleEnd: 2 }); // Minimal: '32************23'
     default:
       return '****-****-****-****'; // Hidden
   }
@@ -1178,9 +1194,9 @@ function processNIK(nik: string): NIKInfo | null {
 
 // Type-safe options
 const options: MaskOptions = {
-  start: 4,
-  end: 4,
-  char: '*',
+  visibleStart: 4,
+  visibleEnd: 4,
+  maskChar: '*',
   separator: '-',
 };
 ```

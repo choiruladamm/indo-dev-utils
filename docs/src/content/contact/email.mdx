@@ -177,3 +177,30 @@ The regular expression used internally for validation.
 ### DISPOSABLE_DOMAINS
 
 A list of common disposable email domains that are blocked when `blockDisposable` is enabled.
+
+### InvalidEmailError
+
+Error class for invalid email with error code for programmatic handling.
+
+```typescript
+class InvalidEmailError extends Error {
+  readonly code = 'INVALID_EMAIL';
+  constructor(message?: string);
+}
+```
+
+**Example:**
+
+```typescript
+import { InvalidEmailError, validateEmail } from '@indodev/toolkit/email-validator';
+
+try {
+  if (!validateEmail(email)) {
+    throw new InvalidEmailError('Invalid email format');
+  }
+} catch (error) {
+  if (error instanceof InvalidEmailError) {
+    console.log(error.code); // 'INVALID_EMAIL'
+  }
+}
+```

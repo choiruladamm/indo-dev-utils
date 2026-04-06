@@ -2,6 +2,51 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.0] - 2026-04-06
+
+### Added
+
+#### Error Classes
+
+New custom error classes with `code` property for programmatic error handling:
+
+- `InvalidPhoneError` - Error for invalid phone numbers
+- `InvalidNPWPError` - Error for invalid NPWP
+- `InvalidEmailError` - Error for invalid email addresses
+- `InvalidPlateError` - Error for invalid vehicle plates
+- `InvalidVINError` - Error for invalid VINs
+
+#### Parse Functions
+
+- `parseVIN()` - Extract VIN components (WMI, VDS, check digit, model year, plant code, serial number)
+- `parsePlate()` - Extract plate components (prefix, number, suffix, type, formatted)
+
+### Changed
+
+#### Mask Options (Breaking Change with Deprecation)
+
+Standardized mask option names across all modules:
+
+| Old Name | New Name       |
+| -------- | -------------- |
+| `start`  | `visibleStart` |
+| `end`    | `visibleEnd`   |
+| `char`   | `maskChar`     |
+
+**Migration:** Old names still work but emit deprecation warnings. Will be removed in v1.0.0.
+
+#### NIK Module
+
+- `maskNIK()` - Now uses standardized `visibleStart`, `visibleEnd`, `maskChar` options
+
+#### Phone Module
+
+- `maskPhoneNumber()` - Now uses standardized `visibleStart`, `visibleEnd`, `maskChar` options
+
+#### Text Module
+
+- `maskText()` - Now uses standardized `visibleStart`, `visibleEnd`, `maskChar` options, added `separator` support
+
 ## [0.6.0] - 2026-04-06
 
 ### Added

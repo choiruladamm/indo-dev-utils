@@ -48,7 +48,7 @@ The Plate module provides utilities to validate Indonesian license plates, detec
 ## Quick Start
 
 ```typescript
-import { validatePlate, getRegionFromPlate, formatPlate } from '@indodev/toolkit/plate';
+import { validatePlate, getRegionFromPlate, formatPlate, parsePlate } from '@indodev/toolkit/plate';
 
 // Validate Plate
 validatePlate('B 1234 ABC'); // true
@@ -63,6 +63,13 @@ getRegionFromPlate('D 1');
 // Format Plate
 formatPlate('b1234abc');
 // 'B 1234 ABC'
+
+// Parse Plate
+const info = parsePlate('B 1234 ABC');
+console.log(info.prefix); // 'B'
+console.log(info.number); // '1234'
+console.log(info.suffix); // 'ABC'
+console.log(info.type); // 'private'
 ```
 
 ## API Reference
@@ -133,6 +140,46 @@ function formatPlate(plate: string): string;
 
 ---
 
+### parsePlate()
+
+Parses a license plate and extracts its component parts.
+
+**Type Signature:**
+
+```typescript
+function parsePlate(plate: string): PlateInfo | null;
+```
+
+**Parameters:**
+
+| Name    | Type     | Description               |
+| ------- | -------- | ------------------------- |
+| `plate` | `string` | The license plate to parse |
+
+**Returns:**
+
+`PlateInfo | null` - Parsed plate information or `null` if invalid.
+
+**Example:**
+
+```typescript
+const info = parsePlate('B 1234 ABC');
+if (info) {
+  console.log(info.prefix); // 'B'
+  console.log(info.number); // '1234'
+  console.log(info.suffix); // 'ABC'
+  console.log(info.type); // 'private'
+  console.log(info.formatted); // 'B 1234 ABC'
+  console.log(info.isValid); // true
+}
+
+// Parse diplomat plate
+const diplomat = parsePlate('CD 1234 AB');
+console.log(diplomat?.type); // 'diplomat'
+```
+
+---
+
 ## Constants
 
 ### PLATE_REGIONS
@@ -144,4 +191,46 @@ import { PLATE_REGIONS } from '@indodev/toolkit/plate';
 
 console.log(PLATE_REGIONS['B']); // 'DKI Jakarta, Tangerang, Bekasi, Depok'
 console.log(PLATE_REGIONS['D']); // 'Bandung, Cimahi'
+```
+
+### PlateInfo
+
+Information extracted from a valid license plate.
+
+```typescript
+interface PlateInfo {
+  prefix: string;      // Plate prefix (e.g., 'B')
+  number: string;       // Plate number (e.g., '1234')
+  suffix: string;       // Plate suffix (e.g., 'ABC')
+  type: 'private' | 'public' | 'diplomat' | null;
+  formatted: string;     // Formatted plate (e.g., 'B 1234 ABC')
+  isValid: boolean;     // Whether the plate passed validation
+}
+```
+
+### InvalidPlateError
+
+Error class for invalid plate with error code for programmatic handling.
+
+```typescript
+class InvalidPlateError extends Error {
+  readonly code = 'INVALID_PLATE';
+  constructor(message?: string);
+}
+```
+
+**Example:**
+
+```typescript
+import { InvalidPlateError, validatePlate } from '@indodev/toolkit/plate';
+
+try {
+  if (!validatePlate(plate)) {
+    throw new InvalidPlateError('Invalid plate format');
+  }
+} catch (error) {
+  if (error instanceof InvalidPlateError) {
+    console.log(error.code); // 'INVALID_PLATE'
+  }
+}
 ```

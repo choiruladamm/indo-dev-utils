@@ -24,53 +24,67 @@ describe('maskNIK', () => {
 
   describe('custom mask character', () => {
     it('should mask with X', () => {
-      expect(maskNIK(validNIK, { char: 'X' })).toBe('3201XXXXXXXX0123');
+      expect(maskNIK(validNIK, { maskChar: 'X' })).toBe('3201XXXXXXXX0123');
     });
 
     it('should mask with dot', () => {
-      expect(maskNIK(validNIK, { char: '.' })).toBe('3201........0123');
+      expect(maskNIK(validNIK, { maskChar: '.' })).toBe('3201........0123');
     });
 
     it('should mask with dash', () => {
-      expect(maskNIK(validNIK, { char: '-' })).toBe('3201--------0123');
+      expect(maskNIK(validNIK, { maskChar: '-' })).toBe('3201--------0123');
     });
 
     it('should mask with hash', () => {
-      expect(maskNIK(validNIK, { char: '#' })).toBe('3201########0123');
+      expect(maskNIK(validNIK, { maskChar: '#' })).toBe('3201########0123');
     });
 
     it('should mask with bullet', () => {
-      expect(maskNIK(validNIK, { char: '•' })).toBe('3201••••••••0123');
+      expect(maskNIK(validNIK, { maskChar: '•' })).toBe('3201••••••••0123');
     });
   });
 
-  describe('custom start and end positions', () => {
-    it('should mask with custom start', () => {
-      expect(maskNIK(validNIK, { start: 2, end: 4 })).toBe('32**********0123');
+  describe('custom visibleStart and visibleEnd positions', () => {
+    it('should mask with custom visibleStart', () => {
+      expect(maskNIK(validNIK, { visibleStart: 2, visibleEnd: 4 })).toBe(
+        '32**********0123'
+      );
     });
 
-    it('should mask with custom end', () => {
-      expect(maskNIK(validNIK, { start: 4, end: 2 })).toBe('3201**********23');
+    it('should mask with custom visibleEnd', () => {
+      expect(maskNIK(validNIK, { visibleStart: 4, visibleEnd: 2 })).toBe(
+        '3201**********23'
+      );
     });
 
     it('should mask with both custom', () => {
-      expect(maskNIK(validNIK, { start: 6, end: 4 })).toBe('320101******0123');
+      expect(maskNIK(validNIK, { visibleStart: 6, visibleEnd: 4 })).toBe(
+        '320101******0123'
+      );
     });
 
     it('should mask showing more characters', () => {
-      expect(maskNIK(validNIK, { start: 8, end: 6 })).toBe('32010189**310123');
+      expect(maskNIK(validNIK, { visibleStart: 8, visibleEnd: 6 })).toBe(
+        '32010189**310123'
+      );
     });
 
     it('should mask showing less characters', () => {
-      expect(maskNIK(validNIK, { start: 2, end: 2 })).toBe('32************23');
+      expect(maskNIK(validNIK, { visibleStart: 2, visibleEnd: 2 })).toBe(
+        '32************23'
+      );
     });
 
-    it('should mask with start only', () => {
-      expect(maskNIK(validNIK, { start: 6, end: 0 })).toBe('320101**********');
+    it('should mask with visibleStart only', () => {
+      expect(maskNIK(validNIK, { visibleStart: 6, visibleEnd: 0 })).toBe(
+        '320101**********'
+      );
     });
 
-    it('should mask with end only', () => {
-      expect(maskNIK(validNIK, { start: 0, end: 6 })).toBe('**********310123');
+    it('should mask with visibleEnd only', () => {
+      expect(maskNIK(validNIK, { visibleStart: 0, visibleEnd: 6 })).toBe(
+        '**********310123'
+      );
     });
   });
 
@@ -93,22 +107,29 @@ describe('maskNIK', () => {
       );
     });
 
-    it('should combine separator with custom char', () => {
-      expect(maskNIK(validNIK, { char: 'X', separator: '-' })).toBe(
+    it('should combine separator with custom maskChar', () => {
+      expect(maskNIK(validNIK, { maskChar: 'X', separator: '-' })).toBe(
         '32-01-XX-XX-XX-XX-0123'
       );
     });
 
     it('should combine all options', () => {
       expect(
-        maskNIK(validNIK, { start: 6, end: 4, char: '•', separator: '-' })
+        maskNIK(validNIK, {
+          visibleStart: 6,
+          visibleEnd: 4,
+          maskChar: '•',
+          separator: '-',
+        })
       ).toBe('32-01-01-••-••-••-0123');
     });
   });
 
   describe('edge cases', () => {
-    it('should return original if start + end >= 16', () => {
-      expect(maskNIK(validNIK, { start: 8, end: 8 })).toBe(validNIK);
+    it('should return original if visibleStart + visibleEnd >= 16', () => {
+      expect(maskNIK(validNIK, { visibleStart: 8, visibleEnd: 8 })).toBe(
+        validNIK
+      );
     });
 
     it('should return original for invalid NIK', () => {
@@ -128,25 +149,36 @@ describe('maskNIK', () => {
     });
 
     it('should mask minimum (1 char masked)', () => {
-      expect(maskNIK(validNIK, { start: 7, end: 8 })).toBe('3201018*01310123');
-    });
-
-    it('should handle start only with separator', () => {
-      expect(maskNIK(validNIK, { start: 6, end: 0, separator: '-' })).toBe(
-        '32-01-01-**-**-**-****'
+      expect(maskNIK(validNIK, { visibleStart: 7, visibleEnd: 8 })).toBe(
+        '3201018*01310123'
       );
     });
 
-    it('should handle end only with separator', () => {
-      expect(maskNIK(validNIK, { start: 0, end: 6, separator: '-' })).toBe(
-        '**-**-**-**-**-31-0123'
-      );
+    it('should handle visibleStart only with separator', () => {
+      expect(
+        maskNIK(validNIK, { visibleStart: 6, visibleEnd: 0, separator: '-' })
+      ).toBe('32-01-01-**-**-**-****');
+    });
+
+    it('should handle visibleEnd only with separator', () => {
+      expect(
+        maskNIK(validNIK, { visibleStart: 0, visibleEnd: 6, separator: '-' })
+      ).toBe('**-**-**-**-**-31-0123');
     });
 
     it('should mask with boundary on part edge', () => {
-      expect(maskNIK(validNIK, { start: 4, end: 4, separator: '-' })).toBe(
-        '32-01-**-**-**-**-0123'
-      );
+      expect(
+        maskNIK(validNIK, { visibleStart: 4, visibleEnd: 4, separator: '-' })
+      ).toBe('32-01-**-**-**-**-0123');
+    });
+  });
+
+  describe('backward compatibility (deprecated)', () => {
+    it('should still support old option names with deprecation warning', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      expect(maskNIK(validNIK, { start: 2, end: 4 })).toBe('32**********0123');
+      expect(warnSpy).toHaveBeenCalled();
+      warnSpy.mockRestore();
     });
   });
 });

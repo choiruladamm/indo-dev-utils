@@ -190,4 +190,26 @@ export interface MaskOptions {
    * Number of characters to keep visible at end (for 'middle' pattern, default: 2)
    */
   visibleEnd?: number;
+
+  /**
+   * Optional separator to add between groups.
+   *
+   * @defaultValue undefined
+   */
+  separator?: string;
+
+  /**
+   * @deprecated Use `visibleStart` instead. Deprecated in v0.7.0.
+   */
+  start?: number;
+
+  /**
+   * @deprecated Use `visibleEnd` instead. Deprecated in v0.7.0.
+   */
+  end?: number;
+
+  /**
+   * @deprecated Use `maskChar` instead. Deprecated in v0.7.0.
+   */
+  char?: string;
 }

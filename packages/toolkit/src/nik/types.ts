@@ -99,13 +99,13 @@ export interface NIKInfo {
  * what character to use for masking, and optional separators.
  *
  * @example
+ * Default masking:
  * ```typescript
- * // Default: shows first 4 and last 4 digits
- * { start: 4, end: 4, char: '*' }
+ * { visibleStart: 4, visibleEnd: 4, maskChar: '*' }
  * // Result: '3201********0123'
  *
  * // With separator
- * { start: 4, end: 4, char: '*', separator: '-' }
+ * { visibleStart: 4, visibleEnd: 4, maskChar: '*', separator: '-' }
  * // Result: '3201-****-****-0123'
  * ```
  *
@@ -117,21 +117,21 @@ export interface MaskOptions {
    *
    * @defaultValue 4
    */
-  start?: number;
+  visibleStart?: number;
 
   /**
    * Number of characters to show at the end.
    *
    * @defaultValue 4
    */
-  end?: number;
+  visibleEnd?: number;
 
   /**
    * Character to use for masking hidden digits.
    *
    * @defaultValue '*'
    */
-  char?: string;
+  maskChar?: string;
 
   /**
    * Optional separator to add between groups of digits.
@@ -146,6 +146,21 @@ export interface MaskOptions {
    * ```
    */
   separator?: string;
+
+  /**
+   * @deprecated Use `visibleStart` instead. Deprecated in v0.7.0.
+   */
+  start?: number;
+
+  /**
+   * @deprecated Use `visibleEnd` instead. Deprecated in v0.7.0.
+   */
+  end?: number;
+
+  /**
+   * @deprecated Use `maskChar` instead. Deprecated in v0.7.0.
+   */
+  char?: string;
 }
 
 /**

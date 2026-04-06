@@ -110,3 +110,5 @@ export type {
   MaskOptions,
   OperatorName,
 } from './types';
+
+export { InvalidPhoneError } from './errors';
