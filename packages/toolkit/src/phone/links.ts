@@ -1,12 +1,14 @@
 import { toE164 } from './format';
-import { validatePhoneNumber } from './validate';
+import { validatePhoneNumber, isMobileNumber } from './validate';
 
 /**
  * Generates a WhatsApp click-to-chat link.
  *
- * @param phone - The Indonesian phone number
+ * WhatsApp only works on mobile numbers, so landlines will return empty string.
+ *
+ * @param phone - The Indonesian mobile phone number
  * @param message - Optional pre-filled message
- * @returns WhatsApp link, or empty string if phone is invalid
+ * @returns WhatsApp link, or empty string if phone is invalid or landline
  *
  * @example
  * ```typescript
@@ -14,10 +16,16 @@ import { validatePhoneNumber } from './validate';
  * // 'https://wa.me/6281234567890?text=Halo%21'
  * ```
  *
+ * @example
+ * Landlines return empty string (WhatsApp doesn't work on landlines):
+ * ```typescript
+ * generateWALink('0212345678'); // ''
+ * ```
+ *
  * @public
  */
 export function generateWALink(phone: string, message?: string): string {
-  if (!validatePhoneNumber(phone)) {
+  if (!validatePhoneNumber(phone) || !isMobileNumber(phone)) {
     return '';
   }
 
@@ -34,9 +42,11 @@ export function generateWALink(phone: string, message?: string): string {
 /**
  * Generates an SMS link (sms:).
  *
- * @param phone - The Indonesian phone number
+ * SMS only works on mobile numbers, so landlines will return empty string.
+ *
+ * @param phone - The Indonesian mobile phone number
  * @param body - Optional SMS body
- * @returns SMS link, or empty string if phone is invalid
+ * @returns SMS link, or empty string if phone is invalid or landline
  *
  * @example
  * ```typescript
@@ -44,10 +54,16 @@ export function generateWALink(phone: string, message?: string): string {
  * // 'sms:+6281234567890?body=Pesan%20ini'
  * ```
  *
+ * @example
+ * Landlines return empty string (SMS doesn't work on landlines):
+ * ```typescript
+ * generateSmsLink('0212345678'); // ''
+ * ```
+ *
  * @public
  */
 export function generateSmsLink(phone: string, body?: string): string {
-  if (!validatePhoneNumber(phone)) {
+  if (!validatePhoneNumber(phone) || !isMobileNumber(phone)) {
     return '';
   }
 

@@ -446,7 +446,28 @@ git status
 - **minor** (0.3.4 → 0.4.0): New modules, features
 - **major** (0.3.4 → 1.0.0): Breaking API changes
 
-### 8.2 Commit Changes
+### 8.2 Pre-Commit Confirmation
+
+**MANDATORY**: Before committing, show changes and get user approval.
+
+```bash
+# 1. Show what files changed
+git status
+
+# 2. Show diff summary
+git diff --stat
+
+# 3. List the commit message that will be used
+# (based on conventional commits format)
+
+# 4. Wait for user confirmation: "approve?" before proceeding
+```
+
+**If user rejects**: Address feedback, then re-run confirmation step.
+
+**If user approves**: Proceed to commit.
+
+### 8.3 Commit Changes
 
 ```bash
 git add -A
@@ -460,14 +481,14 @@ git commit -m "feat: add {module} module v{X.Y.Z}
 Closes #{issue_number}"
 ```
 
-### 8.3 Create Tag
+### 8.4 Create Tag
 
 ```bash
 git tag v{X.Y.Z}
 git push origin v{X.Y.Z}
 ```
 
-### 8.4 Publish (Manual or CI/CD)
+### 8.5 Publish (Manual or CI/CD)
 
 ```bash
 cd packages/toolkit

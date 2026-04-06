@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2026-04-06
+
+### Changed
+
+#### Phone Module
+
+- `generateWALink()` and `generateSmsLink()` now reject landlines (breaking change)
+  - WhatsApp and SMS only work on mobile numbers
+  - Landline numbers now return empty string `''`
+  - Use `generateTelLink()` for landline phone calls
+
+### Fixed
+
+#### Phone Module
+
+- `comparePhones()` now properly compares using E.164 format for accurate comparison
+- `getLandlineRegion()` now uses shared `normalizePhoneNumber()` utility (removed code duplication)
+
+### Internal
+
+- Removed internal `normalizeToNational` helper (now uses `normalizePhoneNumber`)
+
 ## [0.4.2] - 2026-04-06
 
 ### Changed

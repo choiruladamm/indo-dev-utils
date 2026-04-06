@@ -984,6 +984,10 @@ function exportUsers(users: User[]) {
 
 Generates a WhatsApp click-to-chat link.
 
+<Callout type="warning">
+  **Breaking Change (v0.5.0):** WhatsApp only works on mobile numbers. Landlines now return empty string `''`.
+</Callout>
+
 **Type Signature:**
 
 ```typescript
@@ -994,21 +998,29 @@ function generateWALink(phone: string, message?: string): string;
 
 | Name      | Type     | Description                               |
 | --------- | -------- | ----------------------------------------- |
-| `phone`   | `string` | The phone number                          |
+| `phone`   | `string` | The mobile phone number                   |
 | `message` | `string` | Optional pre-filled message (URL encoded) |
 
 **Returns:**
 
-`string` - The WhatsApp URL link.
+`string` - The WhatsApp URL link, or empty string if landline/invalid.
 
 **Examples:**
 
 ```typescript
+// Mobile numbers
 generateWALink('081234567890');
 // 'https://wa.me/6281234567890'
 
 generateWALink('081234567890', 'Halo apa kabar?');
 // 'https://wa.me/6281234567890?text=Halo%20apa%20kabar%3F'
+
+// Landlines return empty string (WA does not work on landlines)
+generateWALink('0212345678');
+// ''
+
+generateWALink('+62212345678');
+// ''
 ```
 
 ---
@@ -1016,6 +1028,10 @@ generateWALink('081234567890', 'Halo apa kabar?');
 ### generateSmsLink()
 
 Generates an SMS link.
+
+<Callout type="warning">
+  **Breaking Change (v0.5.0):** SMS only works on mobile numbers. Landlines now return empty string `''`.
+</Callout>
 
 **Type Signature:**
 
@@ -1027,21 +1043,26 @@ function generateSmsLink(phone: string, body?: string): string;
 
 | Name    | Type     | Description                            |
 | ------- | -------- | -------------------------------------- |
-| `phone` | `string` | The phone number                       |
+| `phone` | `string` | The mobile phone number                |
 | `body`  | `string` | Optional pre-filled body (URL encoded) |
 
 **Returns:**
 
-`string` - The `sms:` URI link.
+`string` - The `sms:` URI link, or empty string if landline/invalid.
 
 **Examples:**
 
 ```typescript
+// Mobile numbers
 generateSmsLink('081234567890');
 // 'sms:6281234567890'
 
 generateSmsLink('081234567890', 'Halo!');
 // 'sms:6281234567890?body=Halo!'
+
+// Landlines return empty string (SMS does not work on landlines)
+generateSmsLink('0212345678');
+// ''
 ```
 
 ---
@@ -1724,6 +1745,127 @@ function canReceiveFlashSMS(phone: string) {
 }
 ```
 
+### 7. Handle WhatsApp Links Properly
+
+```typescript
+// ❌ BAD: Using validatePhoneNumber without checking mobile
+function WhatsAppButton({ phone }) {
+  const waLink = generateWALink(phone); // Landlines return '' silently
+  return <a href={waLink}>Chat</a>;
+}
+
+// ✅ GOOD: Check if mobile first
+function WhatsAppButton({ phone }) {
+  if (!isMobileNumber(phone)) {
+    return null; // or show alternative contact
+  }
+  return <a href={generateWALink(phone)}>Chat on WhatsApp</a>;
+}
+
+// ✅ GOOD: Using parsePhoneNumber for full info
+function WhatsAppButton({ phone }) {
+  const info = parsePhoneNumber(phone);
+  if (!info?.isMobile) {
+    return <span>WhatsApp only for mobile</span>;
+  }
+  return <a href={generateWALink(phone)}>Chat on WhatsApp</a>;
+}
+```
+
+### 8. Deduplicate Phone Numbers
+
+```typescript
+// ✅ GOOD: Use comparePhones for deduplication
+function findDuplicates(phones: string[]): string[][] {
+  const groups: string[][] = [];
+  const seen = new Map<string, number>();
+
+  phones.forEach((phone, index) => {
+    for (const [e164, firstIndex] of seen) {
+      if (comparePhones(phone, e164)) {
+        groups[firstIndex].push(phone);
+        return;
+      }
+    }
+    seen.set(phone, groups.length);
+    groups.push([phone]);
+  });
+
+  return groups.filter(g => g.length > 1);
+}
+
+// Usage
+const phones = [
+  '081234567890',
+  '+62 812 345 67890',  // duplicate
+  '6281234567890',       // duplicate
+  '0212345678',          // different
+];
+findDuplicates(phones); // [['081234567890', '+62 812 345 67890', '6281234567890']]
+```
+
+### 9. Distinguish Mobile vs Landline in Forms
+
+```typescript
+// ✅ GOOD: Different validation for mobile vs landline
+function validatePhoneInput(input: string, type: 'mobile' | 'landline' | 'any') {
+  if (!validatePhoneNumber(input)) {
+    return { valid: false, error: 'Invalid phone number' };
+  }
+
+  const info = parsePhoneNumber(input);
+
+  if (type === 'mobile' && !info?.isMobile) {
+    return { valid: false, error: 'Please enter a mobile number' };
+  }
+
+  if (type === 'landline' && !info?.isLandline) {
+    return { valid: false, error: 'Please enter a landline number' };
+  }
+
+  return { valid: true, info };
+}
+
+// Usage
+validatePhoneInput('081234567890', 'mobile');    // ✅ valid
+validatePhoneInput('0212345678', 'mobile');      // ❌ error: landline not allowed
+validatePhoneInput('0212345678', 'landline');    // ✅ valid
+validatePhoneInput('081234567890', 'any');       // ✅ valid
+```
+
+### 10. Normalize User Input Aggressively
+
+```typescript
+// ✅ GOOD: Always normalize user input before storage
+function normalizeUserPhone(input: string): string | null {
+  // Remove all non-digit except leading +
+  const cleaned = cleanPhoneNumber(input);
+
+  if (!validatePhoneNumber(cleaned)) {
+    return null;
+  }
+
+  // Store as E.164 for consistency
+  return formatPhoneNumber(cleaned, 'e164');
+}
+
+// Usage - in registration form
+async function registerUser(formData: { phone: string }) {
+  const normalized = normalizeUserPhone(formData.phone);
+
+  if (!normalized) {
+    throw new Error('Invalid phone number');
+  }
+
+  await db.users.create({ phone: normalized });
+}
+
+// When displaying, always format for context
+function displayUserPhone(e164: string, context: 'domestic' | 'international') {
+  return formatPhoneNumber(e164, context === 'international' ? 'international' : 'national');
+}
+```
+
 ---
 
 ## Troubleshooting
@@ -1828,6 +1970,159 @@ A: The library already handles this. Former Tri prefixes (089x) are now under In
 ```typescript
 getOperator('089534567890'); // 'Indosat'
 // Tri merged with Indosat in 2024
+```
+
+### Q: Why does `620xxx` fail validation?
+
+A: `620` is not a valid country code pattern for Indonesia. The valid patterns are:
+
+- `+62` followed by 8-11 digits (international with plus)
+- `62` followed by 8-11 digits (international without plus)
+- `0` followed by 9-12 digits (national)
+
+```typescript
+validatePhoneNumber('+6281234567890'); // ✅ true (+62 prefix)
+validatePhoneNumber('6281234567890');  // ✅ true (62 prefix)
+validatePhoneNumber('081234567890');   // ✅ true (0 prefix)
+validatePhoneNumber('620812345678');   // ❌ false (620 is not valid)
+
+// Why? '620' looks like a typo for '62' + '0812...'
+// The extra '0' would incorrectly become part of the number
+```
+
+### Q: How do I detect landline vs mobile for routing?
+
+A: Use `isMobileNumber()` or `isLandlineNumber()`, or check from `parsePhoneNumber()`:
+
+```typescript
+function routeMessage(phone: string) {
+  if (isMobileNumber(phone)) {
+    return sendSMS(phone); // or WhatsApp
+  }
+  if (isLandlineNumber(phone)) {
+    return initiateCall(phone);
+  }
+  return null;
+}
+
+// Or using parsePhoneNumber
+function routeMessage2(phone: string) {
+  const info = parsePhoneNumber(phone);
+  if (!info) return null;
+
+  if (info.isMobile) {
+    return { type: 'sms', to: info.formatted.e164 };
+  } else {
+    return { type: 'call', to: info.formatted.e164 };
+  }
+}
+```
+
+### Q: How do I handle number portability?
+
+A: Number portability means operators can change without changing the number. This library validates format only, not current operator:
+
+```typescript
+// ✅ GOOD: Validate format, not current operator
+function validateForSMS(phone: string) {
+  if (!validatePhoneNumber(phone)) {
+    return { valid: false, reason: 'invalid_format' };
+  }
+
+  if (!isMobileNumber(phone)) {
+    return { valid: false, reason: 'landline' };
+  }
+
+  return { valid: true, normalized: formatPhoneNumber(phone, 'e164') };
+}
+
+// Note: For real-time operator verification, you need a carrier lookup API
+```
+
+### Q: Why does `generateWALink` return empty string for my number?
+
+A: `generateWALink` only works for mobile numbers. WhatsApp requires mobile:
+
+```typescript
+generateWALink('0212345678');      // '' (landline - WA doesn't work)
+generateWALink('081234567890');    // 'https://wa.me/6281234567890' (mobile)
+
+// For landlines, use generateTelLink instead
+generateTelLink('0212345678');     // 'tel:+62212345678'
+```
+
+### Q: How do I validate phone numbers from user input?
+
+A: Handle common user input issues:
+
+```typescript
+function sanitizePhoneInput(input: string): string {
+  // Remove common formatting artifacts
+  let cleaned = input.trim();
+
+  // Handle common paste errors
+  cleaned = cleaned.replace(/^8/, '628'); // User typed 0812 instead of +62
+
+  // Remove all separators except +
+  cleaned = cleaned.replace(/[\s\-().]/g, '');
+
+  // Normalize international format
+  if (!cleaned.startsWith('+') && !cleaned.startsWith('62')) {
+    if (cleaned.startsWith('0')) {
+      cleaned = '+62' + cleaned.substring(1);
+    } else {
+      cleaned = '+62' + cleaned;
+    }
+  }
+
+  return cleaned;
+}
+
+// Usage
+const input = '  0812-3456-7890  ';
+const normalized = sanitizePhoneInput(input);
+validatePhoneNumber(normalized); // true
+```
+
+---
+
+## Edge Cases
+
+### Handling Prefix Edge Cases
+
+| Input | Expected Behavior |
+|-------|------------------|
+| `620xxx` | Invalid - `620` is not a valid country code pattern |
+| `+620xxx` | Invalid - extra 0 is not part of valid format |
+| `08xxxxxxxx` (9 digits) | Invalid - mobile must be 10-13 digits |
+| `08xxxxxxxxxxxxx` (14 digits) | Invalid - mobile must be 10-13 digits |
+| `021xxxxxxxx` (10 digits) | Valid - landline minimum |
+| `021xxxxxxxxxx` (12 digits) | Valid - landline maximum |
+| `+62` alone | Invalid - no number after country code |
+| `62` alone | Invalid - no number after country code |
+| Empty string | Invalid - returns `false` for validation |
+
+### Special Phone Types
+
+| Type | Detection | Notes |
+|------|-----------|-------|
+| Mobile | `isMobileNumber()` | WhatsApp/SMS capable |
+| Landline | `isLandlineNumber()` | Voice calls only |
+| International (+62) | Any format with +62 | Valid if in E.164 format |
+| Toll-free | Not in library | Check with carrier |
+
+### Common Formatting Variations
+
+```typescript
+// All these are equivalent and validate to true
+validatePhoneNumber('081234567890');      // national
+validatePhoneNumber('0812-3456-7890');    // with dashes
+validatePhoneNumber('0812 3456 7890');    // with spaces
+validatePhoneNumber('+6281234567890');    // international
+validatePhoneNumber('+62 812 3456 7890'); // international with spaces
+validatePhoneNumber('+62-812-3456-7890'); // international with dashes
+validatePhoneNumber('6281234567890');     // e164 without plus
+validatePhoneNumber('(0812) 3456-7890'); // parentheses
 ```
 
 ---
