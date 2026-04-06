@@ -49,6 +49,8 @@ guide/
 # PRD (internal docs)
 packages/toolkit/prd/
 
+.opencode
+
 # ===================================
 # Monorepo Specific
 # ===================================

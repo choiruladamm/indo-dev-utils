@@ -174,3 +174,81 @@ export class InvalidNIKError extends Error {
     this.name = 'InvalidNIKError';
   }
 }
+
+/**
+ * Error codes for detailed NIK validation.
+ *
+ * @public
+ */
+export type NIKErrorCode =
+  | 'INVALID_FORMAT'
+  | 'INVALID_PROVINCE'
+  | 'INVALID_MONTH'
+  | 'INVALID_DAY'
+  | 'INVALID_DATE'
+  | 'FUTURE_DATE';
+
+/**
+ * A single validation error with code and message.
+ *
+ * @public
+ */
+export interface NIKValidationError {
+  /** Error code for programmatic handling */
+  code: NIKErrorCode;
+  /** Human-readable error message */
+  message: string;
+}
+
+/**
+ * Detailed validation result for NIK with structured error reporting.
+ *
+ * Use this for form validation where you need to show specific error
+ * messages per field.
+ *
+ * @example
+ * ```typescript
+ * const result = validateNIKDetailed('1234');
+ * if (!result.isValid) {
+ *   result.errors.forEach(err => {
+ *     console.log(err.code, err.message);
+ *   });
+ * }
+ * ```
+ *
+ * @public
+ */
+export interface NIKValidationResult {
+  /** Whether the NIK is valid */
+  isValid: boolean;
+  /** List of validation errors (empty if valid) */
+  errors: NIKValidationError[];
+  /** Cleaned 16-digit NIK if valid, null otherwise */
+  nik: string | null;
+}
+
+/**
+ * Options for getAge function.
+ *
+ * @public
+ */
+export interface GetAgeOptions {
+  /** Date to calculate age from (default: current date) */
+  referenceDate?: Date;
+  /** Return formatted Indonesian string instead of object */
+  asString?: boolean;
+}
+
+/**
+ * Age result object with years, months, and days.
+ *
+ * @public
+ */
+export interface Age {
+  /** Full years */
+  years: number;
+  /** Remaining months after full years */
+  months: number;
+  /** Remaining days after full months */
+  days: number;
+}

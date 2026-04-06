@@ -130,5 +130,23 @@ describe('maskNIK', () => {
     it('should mask minimum (1 char masked)', () => {
       expect(maskNIK(validNIK, { start: 7, end: 8 })).toBe('3201018*01310123');
     });
+
+    it('should handle start only with separator', () => {
+      expect(maskNIK(validNIK, { start: 6, end: 0, separator: '-' })).toBe(
+        '32-01-01-**-**-**-****'
+      );
+    });
+
+    it('should handle end only with separator', () => {
+      expect(maskNIK(validNIK, { start: 0, end: 6, separator: '-' })).toBe(
+        '**-**-**-**-**-31-0123'
+      );
+    });
+
+    it('should mask with boundary on part edge', () => {
+      expect(maskNIK(validNIK, { start: 4, end: 4, separator: '-' })).toBe(
+        '32-01-**-**-**-**-0123'
+      );
+    });
   });
 });

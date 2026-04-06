@@ -133,7 +133,9 @@ export function maskNIK(nik: string, options: MaskOptions = {}): string {
         // Fully masked
         return char.repeat(part.length);
       } else {
-        // Partially masked
+        // Partially masked - This branch is theoretically possible for variable-width
+        // parts, but with fixed 2-char NIK segments it cannot be triggered since
+        // no 2-char part can span both the start-visible and end-visible boundaries.
         return part
           .split('')
           .map((ch, idx) => {

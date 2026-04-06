@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2026-04-06
+
+### Added
+
+#### NIK Module
+
+- `cleanNIK()`: Normalize NIK input by stripping separators (`.`, `-`, ` `)
+- `compareNIK()`: Check if two NIKs belong to the same person
+- `isAdult()`: Check KTP eligibility (17 years default, configurable)
+- `validateNIKDetailed()`: Structured validation result with error codes and messages
+- `NIKValidationResult`, `NIKValidationError`, `NIKErrorCode` types
+- `Age` and `GetAgeOptions` types
+
+### Changed
+
+#### NIK Module (Breaking Change)
+
+- `getAge()` now returns `{ years, months, days }` object instead of `number`
+  - Use `{ asString: true }` option for formatted output ("35 Tahun 2 Bulan 6 Hari")
+  - Use `age.years` for year comparison
+- `formatBirthDate()` now uses internal formatting (consistent with datetime module)
+
+### Documentation
+
+- Updated NIK docs with all new functions
+- Added Type Reference for new types
+- Updated Quick Start examples
+
 ## [0.5.0] - 2026-04-06
 
 ### Changed

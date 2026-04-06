@@ -3,6 +3,33 @@ title: Changelog
 description: Latest updates and changes to the @indodev/toolkit library.
 ---
 
+## v0.6.0 - April 6, 2026
+
+### New Features
+
+#### NIK Module
+
+- `cleanNIK()`: Normalize NIK input by stripping separators (`.`, `-`, ` `)
+- `compareNIK()`: Check if two NIKs belong to the same person
+- `isAdult()`: Check KTP eligibility (17 years default, configurable)
+- `validateNIKDetailed()`: Structured validation result with error codes and messages
+- `NIKValidationResult`, `NIKValidationError`, `NIKErrorCode` types
+- `Age` and `GetAgeOptions` types
+
+### Breaking Changes
+
+#### NIK Module
+
+- `getAge()` now returns `{ years, months, days }` object instead of `number`
+  - Use `{ asString: true }` option for formatted output ("35 Tahun 2 Bulan 6 Hari")
+  - Use `age.years` for year comparison
+
+### Improvements
+
+#### NIK Module
+
+- `formatBirthDate()` now uses internal formatting (consistent with datetime module)
+
 ## v0.5.0 - April 6, 2026
 
 ### Breaking Changes
