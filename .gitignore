@@ -46,6 +46,9 @@ pnpm-debug.log*
 # Guide (internal docs)
 guide/
 
+# AGENTS.md (internal - project-specific agent configs)
+AGENTS.md
+
 # PRD (internal docs)
 packages/toolkit/prd/
 
