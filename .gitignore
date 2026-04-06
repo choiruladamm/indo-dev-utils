@@ -49,7 +49,11 @@ guide/
 # PRD (internal docs)
 packages/toolkit/prd/
 
-.opencode
+# Research (internal docs)
+packages/toolkit/research/
+
+# OpenCode internal
+.opencode/
 
 # ===================================
 # Monorepo Specific
