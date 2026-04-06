@@ -166,6 +166,24 @@ ls -lh packages/toolkit/dist/{module}/index.js
 
 ## Phase 6: Documentation Update
 
+### 6.0 ⭐ Check Module Docs for Updates
+
+**CRITICAL: For every release, check if existing module docs need updating:**
+
+- **New module**: Create full API docs (see 6.3)
+- **Patch/Minor release**: Check existing module docs for:
+  - New functions added → Add API documentation
+  - Bug fixes that change behavior → Update existing docs
+  - New examples or use cases → Add to existing docs
+  - Type changes → Update type references
+
+**Files to check per module:**
+
+- Identity: `docs/src/content/identity/{module}/index.mdx`
+- Contact: `docs/src/content/contact/{module}/index.mdx`
+- Vehicles: `docs/src/content/vehicles/{module}/index.mdx`
+- Utilities: `docs/src/content/utilities/{module}/index.mdx`
+
 ### 6.1 JSDoc in Source (Done during implementation)
 
 Ensure all exports have JSDoc with:

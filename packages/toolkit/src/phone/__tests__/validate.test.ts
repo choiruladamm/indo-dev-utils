@@ -220,6 +220,10 @@ describe('isMobileNumber', () => {
     it('should reject wrong prefix', () => {
       expect(isMobileNumber('090012345678')).toBe(false);
     });
+
+    it('should reject 620 prefix (invalid country code pattern)', () => {
+      expect(isMobileNumber('620812345678')).toBe(false);
+    });
   });
 });
 

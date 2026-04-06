@@ -11,6 +11,8 @@ import {
   maskPhoneNumber,
   parsePhoneNumber,
   getOperator,
+  comparePhones,
+  getLandlineRegion,
 } from '../index';
 import { generateWALink, generateSmsLink, generateTelLink } from '../links';
 
@@ -175,6 +177,38 @@ describe('end-to-end workflows', () => {
       expect(generateWALink('invalid')).toBe('');
       expect(generateSmsLink('invalid')).toBe('');
       expect(generateTelLink('invalid')).toBe('');
+    });
+  });
+
+  describe('getLandlineRegion integration', () => {
+    it('should work with parsePhoneNumber region field', () => {
+      const info = parsePhoneNumber('0212345678');
+      expect(info?.region).toBe(getLandlineRegion('0212345678'));
+    });
+
+    it('should work with different landline formats', () => {
+      expect(getLandlineRegion('0212345678')).toBe('Jakarta');
+      expect(getLandlineRegion('+62212345678')).toBe('Jakarta');
+      expect(getLandlineRegion('62212345678')).toBe('Jakarta');
+    });
+  });
+
+  describe('comparePhones integration', () => {
+    it('should match numbers across all format conversions', () => {
+      const phone = '081234567890';
+      const intl = toInternational(phone);
+      const e164 = toE164(phone);
+      const national = toNational(phone);
+
+      expect(comparePhones(phone, intl)).toBe(true);
+      expect(comparePhones(phone, e164)).toBe(true);
+      expect(comparePhones(phone, national)).toBe(true);
+      expect(comparePhones(intl, e164)).toBe(true);
+    });
+
+    it('should correctly identify different numbers', () => {
+      expect(comparePhones('081234567890', '081234567891')).toBe(false);
+      expect(comparePhones('0212345678', '0221234567')).toBe(false);
     });
   });
 });

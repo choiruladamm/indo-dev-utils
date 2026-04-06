@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.1] - 2026-04-06
+
+### Added
+
+#### Phone Module Enhancements
+
+- `normalizePhoneNumber()` - New utility to normalize phone numbers to national format (08xx)
+- `comparePhones()` - Compare two phone numbers regardless of format
+- `getLandlineRegion()` - Get region name from landline area code
+
+### Fixed
+
+- `isMobileNumber()` - Fixed 620 prefix edge case bug (was treating invalid 620xxx as valid)
+- Removed code duplication in `format.ts` and `parse.ts` (single source of truth in `utils.ts`)
+
+### Changed
+
+- `getOperator()` - Return type now properly typed as `OperatorName | null`
+- Constants now use `as const` for better type safety
+- `OPERATOR_PREFIXES` values typed as `OperatorName` union type
+
+### Documentation
+
+- Added `@public` JSDoc tags to `generateWALink`, `generateSmsLink`, `generateTelLink`
+- Updated module documentation with new function examples
+
 ## [0.4.0] - 2026-04-05
 
 ### Added

@@ -1,4 +1,16 @@
 /**
+ * Indonesian mobile operator names.
+ *
+ * @public
+ */
+export type OperatorName =
+  | 'Telkomsel'
+  | 'XL'
+  | 'Indosat'
+  | 'Smartfren'
+  | 'Axis';
+
+/**
  * Format types for Indonesian phone numbers.
  *
  * - `international`: +62 format with spaces (e.g., '+62 812-3456-7890')
@@ -44,7 +56,7 @@ export interface PhoneInfo {
   /**
    * Mobile operator name, or `null` if not detected.
    *
-   * Possible values: 'Telkomsel', 'XL', 'Indosat', 'Tri', 'Smartfren', 'Axis'
+   * Possible values: 'Telkomsel', 'XL', 'Indosat', 'Smartfren', 'Axis'
    *
    * @example
    * ```typescript
@@ -53,7 +65,7 @@ export interface PhoneInfo {
    * null        // if operator cannot be determined
    * ```
    */
-  operator: string | null;
+  operator: OperatorName | null;
 
   /**
    * Raw phone number without country code or leading zero.

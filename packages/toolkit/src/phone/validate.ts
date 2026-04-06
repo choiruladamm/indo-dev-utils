@@ -167,7 +167,7 @@ export function isMobileNumber(phone: string): boolean {
 
   if (cleaned.startsWith('+62')) {
     normalized = '0' + cleaned.substring(3);
-  } else if (cleaned.startsWith('62')) {
+  } else if (cleaned.startsWith('62') && !cleaned.startsWith('620')) {
     normalized = '0' + cleaned.substring(2);
   } else {
     normalized = cleaned;
