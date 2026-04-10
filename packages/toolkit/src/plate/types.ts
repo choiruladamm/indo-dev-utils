@@ -1,4 +1,22 @@
 /**
+ * Options for masking a license plate.
+ */
+export interface PlateMaskOptions {
+  /**
+   * Number of characters visible at the start (default: 1).
+   */
+  visibleStart?: number;
+  /**
+   * Number of characters visible at the end (default: 3).
+   */
+  visibleEnd?: number;
+  /**
+   * Character to use for masking (default: '*').
+   */
+  maskChar?: string;
+}
+
+/**
  * Information extracted from a valid Indonesian license plate number.
  *
  * Contains parsed data including the plate prefix, number, suffix,

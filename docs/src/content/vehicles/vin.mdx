@@ -46,7 +46,7 @@ The VIN module provides utilities to validate the 17-character unique identifica
 ## Quick Start
 
 ```typescript
-import { validateVIN, parseVIN } from '@indodev/toolkit/vin';
+import { validateVIN, parseVIN, maskVIN, cleanVIN } from '@indodev/toolkit/vin';
 
 // Validate a VIN (with correct checksum)
 validateVIN('1HGCM82633A004352'); // true
@@ -65,6 +65,12 @@ console.log(info.checkDigit); // '3'
 console.log(info.modelYearCode); // 'A'
 console.log(info.plantCode); // '0'
 console.log(info.serialNumber); // '04352'
+
+// Mask VIN (for privacy)
+maskVIN('1HGBH41JXMN109186'); // '1HGBH41JXMN******'
+
+// Clean VIN (remove non-alphanumeric)
+cleanVIN('1HGBH-41JXMN-109186'); // '1HGBH41JXMN109186'
 ```
 
 ## API Reference
@@ -128,6 +134,64 @@ if (info) {
 
 ---
 
+### maskVIN()
+
+Masks a VIN for privacy.
+
+**Type Signature:**
+
+```typescript
+function maskVIN(vin: string, options?: VINMaskOptions): string;
+```
+
+**Parameters:**
+
+| Name      | Type              | Description                    |
+| --------- | ----------------- | ------------------------------ |
+| `vin`     | `string`          | The VIN to mask                |
+| `options` | `VINMaskOptions`  | Optional masking configuration |
+
+**Returns:**
+
+`string` - Masked VIN, or empty string if invalid.
+
+**Example:**
+
+```typescript
+maskVIN('1HGBH41JXMN109186'); // '1HGBH41JXMN******'
+maskVIN('1HGBH41JXMN109186', { visibleEnd: 2 }); // '1HGBH41JXMN****86'
+```
+
+---
+
+### cleanVIN()
+
+Cleans a VIN by removing all non-alphanumeric characters.
+
+**Type Signature:**
+
+```typescript
+function cleanVIN(vin: string): string;
+```
+
+**Parameters:**
+
+| Name  | Type     | Description          |
+| ----- | -------- | -------------------- |
+| `vin` | `string` | The VIN to clean     |
+
+**Returns:**
+
+`string` - Cleaned VIN (alphanumeric only, uppercase).
+
+**Example:**
+
+```typescript
+cleanVIN('1HGBH-41JXMN-109186'); // '1HGBH41JXMN109186'
+```
+
+---
+
 ## Constants
 
 ### VIN_WEIGHTS
@@ -159,6 +223,18 @@ interface VINInfo {
   plantCode: string;     // Plant code (position 11)
   serialNumber: string;  // Serial number (positions 12-17)
   isValid: boolean;      // Whether the VIN passed validation
+}
+```
+
+### VINMaskOptions
+
+Options for masking a VIN.
+
+```typescript
+interface VINMaskOptions {
+  visibleStart?: number; // Characters visible at start (default: 11)
+  visibleEnd?: number;    // Characters visible at end (default: 0)
+  maskChar?: string;     // Mask character (default: '*')
 }
 ```
 

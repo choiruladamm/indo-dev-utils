@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.1] - 2026-04-10
+
+### Added
+
+#### Plate Module
+
+- `maskPlate()` - Mask license plate for privacy
+- `cleanPlate()` - Remove non-alphanumeric characters
+- `isPrivatePlate()` - Check if private vehicle plate
+- `isPublicPlate()` - Check if public transportation plate
+- `isDiplomatPlate()` - Check if diplomat plate
+- `PlateMaskOptions` type
+
+#### VIN Module
+
+- `maskVIN()` - Mask VIN for privacy
+- `cleanVIN()` - Remove non-alphanumeric characters
+- `VINMaskOptions` type
+
+#### NPWP Module
+
+- `cleanNPWP()` - Remove non-digit characters
+- `isNIKBasedNPWP()` - Check if 16-digit NIK-based NPWP
+
+#### Main Export Additions
+
+Added missing barrel exports:
+
+- NIK: `cleanNIK`, `validateNIKDetailed`, `compareNIK`, `isAdult`
+- Phone: `normalizePhoneNumber`, `comparePhones`, `getLandlineRegion`
+- Currency: `splitAmount`, `percentageOf`, `difference`
+
+### Fixed
+
+- `InvalidSplitError` - Added `readonly code` property and default message (was missing, inconsistent with other error classes)
+
+---
+
 ## [0.7.0] - 2026-04-06
 
 ### Added

@@ -98,6 +98,28 @@ describe('splitAmount', () => {
       );
     });
   });
+
+  describe('InvalidSplitError', () => {
+    it('should have code property', () => {
+      const error = new InvalidSplitError('test');
+      expect(error.code).toBe('INVALID_SPLIT');
+    });
+
+    it('should have default message', () => {
+      const error = new InvalidSplitError();
+      expect(error.message).toBe('Invalid split parameters');
+    });
+
+    it('should support custom message', () => {
+      const error = new InvalidSplitError('Custom message');
+      expect(error.message).toBe('Custom message');
+    });
+
+    it('should be instance of Error', () => {
+      const error = new InvalidSplitError();
+      expect(error).toBeInstanceOf(Error);
+    });
+  });
 });
 
 describe('percentageOf', () => {
