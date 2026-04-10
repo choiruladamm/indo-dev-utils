@@ -17,11 +17,29 @@ Stop wrestling with NIK validation, Rupiah formatting, and phone normalization. 
 
 | Metric | Value |
 |--------|-------|
-| Test cases | 1563+ |
+| Test cases | 1701+ |
 | Coverage | 95%+ |
 | Dependencies | Zero |
-| Bundle size | {'<'}50KB (total) |
+| [Bundle size](https://bundlephobia.com/package/@indodev/toolkit@0.7.0) | **48.1 KB** (17.5 KB gzipped) |
 | Modules | 9 |
+
+### Bundle Analysis
+
+Tree-shakeable exports — import only what you need:
+
+| Module | Exports | Import |
+|--------|---------|--------|
+| `nik` | 10 | `import { validateNIK } from '@indodev/toolkit/nik'` |
+| `phone` | 17 | `import { formatPhoneNumber } from '@indodev/toolkit/phone'` |
+| `npwp` | 7 | `import { validateNPWP } from '@indodev/toolkit/npwp'` |
+| `plate` | 6 | `import { validatePlate } from '@indodev/toolkit/plate'` |
+| `vin` | 6 | `import { validateVIN } from '@indodev/toolkit/vin'` |
+| `email-validator` | 7 | `import { validateEmail } from '@indodev/toolkit/email-validator'` |
+| `currency` | 10 | `import { formatRupiah } from '@indodev/toolkit/currency'` |
+| `text` | 25 | `import { slugify } from '@indodev/toolkit/text'` |
+| `datetime` | 22 | `import { formatDate } from '@indodev/toolkit/datetime'` |
+
+> **Total: 110+ exports** across 9 modules. Each module is independent and tree-shakeable — your bundler will only include the functions you actually use.
 
 ## Modules
 
@@ -144,6 +162,7 @@ slugify('Pria & Wanita'); // 'pria-dan-wanita'
 import { formatDate, parseDate } from '@indodev/toolkit/datetime';
 formatDate(new Date('2026-01-02'), 'long'); // '2 Januari 2026'
 parseDate('02-01-2026'); // Date(2026, 0, 2)
+```
 
 ## What's Next
 

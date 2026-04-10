@@ -17,68 +17,80 @@ TypeScript utilities for Indonesian data. Handles Rupiah formatting, terbilang, 
 npm install @indodev/toolkit
 ```
 
-## Usage
+## Highlights
 
-Generate an invoice with proper Rupiah formatting and terbilang:
+### Currency — Smart Rupiah Formatting
 
 ```typescript
-import { formatRupiah, toWords, calculateTax } from '@indodev/toolkit/currency';
+import {
+  formatRupiah,
+  formatCompact,
+  toWords,
+  formatAccounting,
+} from '@indodev/toolkit/currency';
 
-const items = [
-  { name: 'Jasa Desain Website', qty: 1, price: 5000000 },
-  { name: 'Hosting 1 Tahun', qty: 1, price: 1200000 },
-];
-
-const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
-const tax = calculateTax(subtotal, 0.11);
-const total = subtotal + tax;
-
-console.log(formatRupiah(subtotal)); // 'Rp 6.200.000'
-console.log(formatRupiah(tax)); // 'Rp 682.000'
-console.log(formatRupiah(total)); // 'Rp 6.882.000'
-console.log(toWords(total)); // 'enam juta delapan ratus delapan puluh dua ribu rupiah'
+formatRupiah(1500000); // 'Rp 1.500.000'
+formatCompact(1500000); // 'Rp 1,5 juta'
+formatCompact(1000000); // 'Rp 1 juta'  ← NO "1,0 juta"
+toWords(1500000); // 'satu juta lima ratus ribu rupiah'
+formatAccounting(-500000); // '(Rp 500.000)'
 ```
 
-Validate and parse an Indonesian NIK:
+### Text — Indonesian-Specific Rules
 
 ```typescript
-import { validateNIK, parseNIK } from '@indodev/toolkit/nik';
+import {
+  toTitleCase,
+  expandAbbreviation,
+  toFormal,
+  isAlay,
+  slugify,
+} from '@indodev/toolkit/text';
 
-validateNIK('3201234567890123'); // true
-
-const info = parseNIK('3201234567890123');
-// info.province.name  → 'Jawa Barat'
-// info.gender         → 'male'
-// info.birthDate      → Date(1990-01-01)
-```
-
-Format phone numbers and mask sensitive data:
-
-```typescript
-import { formatPhoneNumber } from '@indodev/toolkit/phone';
-import { maskText, toTitleCase, slugify } from '@indodev/toolkit/text';
-
-formatPhoneNumber('081234567890', 'international'); // '+62 812-3456-7890'
-maskText('08123456789', { pattern: 'middle', visibleStart: 4, visibleEnd: 3 }); // '0812****789'
-toTitleCase('pt bank central asia tbk'); // 'PT Bank Central Asia Tbk'
+toTitleCase('pt bank central asia'); // 'PT Bank Central Asia'
+expandAbbreviation('Jl. Sudirman'); // 'Jalan Sudirman'
+expandAbbreviation('Dr. Joko, S.H.'); // 'Doktor Joko, Sarjana Hukum'
+toFormal('gw lg makan deh'); // 'saya sedang makan'
+isAlay('aqU sAyAnG kMu'); // true
 slugify('Pria & Wanita'); // 'pria-dan-wanita'
 ```
 
-Format dates with Indonesian locale:
+### DateTime — Indonesian Locale
 
 ```typescript
 import {
   formatDate,
   parseDate,
   toRelativeTime,
+  getAge,
+  isWorkingDay,
 } from '@indodev/toolkit/datetime';
 
 formatDate(new Date('2026-01-02'), 'long'); // '2 Januari 2026'
 parseDate('02-01-2026'); // Date(2026, 0, 2)
-toRelativeTime(new Date(Date.now() - 3600000)); // '1 jam yang lalu'
+toRelativeTime(Date.now() - 3600000); // '1 jam yang lalu'
+getAge('1990-06-15'); // { years: 35, months: 9, ... }
+isWorkingDay(new Date('2026-01-01')); // false (Tahun Baru)
 ```
 
-## Modules
+## More Modules
+
+Validate and parse Indonesian identity documents:
+
+```typescript
+import { validateNIK, parseNIK } from '@indodev/toolkit/nik';
+import { validateNPWP, formatNPWP } from '@indodev/toolkit/npwp';
+import { formatPhoneNumber, maskPhoneNumber } from '@indodev/toolkit/phone';
+
+validateNIK('3201234567890123'); // true
+parseNIK('3201234567890123').province.name; // 'Jawa Barat'
+
+validateNPWP('012345678901234'); // true
+formatPhoneNumber('081234567890', 'international'); // '+62 812-3456-7890'
+maskPhoneNumber('081234567890'); // '0812****7890'
+```
+
+## All Modules
 
 | Module                                                          | Description                                                    |
 | --------------------------------------------------------------- | -------------------------------------------------------------- |
@@ -91,7 +103,6 @@ toRelativeTime(new Date(Date.now() - 3600000)); // '1 jam yang lalu'
 | [Email](https://toolkit.adamm.cloud/docs/contact/email)         | Validate emails with disposable domain detection               |
 | [Plate](https://toolkit.adamm.cloud/docs/vehicles/plate)        | Validate license plates with region detection                  |
 | [VIN](https://toolkit.adamm.cloud/docs/vehicles/vin)            | Validate Vehicle Identification Numbers (ISO 3779)             |
-
 
 Full docs, examples, and API reference at [toolkit.adamm.cloud](https://toolkit.adamm.cloud/docs)
 
