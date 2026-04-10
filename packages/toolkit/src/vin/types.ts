@@ -9,6 +9,24 @@ export interface VINOptions {
 }
 
 /**
+ * Options for masking a VIN.
+ */
+export interface VINMaskOptions {
+  /**
+   * Number of characters visible at the start (default: 11).
+   */
+  visibleStart?: number;
+  /**
+   * Number of characters visible at the end (default: 0).
+   */
+  visibleEnd?: number;
+  /**
+   * Character to use for masking (default: '*').
+   */
+  maskChar?: string;
+}
+
+/**
  * Detailed validation result.
  */
 export interface VINValidationResult {

@@ -48,7 +48,7 @@ The Plate module provides utilities to validate Indonesian license plates, detec
 ## Quick Start
 
 ```typescript
-import { validatePlate, getRegionFromPlate, formatPlate, parsePlate } from '@indodev/toolkit/plate';
+import { validatePlate, getRegionFromPlate, formatPlate, parsePlate, maskPlate, cleanPlate, isPrivatePlate, isPublicPlate, isDiplomatPlate } from '@indodev/toolkit/plate';
 
 // Validate Plate
 validatePlate('B 1234 ABC'); // true
@@ -70,6 +70,17 @@ console.log(info.prefix); // 'B'
 console.log(info.number); // '1234'
 console.log(info.suffix); // 'ABC'
 console.log(info.type); // 'private'
+
+// Mask Plate (for privacy)
+maskPlate('B 1234 ABC'); // 'B****ABC'
+
+// Clean Plate (remove non-alphanumeric)
+cleanPlate('B 1234 ABC'); // 'B1234ABC'
+
+// Check plate type
+isPrivatePlate('B 1234 ABC');  // true
+isPublicPlate('B 1234 U');    // false (single suffix treated as private)
+isDiplomatPlate('CD 1234 AB'); // true
 ```
 
 ## API Reference
@@ -180,6 +191,132 @@ console.log(diplomat?.type); // 'diplomat'
 
 ---
 
+### maskPlate()
+
+Masks a license plate number for privacy.
+
+**Type Signature:**
+
+```typescript
+function maskPlate(plate: string, options?: PlateMaskOptions): string;
+```
+
+**Parameters:**
+
+| Name      | Type              | Description                    |
+| --------- | ----------------- | ------------------------------ |
+| `plate`   | `string`          | The license plate to mask      |
+| `options` | `PlateMaskOptions`| Optional masking configuration |
+
+**Returns:**
+
+`string` - Masked plate string (without spaces), or empty string if invalid.
+
+**Example:**
+
+```typescript
+maskPlate('B 1234 ABC'); // 'B****ABC'
+maskPlate('B 1234 ABC', { visibleStart: 2 }); // 'B1***ABC'
+maskPlate('B 1234 ABC', { maskChar: '#' }); // 'B####ABC'
+```
+
+---
+
+### cleanPlate()
+
+Cleans a license plate by removing all non-alphanumeric characters.
+
+**Type Signature:**
+
+```typescript
+function cleanPlate(plate: string): string;
+```
+
+**Parameters:**
+
+| Name    | Type     | Description                   |
+| ------- | -------- | ----------------------------- |
+| `plate` | `string` | The license plate to clean   |
+
+**Returns:**
+
+`string` - Cleaned plate string (alphanumeric only, uppercase).
+
+**Example:**
+
+```typescript
+cleanPlate('B 1234 ABC');  // 'B1234ABC'
+cleanPlate('da-1234-xyz'); // 'DA1234XYZ'
+```
+
+---
+
+### isPrivatePlate()
+
+Checks if a license plate is a private vehicle plate.
+
+**Type Signature:**
+
+```typescript
+function isPrivatePlate(plate: string): boolean;
+```
+
+**Parameters:**
+
+| Name    | Type     | Description                   |
+| ------- | -------- | ----------------------------- |
+| `plate` | `string` | The license plate to check   |
+
+**Returns:**
+
+`boolean` - Returns `true` if valid private plate, `false` otherwise.
+
+---
+
+### isPublicPlate()
+
+Checks if a license plate is a public transportation plate.
+
+**Type Signature:**
+
+```typescript
+function isPublicPlate(plate: string): boolean;
+```
+
+**Parameters:**
+
+| Name    | Type     | Description                   |
+| ------- | -------- | ----------------------------- |
+| `plate` | `string` | The license plate to check   |
+
+**Returns:**
+
+`boolean` - Returns `true` if valid public plate, `false` otherwise.
+
+---
+
+### isDiplomatPlate()
+
+Checks if a license plate is a diplomat plate.
+
+**Type Signature:**
+
+```typescript
+function isDiplomatPlate(plate: string): boolean;
+```
+
+**Parameters:**
+
+| Name    | Type     | Description                   |
+| ------- | -------- | ----------------------------- |
+| `plate` | `string` | The license plate to check   |
+
+**Returns:**
+
+`boolean` - Returns `true` if valid diplomat plate, `false` otherwise.
+
+---
+
 ## Constants
 
 ### PLATE_REGIONS
@@ -205,6 +342,18 @@ interface PlateInfo {
   type: 'private' | 'public' | 'diplomat' | null;
   formatted: string;     // Formatted plate (e.g., 'B 1234 ABC')
   isValid: boolean;     // Whether the plate passed validation
+}
+```
+
+### PlateMaskOptions
+
+Options for masking a license plate.
+
+```typescript
+interface PlateMaskOptions {
+  visibleStart?: number; // Characters visible at start (default: 1)
+  visibleEnd?: number;   // Characters visible at end (default: 3)
+  maskChar?: string;     // Mask character (default: '*')
 }
 ```
 

@@ -6,7 +6,9 @@ import type { RoundUnit, SplitOptions } from './types';
  * @public
  */
 export class InvalidSplitError extends Error {
-  constructor(message: string) {
+  readonly code = 'INVALID_SPLIT' as const;
+
+  constructor(message: string = 'Invalid split parameters') {
     super(message);
     this.name = 'InvalidSplitError';
   }

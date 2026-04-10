@@ -83,10 +83,9 @@ export default async function RootLayout({ children }) {
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head faviconGlyph="🇮🇩" />
       <body>
-        <Banner storageKey="v0.7.0">
-          v0.7.0 released — Breaking: mask options renamed
-          (visibleStart/visibleEnd/maskChar). New: parseVIN(), parsePlate(),
-          InvalidXxxError classes.{' '}
+        <Banner storageKey="v0.7.1">
+          v0.7.1 released — New: maskPlate, maskVIN, cleanNPWP. Fixed:
+          InvalidSplitError.{' '}
           <a href="/docs/changelog" style={{ textDecoration: 'underline' }}>
             Read changelog
           </a>

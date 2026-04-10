@@ -10,7 +10,11 @@ export {
   parseNIK,
   formatNIK,
   maskNIK,
+  cleanNIK,
+  validateNIKDetailed,
   getAge,
+  compareNIK,
+  isAdult,
   formatBirthDate,
   isValidForGender,
   isValidForBirthDate,
@@ -35,6 +39,9 @@ export {
   generateSmsLink,
   generateTelLink,
   isProvider,
+  normalizePhoneNumber,
+  comparePhones,
+  getLandlineRegion,
 } from './phone';
 
 export type {
@@ -46,21 +53,38 @@ export type {
 export { InvalidPhoneError } from './phone';
 
 // NPWP (Taxpayer Identification Number) utilities
-export { validateNPWP, formatNPWP, parseNPWP, maskNPWP } from './npwp';
+export {
+  validateNPWP,
+  formatNPWP,
+  parseNPWP,
+  maskNPWP,
+  cleanNPWP,
+  isNIKBasedNPWP,
+} from './npwp';
 
 export {
   validatePlate,
   getRegionFromPlate,
   formatPlate,
   parsePlate,
+  maskPlate,
+  cleanPlate,
+  isPrivatePlate,
+  isPublicPlate,
+  isDiplomatPlate,
 } from './plate';
 export { InvalidPlateError } from './plate';
-export type { PlateInfo } from './plate';
+export type { PlateInfo, PlateMaskOptions } from './plate';
 
 // VIN (Vehicle Identification Number) utilities
-export { validateVIN, parseVIN } from './vin';
+export { validateVIN, parseVIN, maskVIN, cleanVIN } from './vin';
 export { InvalidVINError } from './vin';
-export type { VINOptions, VINValidationResult, VINInfo } from './vin';
+export type {
+  VINOptions,
+  VINValidationResult,
+  VINInfo,
+  VINMaskOptions,
+} from './vin';
 
 // Email validator utilities
 export {
@@ -92,9 +116,14 @@ export {
   formatAccounting,
   calculateTax,
   addRupiahSymbol,
+  splitAmount,
+  percentageOf,
+  difference,
 } from './currency';
 
 export type { RupiahOptions, WordOptions } from './currency';
+
+export { InvalidSplitError } from './currency';
 
 // Text utilities
 export {
