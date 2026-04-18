@@ -24,7 +24,7 @@
  */
 
 // Formatting functions
-export { formatRupiah, formatCompact } from './format';
+export { formatRupiah, formatCompact, formatPercentage } from './format';
 
 // Parsing functions
 export { parseRupiah } from './parse';
@@ -58,4 +58,5 @@ export type {
   RoundUnit,
   CompactOptions,
   SplitOptions,
+  PercentageOptions,
 } from './types';

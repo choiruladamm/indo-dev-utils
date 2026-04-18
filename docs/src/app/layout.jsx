@@ -83,9 +83,9 @@ export default async function RootLayout({ children }) {
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head faviconGlyph="🇮🇩" />
       <body>
-        <Banner storageKey="v0.7.1">
-          v0.7.1 released — New: maskPlate, maskVIN, cleanNPWP. Fixed:
-          InvalidSplitError.{' '}
+        <Banner storageKey="v0.7.2">
+          v0.7.2 released — New: formatPercentage for Indonesian currency
+          formatting.{' '}
           <a href="/docs/changelog" style={{ textDecoration: 'underline' }}>
             Read changelog
           </a>
