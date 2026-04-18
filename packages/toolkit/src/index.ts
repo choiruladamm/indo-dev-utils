@@ -110,6 +110,7 @@ export { InvalidNPWPError } from './npwp';
 export {
   formatRupiah,
   formatCompact,
+  formatPercentage,
   parseRupiah,
   toWords,
   roundToClean,
@@ -121,7 +122,7 @@ export {
   difference,
 } from './currency';
 
-export type { RupiahOptions, WordOptions } from './currency';
+export type { RupiahOptions, WordOptions, PercentageOptions } from './currency';
 
 export { InvalidSplitError } from './currency';
 

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.2] - 2026-04-18
+
+### Added
+
+#### Currency Module
+
+- `formatPercentage()` - Format number as Indonesian percentage with comma as decimal separator
+- `PercentageOptions` type
+
 ## [0.7.1] - 2026-04-10
 
 ### Added

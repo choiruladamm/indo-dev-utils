@@ -242,3 +242,66 @@ export interface SplitOptions {
    */
   roundTo?: RoundUnit;
 }
+
+/**
+ * Options for formatting percentages.
+ *
+ * @example
+ * Default formatting:
+ * ```typescript
+ * formatPercentage(0.115); // '11,5%'
+ * ```
+ *
+ * @example
+ * With custom decimals:
+ * ```typescript
+ * formatPercentage(0.1152, { decimals: 2 }); // '11,52%'
+ * ```
+ *
+ * @example
+ * Without symbol:
+ * ```typescript
+ * formatPercentage(0.11, { symbol: false }); // '11'
+ * ```
+ *
+ * @example
+ * isPercentage mode (value already in percentage form):
+ * ```typescript
+ * formatPercentage(11.5, { isPercentage: true }); // '11,5%'
+ * ```
+ *
+ * @public
+ */
+export interface PercentageOptions {
+  /**
+   * Number of decimal places.
+   *
+   * @defaultValue 1
+   */
+  decimals?: number;
+
+  /**
+   * Whether to include '%' symbol.
+   *
+   * @defaultValue true
+   */
+  symbol?: boolean;
+
+  /**
+   * Decimal separator character.
+   *
+   * @defaultValue ','
+   */
+  decimalSeparator?: string;
+
+  /**
+   * Whether to interpret value as already a percentage (not decimal).
+   *
+   * When true, multiplies by 100 internally.
+   * e.g., formatPercentage(11.5, { isPercentage: true }) → '11,5%'
+   * instead of formatPercentage(0.115) → '11,5%'
+   *
+   * @defaultValue false
+   */
+  isPercentage?: boolean;
+}

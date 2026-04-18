@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 
-import type { CompactOptions, RupiahOptions } from './types';
+import type { CompactOptions, PercentageOptions, RupiahOptions } from './types';
 
 /**
  * Formats a number as Indonesian Rupiah currency.
@@ -187,4 +187,82 @@ function formatCompactValue(value: number, unit: string): string {
   }
 
   return `${rounded.toString().replace('.', ',')} ${unit}`;
+}
+
+/**
+ * Formats a number as an Indonesian percentage string.
+ *
+ * Uses Indonesian conventions: comma as decimal separator.
+ *
+ * @param value - The decimal value (0-1) to format as percentage
+ * @param options - Formatting options
+ * @returns Formatted percentage string
+ *
+ * @example
+ * Basic formatting:
+ * ```typescript
+ * formatPercentage(0.115); // '11,5%'
+ * ```
+ *
+ * @example
+ * Custom decimals:
+ * ```typescript
+ * formatPercentage(0.1152, { decimals: 2 }); // '11,52%'
+ * ```
+ *
+ * @example
+ * Without symbol:
+ * ```typescript
+ * formatPercentage(0.11, { symbol: false }); // '11'
+ * ```
+ *
+ * @example
+ * isPercentage mode (value already in percentage form):
+ * ```typescript
+ * formatPercentage(11.5, { isPercentage: true }); // '11,5%'
+ * ```
+ *
+ * @public
+ */
+export function formatPercentage(
+  value: number,
+  options?: PercentageOptions
+): string {
+  const {
+    decimals = 1,
+    symbol = true,
+    decimalSeparator = ',',
+    isPercentage = false,
+  } = options || {};
+
+  if (!Number.isFinite(value) || Number.isNaN(value)) {
+    const prefix = value < 0 ? '-' : '';
+    return symbol ? `${prefix}0%` : `${prefix}0`;
+  }
+
+  const percentageValue = isPercentage ? value : value * 100;
+
+  const isNegative = percentageValue < 0;
+  const absValue = Math.abs(percentageValue);
+
+  const factor = Math.pow(10, decimals);
+  const rounded = Math.round(absValue * factor) / factor;
+
+  let formatted: string;
+  if (decimals === 0) {
+    formatted = Math.round(rounded).toString();
+  } else {
+    formatted = rounded.toFixed(decimals).replace('.', decimalSeparator);
+
+    if (!formatted.includes(decimalSeparator)) {
+      formatted = rounded.toString();
+    } else if (formatted.endsWith(`${decimalSeparator}0`)) {
+      formatted = formatted.slice(0, -2);
+    }
+  }
+
+  const prefix = isNegative ? '-' : '';
+  const suffix = symbol ? '%' : '';
+
+  return `${prefix}${formatted}${suffix}`;
 }
