@@ -5,41 +5,9 @@
  * @packageDocumentation
  */
 
-import {
-  InvalidDateError,
-  InvalidDateRangeError,
-  type DateStyle,
-} from './types';
+import { InvalidDateError, InvalidDateRangeError, type DateStyle } from './types';
 import { MONTH_NAMES, MONTH_NAMES_SHORT, DAY_NAMES } from './constants';
-
-/**
- * Normalize various date input types to a Date object.
- *
- * @param date - Date input (Date, string, or number timestamp)
- * @returns Date object
- * @throws {InvalidDateError} If the input cannot be parsed to a valid date
- */
-function normalizeDate(date: Date | string | number): Date {
-  let result: Date;
-
-  if (date instanceof Date) {
-    result = date;
-  } else if (typeof date === 'number') {
-    // Assume milliseconds timestamp
-    result = new Date(date);
-  } else if (typeof date === 'string') {
-    result = new Date(date);
-  } else {
-    throw new InvalidDateError('Date must be a Date, string, or number');
-  }
-
-  // Validate the result
-  if (Number.isNaN(result.getTime())) {
-    throw new InvalidDateError(`Unable to parse date: ${String(date)}`);
-  }
-
-  return result;
-}
+import { normalizeDate } from './utils';
 
 /**
  * Format a date with Indonesian locale.

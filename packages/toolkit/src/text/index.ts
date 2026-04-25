@@ -1,3 +1,23 @@
+/**
+ * Indonesian text processing utilities.
+ *
+ * Provides text manipulation functions specifically tailored for
+ * Indonesian language including case conversion, normalization,
+ * slug generation, and text filtering.
+ *
+ * @example
+ * ```typescript
+ * import { toTitleCase, slugify, removeAccents } from '@indodev/toolkit/text';
+ *
+ * toTitleCase('halo dunia');     // 'Halo Dunia'
+ * slugify('Halo Dunia!');        // 'halo-dunia'
+ * removeAccents('Haić');         // 'Haic'
+ * ```
+ *
+ * @module text
+ * @packageDocumentation
+ */
+
 export { capitalize, toTitleCase, toSentenceCase } from './capitalization';
 
 export { slugify } from './slug';

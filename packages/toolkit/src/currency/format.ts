@@ -56,7 +56,7 @@ export function formatRupiah(amount: number, options?: RupiahOptions): string {
   const precision =
     options?.precision !== undefined ? options.precision : decimal ? 2 : 0;
 
-  const isNegative = amount < 0 && amount !== 0;
+  const isNegative = amount < 0;
   const absAmount = Math.abs(amount);
 
   let result: string;
@@ -135,7 +135,7 @@ export function formatCompact(
 ): string {
   const { symbol = true, spaceAfterSymbol = true } = options || {};
 
-  const isNegative = amount < 0 && amount !== 0;
+  const isNegative = amount < 0;
   const abs = Math.abs(amount);
 
   let result: string;
