@@ -83,9 +83,8 @@ export default async function RootLayout({ children }) {
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head faviconGlyph="🇮🇩" />
       <body>
-        <Banner storageKey="v0.7.2">
-          v0.7.2 released — New: formatPercentage for Indonesian currency
-          formatting.{' '}
+        <Banner storageKey="v0.7.3">
+          v0.7.3 released — API consistency: added 13 missing barrel exports.{' '}
           <a href="/docs/changelog" style={{ textDecoration: 'underline' }}>
             Read changelog
           </a>

@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.3] - 2026-04-26
+
+### Fixed
+
+#### API Consistency
+
+- Add missing barrel exports to main index:
+  - `validateRupiah`, `RoundUnit`, `CompactOptions`, `SplitOptions` from currency
+  - `toCamelCase`, `toPascalCase`, `toSnakeCase`, `countSyllables`, `LOWERCASE_WORDS`, `ACRONYMS`, `ABBREVIATIONS` from text
+  - `OperatorName` type from phone
+  - `PLATE_REGIONS` constant from plate
+
 ## [0.7.2] - 2026-04-18
 
 ### Added
