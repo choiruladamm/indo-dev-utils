@@ -52,6 +52,8 @@ export type {
 
 export { InvalidPhoneError } from './phone';
 
+export type { OperatorName } from './phone';
+
 // NPWP (Taxpayer Identification Number) utilities
 export {
   validateNPWP,
@@ -74,6 +76,7 @@ export {
   isDiplomatPlate,
 } from './plate';
 export { InvalidPlateError } from './plate';
+export { PLATE_REGIONS } from './plate';
 export type { PlateInfo, PlateMaskOptions } from './plate';
 
 // VIN (Vehicle Identification Number) utilities
@@ -120,9 +123,10 @@ export {
   splitAmount,
   percentageOf,
   difference,
+  validateRupiah,
 } from './currency';
 
-export type { RupiahOptions, WordOptions, PercentageOptions } from './currency';
+export type { RupiahOptions, WordOptions, PercentageOptions, RoundUnit, CompactOptions, SplitOptions } from './currency';
 
 export { InvalidSplitError } from './currency';
 
@@ -156,6 +160,16 @@ export type {
   ExtractOptions,
   CompareOptions,
   MaskOptions as TextMaskOptions,
+} from './text';
+
+export {
+  toCamelCase,
+  toPascalCase,
+  toSnakeCase,
+  countSyllables,
+  LOWERCASE_WORDS,
+  ACRONYMS,
+  ABBREVIATIONS,
 } from './text';
 
 // DateTime utilities
