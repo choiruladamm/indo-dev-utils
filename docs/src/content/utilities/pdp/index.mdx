@@ -1,0 +1,260 @@
+---
+title: PDP (Privacy Engine)
+description: Indonesian PII scanning and anonymization utilities for UU PDP compliance.
+---
+
+import { Callout, Tabs } from 'nextra/components';
+
+# Privacy Engine (PDP)
+
+Indonesian PII (Personally Identifiable Information) scanning and masking utilities for UU PDP compliance.
+
+## Overview
+
+The PDP module provides data-independent privacy utilities that scan and mask sensitive Indonesian PII:
+- **NIK**: Indonesian National Identity Number (16 digits)
+- **NPWP**: Taxpayer Identification Number
+- **Phone**: Indonesian phone numbers (mobile and landline)
+- **Email**: Email addresses
+- **Passport**: Indonesian passport numbers
+- **BPJS**: BPJS health/national insurance numbers
+- **Bank Account**: Generic bank account numbers
+
+### Features
+
+- Zero external dependencies (pure regex + algorithms)
+- Recursive object traversal for nested JSON
+- Cyclical reference detection (prevents infinite loops)
+- Confidence scoring for detections
+- JSON-safe escaping for logging
+- Partial or full masking strategies
+
+## Installation
+
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+  <Tabs.Tab>
+    ```bash
+    npm install @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    pnpm add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    yarn add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    bun add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Quick Start
+
+```typescript
+import { scanPII, maskStringPDP, anonymizePDP, anonymizeString } from '@indodev/toolkit/pdp';
+
+// Scan for PII
+const findings = scanPII('NIK: 3171034567890123, HP: 081234567890');
+// [{ type: 'nik', value: '3171034567890123', startIndex: 5, endIndex: 21, confidence: 'high' }, ...]
+
+// Mask in string
+maskStringPDP('NIK: 3171034567890123', { autoDetectPII: true });
+// 'NIK: 3171********0123'
+
+// Anonymize JSON object
+anonymizePDP({
+  user: 'Budi',
+  nik: '3171034567890123',
+  email: 'budi@contoh.com'
+}, { autoDetectPII: true });
+// { user: 'Budi', nik: '3171********0123', email: 'bu**@contoh.com' }
+
+// With escapeForLog for JSON-safe logging
+anonymizeString('Text with "quotes" and \\n newlines', { escapeForLog: true });
+// 'Text with \"quotes\" and \\n newlines'
+```
+
+## API Reference
+
+### scanPII()
+
+Scans text for Indonesian PII and returns findings with position and confidence.
+
+```typescript
+function scanPII(text: string): PIIFinding[];
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `text` | `string` | Text to scan |
+
+**Returns:** Array of `PIIFinding` objects sorted by position
+
+**Supported PII Types:**
+
+| Type | Pattern | Confidence |
+|------|---------|------------|
+| `nik` | 16 digits | high |
+| `npwp` | 15 digits with dots | high |
+| `phone` | 08xx or +62 prefix | medium |
+| `email` | Standard email format | medium |
+| `passport` | Letter + 6-8 digits | low |
+| `bpjs` | 000 prefix or BPJS prefix | low |
+| `bank-account` | 7-16 digits | low |
+
+**Examples:**
+
+```typescript
+scanPII('NIK: 3171034567890123');
+// [{ type: 'nik', value: '3171034567890123', startIndex: 5, endIndex: 21, confidence: 'high' }]
+```
+
+### maskStringPDP()
+
+Masks detected PII in a string without altering structure.
+
+```typescript
+function maskStringPDP(text: string, options?: PIIOptions): string;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `text` | `string` | Text containing PII |
+| `options` | `PIIOptions` | Masking options |
+
+**Examples:**
+
+```typescript
+maskStringPDP('NIK: 3171034567890123', { autoDetectPII: true });
+// 'NIK: 3171********0123'
+
+maskStringPDP('NIK: 3171034567890123', { maskChar: 'X', maskStrategy: 'full' });
+// 'NIK: XXXXXXXXXXXXXXXX'
+```
+
+### anonymizeString()
+
+Masks PII and optionally escapes for JSON-safe logging.
+
+```typescript
+function anonymizeString(text: string, options?: PIIOptions): string;
+```
+
+**Examples:**
+
+```typescript
+anonymizeString('NIK: 3171034567890123', { autoDetectPII: true });
+// 'NIK: 3171********0123'
+
+anonymizeString('Alert: injection\\ntest', { escapeForLog: true });
+// 'Alert: injection\\\\ntest'
+```
+
+### anonymizePDP()
+
+Recursively anonymizes JSON objects with cyclical reference protection.
+
+```typescript
+function anonymizePDP<T>(payload: T, options?: PIIOptions): T;
+```
+
+**Examples:**
+
+```typescript
+const data = {
+  user: 'Budi',
+  nik: '3171034567890123',
+  address: {
+    phone: '02112345678'
+  }
+};
+
+anonymizePDP(data, { autoDetectPII: true });
+// { user: 'Budi', nik: '3171********0123', address: { phone: '021****5678' } }
+
+// With cyclical reference
+const circular: any = { name: 'test' };
+circular.self = circular;
+
+anonymizePDP(circular);
+// { name: 'test', self: '[Circular]' }
+```
+
+## PIIOptions
+
+```typescript
+interface PIIOptions {
+  explicitKeys?: Array<string | RegExp>;
+  autoDetectPII?: boolean;
+  maskChar?: string;
+  maskStrategy?: 'full' | 'partial';
+  replacementText?: string;
+  escapeForLog?: boolean;
+}
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `explicitKeys` | `Array<string \| RegExp>` | `[]` | Keys to always mask |
+| `autoDetectPII` | `boolean` | `true` | Auto-detect PII types |
+| `maskChar` | `string` | `'*'` | Character for masking |
+| `maskStrategy` | `'full' \| 'partial'` | `'partial'` | Partial preserves start/end |
+| `replacementText` | `string` | `''` | Custom replacement text |
+| `escapeForLog` | `boolean` | `false` | Escape for JSON logging |
+
+## Type Reference
+
+### PIIType
+
+```typescript
+type PIIType = 'nik' | 'npwp' | 'phone' | 'email' | 'passport' | 'bpjs' | 'bank-account';
+```
+
+### PIIFinding
+
+```typescript
+interface PIIFinding {
+  type: PIIType;
+  value: string;
+  startIndex: number;
+  endIndex: number;
+  confidence: 'high' | 'medium' | 'low';
+}
+```
+
+### PIIConfidence
+
+```typescript
+type PIIConfidence = 'high' | 'medium' | 'low';
+```
+
+- **high**: Valid format + checksum validation
+- **medium**: Valid format + prefix matched
+- **low**: Pattern match only
+
+## Edge Cases
+
+| Case | Behavior |
+|------|----------|
+| Cyclical references | Returns `'[Circular]'` |
+| Deep nesting (>10 levels) | Stops traversal |
+| Null/undefined | Returns as-is |
+| Arrays | Recursively processes each element |
+| Non-PII content | Returns unchanged |
+| Empty string | Returns `''` |
+
+## Related Modules
+
+- [NLP](/docs/utilities/nlp) - Text processing utilities
+- [NIK](/docs/identity/nik) - NIK validation and parsing
+- [Phone](/docs/contact/phone) - Phone number utilities

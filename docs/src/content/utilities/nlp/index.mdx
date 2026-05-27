@@ -1,0 +1,267 @@
+---
+title: NLP
+description: Indonesian Natural Language Processing utilities for text stemming, phonetic encoding, and sentence tokenization.
+---
+
+import { Callout, Tabs } from 'nextra/components';
+
+# NLP Engine
+
+Indonesian NLP utilities for text processing without external dependencies.
+
+## Overview
+
+The NLP module provides algorithmic text processing for Indonesian language:
+- **Stemming**: Strip common Indonesian affixes (prefixes/suffixes)
+- **Phonetics**: Encode names for fuzzy matching (Soundex-like for Indonesian)
+- **Tokenization**: Split sentences while preserving abbreviations
+- **Normalization**: Clean whitespace and remove unwanted characters
+
+### Features
+
+- Zero external dependencies (pure algorithms)
+- Works in browser and Node.js environments
+- Heuristic stemming (no dictionary required)
+- Indonesian-specific phonetic normalization (Dutch/Arabic spellings)
+
+## Installation
+
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+  <Tabs.Tab>
+    ```bash
+    npm install @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    pnpm add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    yarn add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    bun add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Quick Start
+
+```typescript
+import { stemText, encodePhonetic, tokenizeIndo, normalizeWhitespace } from '@indodev/toolkit/nlp';
+
+// Stemming
+stemText('mempertanggungjawabkan'); // 'tanggung jawab'
+
+// Phonetic matching
+encodePhonetic('Syahruddin');  // 'S635'
+encodePhonetic('Sjahruddin');   // 'S635' (same!)
+isPhoneticMatch('Fakhri', 'Fahri'); // true
+
+// Tokenization (preserves abbreviations)
+tokenizeIndo("Kpd Yth. Bpk. Budi di Jl. Sudirman. Harap datang.");
+// ["Kpd Yth. Bpk. Budi di Jl. Sudirman.", "Harap datang."]
+
+// Normalization
+normalizeWhitespace("  Budi   pergi  ke   sekolah  ");
+// "Budi pergi ke sekolah"
+```
+
+## API Reference
+
+### stemText()
+
+Strips Indonesian affixes using algorithmic rules.
+
+```typescript
+function stemText(text: string): string;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `text` | `string` | Text to stem |
+
+**Returns:** Stemmed word (affix-stripped)
+
+**Examples:**
+
+```typescript
+stemText('mempertanggungjawabkan'); // 'tanggung jawab'
+stemText('berkewarganegaraan');       // 'warganegara'
+stemText('dikerjakan');               // 'kerja'
+```
+
+### encodePhonetic()
+
+Encodes text to phonetic representation for fuzzy matching.
+
+```typescript
+function encodePhonetic(text: string): string;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `text` | `string` | Text to encode |
+
+**Returns:** Phonetic code (letter + 3 digits)
+
+**Examples:**
+
+```typescript
+encodePhonetic('Syahruddin'); // 'S635'
+encodePhonetic('Sjahrudin');   // 'S635'
+encodePhonetic('Budi');        // 'B300'
+```
+
+<Callout type="warning">
+**False Positives**: Phonetic encoding may produce same codes for different words (e.g., `Bagus` ≈ `Bagas`). Use `isPhoneticMatch` for boolean comparison, not as identity verification.
+</Callout>
+
+### isPhoneticMatch()
+
+Compares two strings for phonetic equality.
+
+```typescript
+function isPhoneticMatch(text1: string, text2: string): boolean;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `text1` | `string` | First text |
+| `text2` | `string` | Second text |
+
+**Returns:** `true` if both encode to same phonetic code
+
+**Examples:**
+
+```typescript
+isPhoneticMatch('Fakhri', 'Fahri');   // true
+isPhoneticMatch('Bhoedie', 'Budi');   // true
+isPhoneticMatch('John', 'Jane');      // false
+```
+
+### tokenizeIndo()
+
+Splits Indonesian text into sentences, preserving abbreviations.
+
+```typescript
+function tokenizeIndo(text: string): string[];
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `text` | `string` | Text to tokenize |
+
+**Returns:** Array of sentences
+
+**Preserved abbreviations:** `Yth.`, `Bpk.`, `Ibu.`, `Sdr.`, `S.Kom.`, `M.Kom.`, `Dr.`, `Sp.`, `Mk.`, `Jl.`, `D.a.`, `D.l.`
+
+**Examples:**
+
+```typescript
+tokenizeIndo("Kpd Yth. Bpk. Budi di Jl. Sudirman. Harap datang.");
+// ["Kpd Yth. Bpk. Budi di Jl. Sudirman.", "Harap datang."]
+```
+
+### normalizeWhitespace()
+
+Normalizes whitespace (collapses multiple spaces, trims).
+
+```typescript
+function normalizeWhitespace(text: string): string;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `text` | `string` | Text to normalize |
+
+**Examples:**
+
+```typescript
+normalizeWhitespace("  Budi   pergi  ke   sekolah  ");
+// "Budi pergi ke sekolah"
+```
+
+### stripNonAlphanumeric()
+
+Removes non-alphanumeric characters except spaces.
+
+```typescript
+function stripNonAlphanumeric(text: string): string;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `text` | `string` | Text to clean |
+
+**Examples:**
+
+```typescript
+stripNonAlphanumeric("Budi123@#$%^&*()");
+// "Budi123"
+```
+
+## Type Reference
+
+### PhoneticResult
+
+```typescript
+interface PhoneticResult {
+  original: string;
+  encoded: string;
+}
+```
+
+### TokenizationResult
+
+```typescript
+interface TokenizationResult {
+  sentences: string[];
+  abbreviationCount: number;
+}
+```
+
+### StemmingResult
+
+```typescript
+interface StemmingResult {
+  original: string;
+  stemmed: string;
+  removedAffixes: string[];
+}
+```
+
+## Known Limitations
+
+### Stemming
+
+- Heuristic-only (no dictionary)
+- May over-stem or under-stem in some cases
+- Best for search/indexing, not grammatical accuracy
+
+### Phonetics
+
+- False positives possible (same code, different words)
+- Dutch/Arabic normalization may affect accuracy for other languages
+- Not suitable for identity verification
+
+## Related Modules
+
+- [Text](/docs/utilities/text) - Additional text manipulation utilities
+- [Privacy (PDP)](/docs/utilities/pdp) - PII scanning and masking

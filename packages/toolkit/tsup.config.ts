@@ -12,6 +12,8 @@ export default defineConfig({
     'vin/index': 'src/vin/index.ts',
     'email-validator/index': 'src/email-validator/index.ts',
     'datetime/index': 'src/datetime/index.ts',
+    'nlp/index': 'src/nlp/index.ts',
+    'pdp/index': 'src/pdp/index.ts',
   },
   format: ['cjs', 'esm'],
   dts: {
