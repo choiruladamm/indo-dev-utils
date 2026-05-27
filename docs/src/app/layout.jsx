@@ -83,8 +83,8 @@ export default async function RootLayout({ children }) {
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head faviconGlyph="🇮🇩" />
       <body>
-        <Banner storageKey="v0.7.3">
-          v0.7.3 released — API consistency: added 13 missing barrel exports.{' '}
+        <Banner storageKey="v0.8.0">
+          v0.8.0 released — NLP Engine + Privacy Engine (PDP) modules for Indonesian text processing and UU PDP compliance.{' '}
           <a href="/docs/changelog" style={{ textDecoration: 'underline' }}>
             Read changelog
           </a>

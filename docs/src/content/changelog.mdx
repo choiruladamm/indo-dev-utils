@@ -3,6 +3,32 @@ title: Changelog
 description: Latest updates and changes to the @indodev/toolkit library.
 ---
 
+## v0.8.0 - May 27, 2026
+
+### New Modules
+
+#### NLP Module
+
+Indonesian Natural Language Processing utilities:
+
+- `stemText()` - Strip Indonesian affixes
+- `encodePhonetic()` - Encode names to phonetic representation
+- `isPhoneticMatch()` - Compare names for fuzzy matching
+- `tokenizeIndo()` - Sentence tokenization preserving abbreviations
+- `normalizeWhitespace()` - Whitespace normalization
+- `stripNonAlphanumeric()` - Remove special characters
+
+#### PDP Module (Privacy Engine)
+
+Indonesian PII scanning and masking for UU PDP compliance:
+
+- `scanPII()` - Detect PII with confidence scoring
+- `maskStringPDP()` - Mask PII in strings
+- `anonymizeString()` - Mask PII with JSON-safe escaping
+- `anonymizePDP()` - Recursive object anonymization
+
+Supported types: NIK, NPWP, Phone, Email, Passport, BPJS, Bank Account
+
 ## v0.7.3 - April 26, 2026
 
 ### API Consistency Fixes

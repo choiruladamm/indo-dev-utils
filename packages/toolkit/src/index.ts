@@ -172,6 +172,34 @@ export {
   ABBREVIATIONS,
 } from './text';
 
+// NLP (Natural Language Processing) utilities
+export {
+  stemText,
+  encodePhonetic,
+  isPhoneticMatch,
+  tokenizeIndo,
+  normalizeWhitespace as normalizeTextWhitespace,
+  stripNonAlphanumeric,
+} from './nlp';
+
+export type { PhoneticResult, TokenizationResult, StemmingResult } from './nlp';
+
+export {
+  SENTENCE_ABBREVIATIONS,
+  PREFIX_PATTERNS,
+  SUFFIX_PATTERNS,
+} from './nlp';
+
+// PDP (Privacy/PII) utilities
+export {
+  scanPII,
+  maskStringPDP,
+  anonymizeString,
+  anonymizePDP,
+} from './pdp';
+
+export type { PIIType, PIIFinding, PIIOptions, PIIConfidence } from './pdp';
+
 // DateTime utilities
 export {
   // Errors

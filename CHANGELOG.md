@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.0] - 2026-05-27
+
+### Added
+
+#### NLP Module
+
+New Natural Language Processing module for Indonesian text:
+
+- `stemText()` - Strip Indonesian affixes using algorithmic rules
+- `encodePhonetic()` - Encode names to phonetic representation (Soundex-like for Indonesian)
+- `isPhoneticMatch()` - Compare two strings for phonetic equality
+- `tokenizeIndo()` - Split sentences preserving Indonesian abbreviations
+- `normalizeWhitespace()` - Normalize whitespace in text
+- `stripNonAlphanumeric()` - Remove non-alphanumeric characters
+
+#### PDP Module (Privacy Engine)
+
+New Privacy/PII module for UU PDP compliance:
+
+- `scanPII()` - Scan text for Indonesian PII with confidence scoring
+- `maskStringPDP()` - Mask PII in strings without breaking structure
+- `anonymizeString()` - Mask PII with optional JSON-safe escaping
+- `anonymizePDP()` - Recursively anonymize JSON objects with cyclical reference protection
+
+Supported PII types: NIK, NPWP, Phone, Email, Passport, BPJS, Bank Account
+
+### Performance
+
+- Bundle size optimized: NLP (6.5KB), PDP (7.1KB)
+- Cyclical reference protection in PDP using WeakSet
+- Single-pass regex scanning for performance
+
 ## [0.7.3] - 2026-04-26
 
 ### Fixed

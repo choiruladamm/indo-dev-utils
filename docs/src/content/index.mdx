@@ -17,11 +17,11 @@ Stop wrestling with NIK validation, Rupiah formatting, and phone normalization. 
 
 | Metric | Value |
 |--------|-------|
-| Test cases | 1752+ |
+| Test cases | 1908+ |
 | Coverage | 95%+ |
 | Dependencies | Zero |
-| [Bundle size](https://bundlephobia.com/package/@indodev/toolkit@0.7.1) | **48.1 KB** (17.5 KB gzipped) |
-| Modules | 9 |
+| [Bundle size](https://bundlephobia.com/package/@indodev/toolkit@0.8.0) | **53.5 KB** (19.2 KB gzipped) |
+| Modules | 11 |
 
 ### Bundle Analysis
 
@@ -29,17 +29,19 @@ Tree-shakeable exports — import only what you need:
 
 | Module | Exports | Import |
 |--------|---------|--------|
-| `nik` | 14 | `import { validateNIK } from '@indodev/toolkit/nik'` |
-| `phone` | 20 | `import { formatPhoneNumber } from '@indodev/toolkit/phone'` |
-| `npwp` | 9 | `import { validateNPWP } from '@indodev/toolkit/npwp'` |
+| `nik` | 8 | `import { validateNIK } from '@indodev/toolkit/nik'` |
+| `phone` | 14 | `import { formatPhoneNumber } from '@indodev/toolkit/phone'` |
+| `npwp` | 6 | `import { validateNPWP } from '@indodev/toolkit/npwp'` |
 | `plate` | 8 | `import { validatePlate } from '@indodev/toolkit/plate'` |
-| `vin` | 8 | `import { validateVIN } from '@indodev/toolkit/vin'` |
-| `email-validator` | 7 | `import { validateEmail } from '@indodev/toolkit/email-validator'` |
-| `currency` | 13 | `import { formatRupiah } from '@indodev/toolkit/currency'` |
-| `text` | 25 | `import { slugify } from '@indodev/toolkit/text'` |
-| `datetime` | 22 | `import { formatDate } from '@indodev/toolkit/datetime'` |
+| `vin` | 4 | `import { validateVIN } from '@indodev/toolkit/vin'` |
+| `email-validator` | 4 | `import { validateEmail } from '@indodev/toolkit/email-validator'` |
+| `currency` | 11 | `import { formatRupiah } from '@indodev/toolkit/currency'` |
+| `text` | 27 | `import { slugify } from '@indodev/toolkit/text'` |
+| `datetime` | 19 | `import { formatDate } from '@indodev/toolkit/datetime'` |
+| `nlp` | 6 | `import { stemText } from '@indodev/toolkit/nlp'` |
+| `pdp` | 4 | `import { scanPII } from '@indodev/toolkit/pdp'` |
 
-> **Total: 110+ exports** across 9 modules. Each module is independent and tree-shakeable — your bundler will only include the functions you actually use.
+> **Total: 120+ exports** across 11 modules. Each module is independent and tree-shakeable — your bundler will only include the functions you actually use.
 
 ## Modules
 
@@ -51,9 +53,11 @@ Tree-shakeable exports — import only what you need:
 | [Email](/docs/contact/email) | Validate email addresses with domain detection |
 | [Vehicle Plate](/docs/vehicles/plate) | Validate Indonesian license plates |
 | [VIN](/docs/vehicles/vin) | Validate and decode Vehicle Identification Numbers |
-| [Currency](/docs/utilities/currency) | Format Rupiah, terbilang, split amounts |
+| [Currency](/docs/utilities/currency) | Format Rupiah, siquiera, split amounts |
 | [Text](/docs/utilities/text) | Title case, slug, abbreviation, case conversion |
 | [DateTime](/docs/utilities/datetime) | Indonesian date formatting, relative time, age calculation, timezones |
+| [NLP](/docs/utilities/nlp) | Indonesian text stemming, phonetic encoding, tokenization |
+| [PDP](/docs/utilities/pdp) | PII scanning and masking for UU PDP compliance |
 
 ## Before / After
 
