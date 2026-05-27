@@ -94,16 +94,16 @@ maskPhoneNumber('081234567890'); // '0812****7890'
 
 | Module                                                          | Description                                                    |
 | --------------------------------------------------------------- | -------------------------------------------------------------- |
-| [Currency](https://toolkit.adamm.cloud/docs/utilities/currency) | Format Rupiah, terbilang, split amounts, percentages           |
-| [Text](https://toolkit.adamm.cloud/docs/utilities/text)         | Title case, slugs, abbreviations, case conversion, masking     |
-| [DateTime](https://toolkit.adamm.cloud/docs/utilities/datetime) | Indonesian date formatting, relative time, age calculation     |
-| [NIK](https://toolkit.adamm.cloud/docs/identity/nik)            | Validate, parse, and mask Indonesian National Identity Numbers |
-| [NPWP](https://toolkit.adamm.cloud/docs/identity/npwp)          | Validate and format Tax Identification Numbers                 |
-| [Phone](https://toolkit.adamm.cloud/docs/contact/phone)         | Format, validate, and detect mobile operators                  |
-| [Email](https://toolkit.adamm.cloud/docs/contact/email)         | Validate emails with disposable domain detection               |
-| [Plate](https://toolkit.adamm.cloud/docs/vehicles/plate)        | Validate license plates with region detection                  |
-| [VIN](https://toolkit.adamm.cloud/docs/vehicles/vin)            | Validate Vehicle Identification Numbers (ISO 3779)             |
+| [Currency](https://toolkit.chrl.cloud/docs/utilities/currency) | Format Rupiah, terbilang, split amounts, percentages           |
+| [Text](https://toolkit.chrl.cloud/docs/utilities/text)         | Title case, slugs, abbreviations, case conversion, masking     |
+| [DateTime](https://toolkit.chrl.cloud/docs/utilities/datetime) | Indonesian date formatting, relative time, age calculation     |
+| [NIK](https://toolkit.chrl.cloud/docs/identity/nik)            | Validate, parse, and mask Indonesian National Identity Numbers |
+| [NPWP](https://toolkit.chrl.cloud/docs/identity/npwp)          | Validate and format Tax Identification Numbers                 |
+| [Phone](https://toolkit.chrl.cloud/docs/contact/phone)         | Format, validate, and detect mobile operators                  |
+| [Email](https://toolkit.chrl.cloud/docs/contact/email)         | Validate emails with disposable domain detection               |
+| [Plate](https://toolkit.chrl.cloud/docs/vehicles/plate)        | Validate license plates with region detection                  |
+| [VIN](https://toolkit.chrl.cloud/docs/vehicles/vin)            | Validate Vehicle Identification Numbers (ISO 3779)             |
 
-Full docs, examples, and API reference at [toolkit.adamm.cloud](https://toolkit.adamm.cloud/docs)
+Full docs, examples, and API reference at [toolkit.chrl.cloud](https://toolkit.chrl.cloud/docs)
 
 MIT

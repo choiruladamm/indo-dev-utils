@@ -10,7 +10,7 @@ import { getPageMap } from 'nextra/page-map';
 import 'nextra-theme-docs/style.css';
 
 export const metadata = {
-  metadataBase: new URL('https://toolkit.adamm.cloud'),
+  metadataBase: new URL('https://toolkit.chrl.cloud'),
   title: {
     template: '%s – @indodev/toolkit',
     default: '@indodev/toolkit – Indonesian Developer Utilities',
@@ -33,7 +33,7 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://toolkit.adamm.cloud',
+    url: 'https://toolkit.chrl.cloud',
     title: '@indodev/toolkit',
     description:
       'Type-safe Indonesian data validation and formatting utilities',

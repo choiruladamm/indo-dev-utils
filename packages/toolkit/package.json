@@ -172,7 +172,7 @@
   "bugs": {
     "url": "https://github.com/choiruladamm/indo-dev-utils/issues"
   },
-  "homepage": "https://toolkit.adamm.cloud/docs",
+  "homepage": "https://toolkit.chrl.cloud/docs",
   "peerDependencies": {
     "zod": "^3.0.0"
   },
