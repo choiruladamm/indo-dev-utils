@@ -17,11 +17,11 @@ Stop wrestling with NIK validation, Rupiah formatting, and phone normalization. 
 
 | Metric | Value |
 |--------|-------|
-| Test cases | 1908+ |
+| Test cases | 2068+ |
 | Coverage | 95%+ |
 | Dependencies | Zero |
 | [Bundle size](https://bundlephobia.com/package/@indodev/toolkit@0.8.0) | **53.5 KB** (19.2 KB gzipped) |
-| Modules | 11 |
+| Modules | 13 |
 
 ### Bundle Analysis
 
@@ -40,8 +40,10 @@ Tree-shakeable exports — import only what you need:
 | `datetime` | 19 | `import { formatDate } from '@indodev/toolkit/datetime'` |
 | `nlp` | 6 | `import { stemText } from '@indodev/toolkit/nlp'` |
 | `pdp` | 4 | `import { scanPII } from '@indodev/toolkit/pdp'` |
+| `bpjs` | 5 | `import { validateBPJS } from '@indodev/toolkit/bpjs'` |
+| `mock` | 8 | `import { generateNIK } from '@indodev/toolkit/mock'` |
 
-> **Total: 120+ exports** across 11 modules. Each module is independent and tree-shakeable — your bundler will only include the functions you actually use.
+> **Total: 133+ exports** across 13 modules. Each module is independent and tree-shakeable — your bundler will only include the functions you actually use.
 
 ## Modules
 
@@ -58,6 +60,8 @@ Tree-shakeable exports — import only what you need:
 | [DateTime](/docs/utilities/datetime) | Indonesian date formatting, relative time, age calculation, timezones |
 | [NLP](/docs/utilities/nlp) | Indonesian text stemming, phonetic encoding, tokenization |
 | [PDP](/docs/utilities/pdp) | PII scanning and masking for UU PDP compliance |
+| [BPJS](/docs/bpjs) | Validate, format, parse, and mask BPJS Kesehatan & Ketenagakerjaan numbers |
+| [Mock](/docs/mock) | Generate deterministic fake Indonesian identity data (NIK, NPWP, phone, email, plate) |
 
 ## Before / After
 

@@ -1,0 +1,497 @@
+---
+title: Mock
+description: Generate structurally valid Indonesian test data - NIK, phone, NPWP, license plate, email, and names with deterministic output.
+---
+
+import { Callout, Tabs } from 'nextra/components';
+
+# Mock Generator
+
+Generate structurally valid Indonesian test data for testing and development.
+
+## Overview
+
+The Mock module generates fake Indonesian data that passes the library's own validators:
+
+- **NIK** — 16-digit Indonesian national ID
+- **Phone** — Valid Indonesian mobile numbers with operator prefixes
+- **NPWP** — Indonesian tax identification numbers
+- **Plate** — Vehicle license plates (private)
+- **Email** — Valid email addresses
+- **Name** — Realistic Indonesian names
+
+**Key feature:** All generators accept an optional `seed` for fully deterministic output. Same seed = same data, every time.
+
+<Callout type="warning">
+Generated data is **structurally valid but not real**. Do not use for fraudulent purposes.
+</Callout>
+
+### Features
+
+- Zero external dependencies (pure algorithms)
+- All generated values pass corresponding validators
+- Deterministic output via optional seed
+- Reuses constants from existing modules
+- Works in Node.js and browser
+
+## Installation
+
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+  <Tabs.Tab>
+    ```bash
+    npm install @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    pnpm add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    yarn add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    bun add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Quick Start
+
+```typescript
+import {
+  generateNIK,
+  generatePhone,
+  generateNPWP,
+  generatePlate,
+  generateEmail,
+  generateName,
+  generateMockPerson,
+  createMockFactory,
+} from '@indodev/toolkit/mock';
+
+// One-shot generation
+const nik = generateNIK({ seed: 42 });        // Deterministic NIK
+const phone = generatePhone({ seed: 42 });      // Deterministic phone
+const person = generateMockPerson({ seed: 42 }); // Full mock person
+
+// Factory for reproducible sequences
+const factory = createMockFactory(12345);
+const p1 = factory.generateMockPerson();
+const p2 = factory.generateMockPerson();
+// p1 and p2 are always the same for the same seed
+```
+
+## Determinism
+
+All generator functions accept an optional `seed` parameter:
+
+```typescript
+// Same seed = same output
+const nik1 = generateNIK({ seed: 42 });
+const nik2 = generateNIK({ seed: 42 });
+console.log(nik1 === nik2); // true — always identical
+```
+
+Without a seed, generators use `Date.now()` as the seed (non-deterministic).
+
+```typescript
+// Without seed — different each time
+generateNIK();  // Different every call
+generateNIK();  // Different every call
+```
+
+## API Reference
+
+### generateNIK(options?)
+
+Generates a structurally valid 16-digit Indonesian NIK.
+
+```typescript
+function generateNIK(options?: NIKMockOptions): string;
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `options.gender` | `'M' \| 'F'` | Random | Gender for day encoding |
+| `options.birthDate` | `Date` | Random 1960-2005 | Birth date to encode |
+| `options.provinceCode` | `string` | Random | 2-digit province code |
+| `options.seed` | `number` | `Date.now()` | For deterministic output |
+
+**Returns:** 16-digit NIK string
+
+**NIK Format:** `PP KK SS YY MM DD XXXX`
+- PP: Province (11-96)
+- KK: Regency (fixed 01)
+- SS: Sub-district (fixed 01)
+- YY: Year (00-30 = 2000s, 31-99 = 1900s)
+- MM: Month (01-12)
+- DD: Day (male: 01-31, female: 41-71 = day+40)
+- XXXX: Serial (fixed 0001)
+
+**Examples:**
+
+```typescript
+// Random NIK
+generateNIK();  // '3212012903850001'
+
+// Deterministic with seed
+generateNIK({ seed: 42 });  // Always same output
+
+// Specific gender and date
+generateNIK({ gender: 'F', birthDate: new Date('1990-05-15'), seed: 1 });
+// '3201019005550001'  (day 15 + 40 = 55 for female)
+
+// Specific province
+generateNIK({ provinceCode: '31', seed: 1 });
+// '3101019005550001'  (31 = DKI Jakarta)
+```
+
+<Callout type="warning">
+For female gender with custom birthDate, ensure day ≤ 28 to guarantee valid NIK encoding. Days > 28 may produce invalid day values.
+</Callout>
+
+---
+
+### generatePhone(options?)
+
+Generates a valid Indonesian mobile phone number.
+
+```typescript
+function generatePhone(options?: PhoneMockOptions): string;
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `options.format` | `'national' \| 'international' \| 'e164'` | `'national'` | Output format |
+| `options.operator` | `PhoneOperator` | Random | Mobile operator |
+| `options.seed` | `number` | `Date.now()` | For deterministic output |
+
+**Output Formats:**
+- `national`: `08123456789` (11 digits starting with 0)
+- `international` / `e164`: `+628123456789` (+62 prefix)
+
+**Examples:**
+
+```typescript
+// Random phone in national format
+generatePhone();  // '08123456789'
+
+// International format
+generatePhone({ format: 'international', seed: 1 });  // '+628123456789'
+
+// Specific operator
+generatePhone({ operator: 'Telkomsel', seed: 1 });  // '08123456789'
+```
+
+**Supported Operators:** Telkomsel, XL, Indosat, Axis, Tri, Smartfren
+
+---
+
+### generateNPWP(options?)
+
+Generates a valid Indonesian NPWP (tax identification) number.
+
+```typescript
+function generateNPWP(options?: NPWPMockOptions): string;
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `options.format` | `'formatted' \| 'raw'` | `'raw'` | Output format |
+| `options.seed` | `number` | `Date.now()` | For deterministic output |
+
+**Examples:**
+
+```typescript
+// Raw format (15-16 digits)
+generateNPWP();  // '012345678901234'
+
+// Formatted
+generateNPWP({ format: 'formatted', seed: 1 });  // '01.234.567.8-901.234'
+```
+
+---
+
+### generatePlate(options?)
+
+Generates a valid Indonesian vehicle license plate (private vehicles).
+
+```typescript
+function generatePlate(options?: PlateMockOptions): string;
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `options.type` | `'private' \| 'public'` | `'private'` | Plate type |
+| `options.region` | `string` | Random | Single letter region code |
+| `options.seed` | `number` | `Date.now()` | For deterministic output |
+
+**Format:** `X 0000 XX` (letter + space + 4 digits + space + 2 letters)
+
+**Examples:**
+
+```typescript
+generatePlate();  // 'B 1234 ABC'
+
+generatePlate({ region: 'D', seed: 1 });  // 'D 5678 XY'
+```
+
+<Callout type="info">
+Only private plates are supported. Public plates are out of scope.
+</Callout>
+
+---
+
+### generateEmail(options?)
+
+Generates a valid Indonesian email address.
+
+```typescript
+function generateEmail(options?: EmailMockOptions): string;
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `options.domain` | `string` | Random | Email domain |
+| `options.seed` | `number` | `Date.now()` | For deterministic output |
+
+**Examples:**
+
+```typescript
+generateEmail();  // 'agus@gmail.com'
+
+generateEmail({ domain: 'yahoo.co.id', seed: 1 });  // 'budi@yahoo.co.id'
+
+// Same seed produces same email
+generateEmail({ seed: 42 });  // Always same
+generateEmail({ seed: 42 });  // Always same
+```
+
+<Callout type="info">
+Email uniqueness is NOT guaranteed. Collisions are acceptable and expected.
+</Callout>
+
+---
+
+### generateName(options?)
+
+Generates a realistic Indonesian name.
+
+```typescript
+function generateName(options?: NameMockOptions): string;
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `options.gender` | `'M' \| 'F'` | Random | Gender for name selection |
+| `options.parts` | `'first' \| 'last' \| 'full'` | `'full'` | Which parts to return |
+| `options.seed` | `number` | `Date.now()` | For deterministic output |
+
+**Examples:**
+
+```typescript
+// Full name
+generateName();  // 'Budi Santoso'
+generateName({ gender: 'F' });  // 'Siti Rahayu'
+
+// First name only
+generateName({ parts: 'first', seed: 1 });  // 'Agus'
+
+// Last name only
+generateName({ parts: 'last', seed: 1 });  // 'Santoso'
+```
+
+---
+
+### generateMockPerson(options?)
+
+Generates a complete mock person with consistent data across all fields.
+
+```typescript
+function generateMockPerson(options?: MockPersonOptions): MockPerson;
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `options.gender` | `'M' \| 'F'` | Random | Gender for all fields |
+| `options.seed` | `number` | `Date.now()` | For deterministic output |
+
+**Returns:** `MockPerson` object
+
+```typescript
+interface MockPerson {
+  name: string;           // Full name
+  gender: 'M' | 'F';      // Consistent across fields
+  birthDate: string;      // ISO 8601: 'YYYY-MM-DD'
+  nik: string;            // Passes validateNIK()
+  npwp: string;           // Passes validateNPWP()
+  phone: string;          // Passes validatePhoneNumber()
+  email: string;          // Passes validateEmail()
+  plate: string;          // Passes validatePlate()
+}
+```
+
+**Examples:**
+
+```typescript
+const person = generateMockPerson({ seed: 42 });
+// {
+//   name: 'Agus Santoso',
+//   gender: 'M',
+//   birthDate: '1985-03-15',
+//   nik: '3201018503150001',
+//   npwp: '012345678901234',
+//   phone: '08123456789',
+//   email: 'agus@gmail.com',
+//   plate: 'B 1234 ABC'
+// }
+
+// Female with specific gender
+const female = generateMockPerson({ gender: 'F', seed: 1 });
+// Gender is consistent: NIK encodes female day, name uses female list
+```
+
+---
+
+### createMockFactory(seed)
+
+Creates a factory for generating reproducible sequences of mock data.
+
+```typescript
+function createMockFactory(seed: number): MockFactory;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `seed` | `number` | Seed for reproducible sequences |
+
+**Returns:** `MockFactory` instance with all generator methods
+
+**Example:**
+
+```typescript
+const factory = createMockFactory(12345);
+
+const p1 = factory.generateMockPerson();
+const p2 = factory.generateMockPerson();
+const p3 = factory.generateNIK();
+
+// All deterministic — same seed = same output
+// Every time you create factory with 12345, you get same sequence
+```
+
+---
+
+## Types
+
+### MockGender
+
+```typescript
+type MockGender = 'M' | 'F';
+```
+
+### PhoneOperator
+
+```typescript
+type PhoneOperator = 'Telkomsel' | 'XL' | 'Indosat' | 'Axis' | 'Tri' | 'Smartfren';
+```
+
+### PhoneFormat
+
+```typescript
+type PhoneFormat = 'national' | 'international' | 'e164';
+```
+
+### NPWPFormat
+
+```typescript
+type NPWPFormat = 'formatted' | 'raw';
+```
+
+### PlateType
+
+```typescript
+type PlateType = 'private' | 'public';
+```
+
+### NameParts
+
+```typescript
+type NameParts = 'first' | 'last' | 'full';
+```
+
+### NIKMockOptions
+
+```typescript
+interface NIKMockOptions {
+  gender?: MockGender;
+  birthDate?: Date;
+  provinceCode?: string;
+  seed?: number;
+}
+```
+
+### MockPersonOptions
+
+```typescript
+interface MockPersonOptions {
+  gender?: MockGender;
+  seed?: number;
+}
+```
+
+### MockFactory
+
+```typescript
+interface MockFactory {
+  generateNIK(options?: Omit<NIKMockOptions, 'seed'>): string;
+  generatePhone(options?: Omit<PhoneMockOptions, 'seed'>): string;
+  generateNPWP(options?: Omit<NPWPMockOptions, 'seed'>): string;
+  generatePlate(options?: Omit<PlateMockOptions, 'seed'>): string;
+  generateEmail(options?: Omit<EmailMockOptions, 'seed'>): string;
+  generateName(options?: Omit<NameMockOptions, 'seed'>): string;
+  generateMockPerson(options?: Omit<MockPersonOptions, 'seed'>): MockPerson;
+}
+```
+
+---
+
+## Validation Guarantee
+
+Every generator is designed so its output passes the corresponding validator:
+
+| Generator | Validator |
+|-----------|-----------|
+| `generateNIK()` | `validateNIK()` from `@indodev/toolkit/nik` |
+| `generatePhone()` | `validatePhoneNumber()` from `@indodev/toolkit/phone` |
+| `generateNPWP()` | `validateNPWP()` from `@indodev/toolkit/npwp` |
+| `generatePlate()` | `validatePlate()` from `@indodev/toolkit/plate` |
+| `generateEmail()` | `validateEmail()` from `@indodev/toolkit/email-validator` |
+
+```typescript
+const nik = generateNIK({ seed: 42 });
+validateNIK(nik);  // true — always passes
+
+const phone = generatePhone({ seed: 42 });
+validatePhoneNumber(phone);  // true — always passes
+```

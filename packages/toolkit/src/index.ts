@@ -232,3 +232,52 @@ export {
 } from './datetime';
 
 export type { DateStyle, AgeOptions, AgeResult } from './datetime';
+
+// BPJS module
+export {
+  validateBPJS,
+  validateBPJSKesehatan,
+  validateBPJSKetenagakerjaan,
+  detectBPJSType,
+  formatBPJS,
+  parseBPJS,
+  maskBPJS,
+  cleanBPJS,
+  InvalidBPJSError,
+} from './bpjs';
+
+export type {
+  BPJSType,
+  BPJSInfo,
+  BPJSMaskOptions,
+} from './bpjs';
+
+// Mock data generator utilities
+export {
+  generateNIK,
+  generatePhone,
+  generateNPWP,
+  generatePlate,
+  generateEmail,
+  generateName,
+  generateMockPerson,
+  createMockFactory,
+} from './mock';
+
+export type {
+  MockGender,
+  PhoneOperator,
+  PhoneFormat as MockPhoneFormat,
+  NPWPFormat,
+  PlateType,
+  NameParts,
+  NIKMockOptions,
+  PhoneMockOptions,
+  NPWPMockOptions,
+  PlateMockOptions,
+  EmailMockOptions,
+  NameMockOptions,
+  MockPersonOptions,
+  MockPerson,
+  MockFactory,
+} from './mock';

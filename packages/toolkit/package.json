@@ -1,6 +1,6 @@
 {
   "name": "@indodev/toolkit",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Indonesian developer utilities for validation, formatting, and more",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -98,6 +98,16 @@
         "default": "./dist/email-validator/index.cjs"
       }
     },
+    "./bpjs": {
+      "import": {
+        "types": "./dist/bpjs/index.d.ts",
+        "default": "./dist/bpjs/index.js"
+      },
+      "require": {
+        "types": "./dist/bpjs/index.d.cts",
+        "default": "./dist/bpjs/index.cjs"
+      }
+    },
     "./datetime": {
       "import": {
         "types": "./dist/datetime/index.d.ts",
@@ -106,6 +116,16 @@
       "require": {
         "types": "./dist/datetime/index.d.cts",
         "default": "./dist/datetime/index.cjs"
+      }
+    },
+    "./mock": {
+      "import": {
+        "types": "./dist/mock/index.d.ts",
+        "default": "./dist/mock/index.js"
+      },
+      "require": {
+        "types": "./dist/mock/index.d.cts",
+        "default": "./dist/mock/index.cjs"
       }
     }
   },

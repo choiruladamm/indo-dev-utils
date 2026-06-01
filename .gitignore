@@ -43,23 +43,18 @@ pnpm-debug.log*
 .temp/
 .tmp/
 
-# Guide (internal docs)
-guide/
-
-# AGENTS.md (internal - project-specific agent configs)
 AGENTS.md
-
-# opencode.json (internal - project-specific opencode config)
-opencode.json
-
-# PRD (internal docs)
+CLAUDE.md
+ROADMAP.md
 packages/toolkit/prd/
-
-# Research (internal docs)
 packages/toolkit/research/
-
-# OpenCode internal
+packages/toolkit/srs/
+graphify-out/
+guide/
+opencode.json
 .opencode/
+.sisyphus/
+.claude/
 
 # ===================================
 # Monorepo Specific

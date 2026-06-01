@@ -83,8 +83,8 @@ export default async function RootLayout({ children }) {
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head faviconGlyph="🇮🇩" />
       <body>
-        <Banner storageKey="v0.8.0">
-          v0.8.0 released — NLP Engine + Privacy Engine (PDP) modules for Indonesian text processing and UU PDP compliance.{' '}
+        <Banner storageKey="v0.9.0">
+          v0.9.0 released — BPJS Module (Kesehatan & Ketenagakerjaan) + Mock Module for deterministic fake Indonesian data.{' '}
           <a href="/docs/changelog" style={{ textDecoration: 'underline' }}>
             Read changelog
           </a>

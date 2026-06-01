@@ -1,0 +1,390 @@
+---
+title: BPJS
+description: Indonesian BPJS (Social Security) number utilities - validate, format, parse, and mask BPJS Kesehatan and Ketenagakerjaan numbers.
+---
+
+import { Callout, Tabs } from 'nextra/components';
+
+# BPJS
+
+Indonesian BPJS (Badan Penyelenggara Jaminan Sosial) number utilities for validation, formatting, parsing, and privacy masking.
+
+## Overview
+
+The BPJS module handles both types of Indonesian social security numbers:
+
+- **BPJS Kesehatan** (Health): 13 numeric digits
+- **BPJS Ketenagakerjaan** (Employment): 11 numeric digits
+
+All operations are format-based — no external data or API calls.
+
+### Features
+
+- Validate BPJS numbers by type
+- Auto-detect BPJS type from digit length
+- Format with standard separators
+- Parse into structured object
+- Mask for privacy display
+- Clean input (remove formatting chars)
+
+## Installation
+
+<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
+  <Tabs.Tab>
+    ```bash
+    npm install @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    pnpm add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    yarn add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```bash
+    bun add @indodev/toolkit
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+## Quick Start
+
+```typescript
+import {
+  validateBPJS,
+  validateBPJSKesehatan,
+  validateBPJSKetenagakerjaan,
+  formatBPJS,
+  parseBPJS,
+  maskBPJS,
+  detectBPJSType,
+} from '@indodev/toolkit/bpjs';
+
+// Validation
+validateBPJSKesehatan('0001234567890');       // true
+validateBPJSKetenagakerjaan('12345678901');   // true
+detectBPJSType('0001234567890');              // 'kesehatan'
+detectBPJSType('12345678901');                // 'ketenagakerjaan'
+
+// Format
+formatBPJS('0001234567890', 'kesehatan');    // '0001-2345-67890'
+formatBPJS('12345678901', 'ketenangan');     // '1234-567-8901'
+
+// Parse
+parseBPJS('0001234567890');
+// {
+//   type: 'kesehatan',
+//   raw: '0001234567890',
+//   formatted: '0001-2345-67890'
+// }
+
+// Mask
+maskBPJS('0001234567890');                    // '0001-****-67890'
+```
+
+## API Reference
+
+### validateBPJS()
+
+Validates a BPJS number for the specified type.
+
+```typescript
+function validateBPJS(number: string, type: BPJSType): boolean;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `number` | `string` | BPJS number (raw or formatted) |
+| `type` | `'kesehatan' \| 'ketenangan'` | BPJS type to validate against |
+
+**Returns:** `boolean` — true if valid, false otherwise
+
+**Examples:**
+
+```typescript
+validateBPJS('0001234567890', 'kesehatan');      // true
+validateBPJS('0001-2345-67890', 'kesehatan');   // true (cleaned first)
+validateBPJS('12345678901', 'ketenangan');       // true
+validateBPJS('123456789', 'kesehatan');          // false (wrong length)
+```
+
+---
+
+### validateBPJSKesehatan()
+
+Validates a BPJS Kesehatan number (13 digits).
+
+```typescript
+function validateBPJSKesehatan(number: string): boolean;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `number` | `string` | BPJS Kesehatan number |
+
+**Returns:** `boolean` — true if valid 13-digit number
+
+**Examples:**
+
+```typescript
+validateBPJSKesehatan('0001234567890');    // true
+validateBPJSKesehatan('000123456789');      // false (12 digits)
+```
+
+---
+
+### validateBPJSKetenagakerjaan()
+
+Validates a BPJS Ketenagakerjaan number (11 digits).
+
+```typescript
+function validateBPJSKetenagakerjaan(number: string): boolean;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `number` | `string` | BPJS Ketenagakerjaan number |
+
+**Returns:** `boolean` — true if valid 11-digit number
+
+**Examples:**
+
+```typescript
+validateBPJSKetenagakerjaan('12345678901');   // true
+validateBPJSKetenagakerjaan('1234567890');     // false (10 digits)
+```
+
+---
+
+### detectBPJSType()
+
+Detects BPJS type from digit length.
+
+```typescript
+function detectBPJSType(number: string): BPJSType | null;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `number` | `string` | BPJS number (raw or formatted) |
+
+**Returns:** `'kesehatan' \| 'ketenangan' \| null` — null if length doesn't match either type
+
+**Examples:**
+
+```typescript
+detectBPJSType('0001234567890');    // 'kesehatan'
+detectBPJSType('12345678901');      // 'ketenangan'
+detectBPJSType('123456789');        // null (invalid length)
+```
+
+---
+
+### formatBPJS()
+
+Formats a raw BPJS number with standard separators.
+
+```typescript
+function formatBPJS(number: string, type?: BPJSType): string;
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `number` | `string` | — | Raw or formatted number |
+| `type` | `BPJSType` | `'kesehatan'` | Type for formatting |
+
+**Returns:** Formatted string with separators
+
+**Examples:**
+
+```typescript
+formatBPJS('0001234567890');            // '0001-2345-67890'
+formatBPJS('0001-2345-67890');           // '0001-2345-67890' (pass-through)
+formatBPJS('12345678901', 'ketenangan'); // '1234-567-8901'
+```
+
+---
+
+### parseBPJS()
+
+Parses a BPJS number into structured info.
+
+```typescript
+function parseBPJS(number: string): BPJSInfo;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `number` | `string` | BPJS number (raw or formatted) |
+
+**Returns:** `BPJSInfo` object
+
+```typescript
+interface BPJSInfo {
+  type: BPJSType;
+  /** Digits-only string, no separators */
+  raw: string;
+  /** Formatted with standard separators */
+  formatted: string;
+}
+```
+
+**Examples:**
+
+```typescript
+parseBPJS('0001234567890');
+// {
+//   type: 'kesehatan',
+//   raw: '0001234567890',
+//   formatted: '0001-2345-67890'
+// }
+
+parseBPJS('1234-567-8901');
+// {
+//   type: 'ketenangan',
+//   raw: '12345678901',
+//   formatted: '1234-567-8901'
+// }
+```
+
+---
+
+### maskBPJS()
+
+Masks a BPJS number for privacy display.
+
+```typescript
+function maskBPJS(number: string, options?: BPJSMaskOptions): string;
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `number` | `string` | — | BPJS number to mask |
+| `options.visibleStart` | `number` | `4` | Characters to keep at start |
+| `options.visibleEnd` | `number` | `2` | Characters to keep at end |
+| `options.maskChar` | `string` | `'*'` | Replacement character |
+
+**Returns:** Masked string (e.g., `'0001-****-67890'`)
+
+**Examples:**
+
+```typescript
+maskBPJS('0001234567890');                    // '0001-****-67890'
+maskBPJS('0001234567890', { visibleStart: 6 }); // '000123-******-90'
+maskBPJS('0001234567890', { maskChar: '•' });   // '0001-•••••-67890'
+```
+
+---
+
+### cleanBPJS()
+
+Removes non-numeric characters from BPJS number.
+
+```typescript
+function cleanBPJS(number: string): string;
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `number` | `string` | BPJS number (raw or formatted) |
+
+**Returns:** Digits-only string
+
+**Examples:**
+
+```typescript
+cleanBPJS('0001-2345-67890');    // '0001234567890'
+cleanBPJS('0001234567890');       // '0001234567890' (pass-through)
+```
+
+---
+
+## Types
+
+### BPJSType
+
+```typescript
+type BPJSType = 'kesehatan' | 'ketenangan';
+```
+
+### BPJSInfo
+
+```typescript
+interface BPJSInfo {
+  type: BPJSType;
+  /** Digits-only string, no separators */
+  raw: string;
+  /** Formatted with standard separators */
+  formatted: string;
+}
+```
+
+### BPJSMaskOptions
+
+```typescript
+interface BPJSMaskOptions {
+  /** Characters to keep visible at start. Default: 4 */
+  visibleStart?: number;
+  /** Characters to keep visible at end. Default: 2 */
+  visibleEnd?: number;
+  /** Replacement character. Default: '*' */
+  maskChar?: string;
+}
+```
+
+### InvalidBPJSError
+
+Error thrown when performing operations on invalid BPJS numbers.
+
+```typescript
+class InvalidBPJSError extends Error {
+  readonly code = 'INVALID_BPJS';
+}
+```
+
+**Example:**
+
+```typescript
+try {
+  formatBPJS('invalid', 'kesehatan');
+} catch (e) {
+  if (e instanceof InvalidBPJSError) {
+    console.log(e.code); // 'INVALID_BPJS'
+  }
+}
+```
+
+---
+
+## Error Handling
+
+All functions are safe to call with any input — they return `false`/`null`/empty string rather than throwing, except for `parseBPJS()` which may throw `InvalidBPJSError` when given completely invalid input.
+
+```typescript
+// No error thrown for invalid input
+validateBPJSKesehatan('invalid');     // false
+validateBPJSKesehatan('');              // false
+formatBPJS('123');                      // '123' (no-op for non-numeric)
+maskBPJS('');                           // ''
+```
