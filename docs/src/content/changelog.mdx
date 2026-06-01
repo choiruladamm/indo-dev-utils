@@ -3,6 +3,40 @@ title: Changelog
 description: Latest updates and changes to the @indodev/toolkit library.
 ---
 
+## v0.9.0 - June 1, 2026
+
+### New Modules
+
+#### BPJS Module
+
+Indonesian BPJS Kesehatan (13-digit) and BPJS Ketenagakerjaan (11-digit) validation, formatting, parsing, and masking:
+
+- `validateBPJS()` - Validate BPJS number by type
+- `validateBPJSKesehatan()` - Validate 13-digit kesehatan number
+- `validateBPJSKetenagakerjaan()` - Validate 11-digit ketenagakerjaan number
+- `detectBPJSType()` - Auto-detect BPJS type from length
+- `formatBPJS()` - Format with proper separators
+- `maskBPJS()` - Mask for privacy display
+- `parseBPJS()` - Extract type, raw, and formatted values
+- `cleanBPJS()` - Strip separators
+
+#### Mock Module
+
+Generate deterministic fake Indonesian identity data that passes all validators — useful for testing:
+
+- `createMockFactory()` - Pre-seeded factory for reproducible data sequences
+- `generateMockPerson()` - Complete person with all fields (NIK, NPWP, phone, email, plate, name, gender, birthDate)
+- `generateNIK()`, `generateNPWP()`, `generatePhone()`, `generateEmail()`, `generatePlate()`, `generateName()` - Individual generators
+- `createLCG()` - Linear Congruential Generator for deterministic pseudo-random sequences
+
+All generated data passes corresponding `validate*()` functions.
+
+### Documentation
+
+- Updated stats: 13 modules, 133+ exports, 2068+ tests
+- README reorganized with code-first examples per module
+- Added BPJS and Mock to module index and navigation
+
 ## v0.8.0 - May 27, 2026
 
 ### New Modules

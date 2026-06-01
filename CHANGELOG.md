@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.0] - 2026-06-01
+
+### Added
+
+#### BPJS Module
+
+New BPJS validation module for Indonesian healthcare (Kesehatan, 13-digit) and employment (Ketenagakerjaan, 11-digit):
+
+- `validateBPJS()` - Validate by type ('kesehatan' or 'ketenagakerjaan')
+- `validateBPJSKesehatan()` - Validate 13-digit kesehatan number
+- `validateBPJSKetenagakerjaan()` - Validate 11-digit ketenangan number
+- `detectBPJSType()` - Auto-detect type from digit length
+- `formatBPJS()` - Format with proper separators (XXXX-XXXX-XXXXX / XXXX-XXX-XXXX)
+- `maskBPJS()` - Mask middle digits for privacy
+- `parseBPJS()` - Parse returns { type, raw, formatted }
+- `cleanBPJS()` - Strip separators
+
+#### Mock Module
+
+New data generation module for deterministic fake Indonesian identity data (testing fixtures):
+
+- `createLCG()` - Linear Congruential Generator for reproducible sequences
+- `createMockFactory()` - Pre-seeded factory for consistent data across calls
+- `generateMockPerson()` - Complete person object (name, gender, birthDate, nik, npwp, phone, email, plate)
+- `generateNIK()` - Generate valid 16-digit NIK
+- `generateNPWP()` - Generate valid 15-digit NPWP
+- `generatePhone()` - Generate valid Indonesian phone number
+- `generateEmail()` - Generate plausible email
+- `generatePlate()` - Generate valid vehicle plate
+- `generateName()` - Generate Indonesian name (full, first, or last)
+
+All generated data passes corresponding `validate*()` functions.
+
+### Documentation
+
+- Updated README with code-first examples per module
+- Stats updated: 13 modules, 133+ exports, 2068+ tests
+
 ## [0.8.0] - 2026-05-27
 
 ### Added
