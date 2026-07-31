@@ -252,3 +252,78 @@ function formatAgeString(age: {
 
   return parts.join(' ');
 }
+
+/**
+ * Add (or subtract) a number of working days to a date, skipping
+ * Saturdays and Sundays.
+ *
+ * National holidays are intentionally **not** considered. A holiday
+ * calendar would require volatile government-decree data and is out
+ * of scope (see `mandates.md`).
+ *
+ * The semantics are: advance the date by `count` calendar days, and
+ * if the resulting day is a weekend, snap forward (positive `count`)
+ * or backward (negative `count`) to the nearest weekday. This
+ * matches the industry-standard `date-fns` behaviour.
+ *
+ * - `count === 0` returns a new Date equal to the input (no snap).
+ * - For non-zero `count`, the result is always a Monday through
+ *   Friday.
+ *
+ * **Note on pre-weekend inputs**: a date that already lands on a
+ * weekend is advanced by `count` calendar days from that weekend day
+ * (not snapped first), then snapped to a weekday. So
+ * `addBusinessDays(Saturday, 1) === next Monday`.
+ *
+ * @param date - Starting date.
+ * @param count - Working days to move. Positive moves forward, negative
+ *   moves backward, `0` returns a new Date equal to the input.
+ * @returns A new Date representing the resulting working day.
+ * @throws {InvalidDateError} If `date` is not a valid Date instance.
+ *
+ * @example
+ * ```typescript
+ * // Friday + 1 working day = next Monday
+ * addBusinessDays(new Date('2026-01-09'), 1);
+ * // -> Date for 2026-01-12 (Monday)
+ *
+ * // Wednesday + 2 working days = Friday (weekend not crossed)
+ * addBusinessDays(new Date('2026-01-07'), 2);
+ * // -> Date for 2026-01-09 (Friday)
+ *
+ * // Monday - 1 working day = previous Friday
+ * addBusinessDays(new Date('2026-01-12'), -1);
+ * // -> Date for 2026-01-09 (Friday)
+ * ```
+ */
+export function addBusinessDays(date: Date, count: number): Date {
+  if (!isValidDate(date)) {
+    throw new InvalidDateError(
+      'addBusinessDays requires a valid Date instance'
+    );
+  }
+
+  if (count === 0) {
+    return new Date(date.getTime());
+  }
+
+  const result = new Date(date.getTime());
+  result.setDate(result.getDate() + count);
+
+  if (!isWeekend(result)) {
+    return result;
+  }
+
+  // Snap to nearest weekday in the direction of motion.
+  if (count > 0) {
+    while (isWeekend(result)) {
+      result.setDate(result.getDate() + 1);
+    }
+  } else {
+    while (isWeekend(result)) {
+      result.setDate(result.getDate() - 1);
+    }
+  }
+
+  return result;
+}
