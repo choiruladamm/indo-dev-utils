@@ -305,3 +305,18 @@ export interface PercentageOptions {
    */
   isPercentage?: boolean;
 }
+
+// Error classes co-located with their related types per `architecture.md` "Custom Error Classes".
+/**
+ * Invalid split error thrown when split parameters are invalid.
+ *
+ * @public
+ */
+export class InvalidSplitError extends Error {
+  readonly code = 'INVALID_SPLIT' as const;
+
+  constructor(message: string = 'Invalid split parameters') {
+    super(message);
+    this.name = 'InvalidSplitError';
+  }
+}

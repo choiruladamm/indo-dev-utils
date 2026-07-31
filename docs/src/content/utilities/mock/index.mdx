@@ -319,6 +319,66 @@ generateName({ parts: 'last', seed: 1 });  // 'Santoso'
 
 ---
 
+### generateBPJS(options?)
+
+Generates a structurally valid Indonesian BPJS number for either scheme.
+
+```typescript
+function generateBPJS(options?: BPJSMockOptions): string;
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `options.scheme` | `'kesehatan' \| 'ketenagakerjaan'` | `'kesehatan'` | Which BPJS scheme to produce |
+| `options.seed` | `number` | `Date.now()` | For deterministic output |
+
+**Returns:** numeric string — 13 digits for Kesehatan, 11 digits for Ketenagakerjaan. Passes `validateBPJS(scheme)`.
+
+**Examples:**
+
+```typescript
+// Default: Kesehatan (13 digits)
+generateBPJS();                          // e.g. '0001234567890'
+generateBPJS({ seed: 42 });              // Deterministic
+
+// Ketenagakerjaan (11 digits)
+generateBPJS({ scheme: 'ketenagakerjaan', seed: 1 });  // e.g. '12345678901'
+```
+
+---
+
+### generateVIN(options?)
+
+Generates a valid 17-character Vehicle Identification Number with a correct check digit.
+
+```typescript
+function generateVIN(options?: VINMockOptions): string;
+```
+
+**Parameters:**
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `options.manufacturerPrefix` | `string` | Random | Optional 3-char WMI segment (must be free of `I`, `O`, `Q`) |
+| `options.seed` | `number` | `Date.now()` | For deterministic output |
+
+**Returns:** 17-character string. Passes `validateVIN()`. Contains no `I`, `O`, or `Q`. Check digit at position 9 is correct per ISO 3779.
+
+**Examples:**
+
+```typescript
+// Random valid VIN
+generateVIN();                  // e.g. '1HBHA82L7ZB000001'
+generateVIN({ seed: 42 });      // Deterministic
+
+// Fixed manufacturer prefix
+generateVIN({ manufacturerPrefix: 'JHM', seed: 1 });  // starts with 'JHM'
+```
+
+---
+
 ### generateMockPerson(options?)
 
 Generates a complete mock person with consistent data across all fields.
@@ -332,6 +392,8 @@ function generateMockPerson(options?: MockPersonOptions): MockPerson;
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
 | `options.gender` | `'M' \| 'F'` | Random | Gender for all fields |
+| `options.includeBPJS` | `boolean` | `false` | Attach a valid BPJS number to the person |
+| `options.bpjsScheme` | `'kesehatan' \| 'ketenagakerjaan'` | `'kesehatan'` | Scheme when `includeBPJS` is true |
 | `options.seed` | `number` | `Date.now()` | For deterministic output |
 
 **Returns:** `MockPerson` object
@@ -339,15 +401,19 @@ function generateMockPerson(options?: MockPersonOptions): MockPerson;
 ```typescript
 interface MockPerson {
   name: string;           // Full name
-  gender: 'M' | 'F';      // Consistent across fields
+  gender: 'M' \| 'F';      // Consistent across fields
   birthDate: string;      // ISO 8601: 'YYYY-MM-DD'
   nik: string;            // Passes validateNIK()
   npwp: string;           // Passes validateNPWP()
   phone: string;          // Passes validatePhoneNumber()
   email: string;          // Passes validateEmail()
   plate: string;          // Passes validatePlate()
+  bpjs?: string;          // Passes validateBPJS() — only present when includeBPJS: true
 }
 ```
+
+<Callout type="info">
+The `bpjs` field is **absent by default** to preserve snapshot compatibility with v0.9.0. Set `includeBPJS: true` to attach a valid BPJS number to the person.
 
 **Examples:**
 
@@ -395,6 +461,8 @@ const factory = createMockFactory(12345);
 const p1 = factory.generateMockPerson();
 const p2 = factory.generateMockPerson();
 const p3 = factory.generateNIK();
+const bpjs = factory.generateBPJS({ scheme: 'ketenagakerjaan' });
+const vin = factory.generateVIN();
 
 // All deterministic — same seed = same output
 // Every time you create factory with 12345, you get same sequence

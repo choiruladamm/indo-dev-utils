@@ -10,6 +10,8 @@
  * - generateNPWP() → passes validateNPWP()
  * - generatePlate() → passes validatePlate()
  * - generateEmail() → passes validateEmail()
+ * - generateBPJS() → passes validateBPJS()
+ * - generateVIN() → passes validateVIN()
  *
  * @example
  * ```typescript
@@ -34,6 +36,8 @@ export { generateNPWP } from './generators/npwp';
 export { generatePlate } from './generators/plate';
 export { generateEmail } from './generators/email';
 export { generateName } from './generators/name';
+export { generateBPJS } from './generators/bpjs';
+export { generateVIN } from './generators/vin';
 export { generateMockPerson, createMockFactory } from './generators/person';
 
 export type {
@@ -43,12 +47,15 @@ export type {
   NPWPFormat,
   PlateType,
   NameParts,
+  BPJSScheme,
   NIKMockOptions,
   PhoneMockOptions,
   NPWPMockOptions,
   PlateMockOptions,
   EmailMockOptions,
   NameMockOptions,
+  BPJSMockOptions,
+  VINMockOptions,
   MockPersonOptions,
   MockPerson,
   MockFactory,

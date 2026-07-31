@@ -1,18 +1,8 @@
 import type { RoundUnit, SplitOptions } from './types';
+import { InvalidSplitError } from './types';
 
-/**
- * Invalid split error thrown when split parameters are invalid.
- *
- * @public
- */
-export class InvalidSplitError extends Error {
-  readonly code = 'INVALID_SPLIT' as const;
-
-  constructor(message: string = 'Invalid split parameters') {
-    super(message);
-    this.name = 'InvalidSplitError';
-  }
-}
+// Re-export so legacy/internal imports of `InvalidSplitError` from `./calc` keep resolving.
+export { InvalidSplitError } from './types';
 
 /**
  * Splits an amount into equal or custom-ratio parts.

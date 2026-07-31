@@ -45,8 +45,10 @@ export {
   splitAmount,
   percentageOf,
   difference,
-  InvalidSplitError,
 } from './calc';
+
+// Error class lives in types.ts (architecture convention).
+export { InvalidSplitError } from './types';
 
 // Validation functions
 export { validateRupiah } from './validate';

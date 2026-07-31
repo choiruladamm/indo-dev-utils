@@ -5,6 +5,8 @@ import { validatePhoneNumber } from '../../phone';
 import { validateNPWP } from '../../npwp';
 import { validatePlate } from '../../plate';
 import { validateEmail } from '../../email-validator';
+import { validateBPJS, detectBPJSType } from '../../bpjs';
+import { validateVIN } from '../../vin';
 
 describe('generateMockPerson', () => {
   it('all fields are present in output', () => {
@@ -71,6 +73,34 @@ describe('generateMockPerson', () => {
   it('same seed produces identical MockPerson', () => {
     expect(generateMockPerson({ seed: 42 })).toEqual(generateMockPerson({ seed: 42 }));
   });
+
+  it('AC-6: default MockPerson shape has no bpjs key (v0.9.0 snapshot preserved)', () => {
+    const person = generateMockPerson({ seed: 42 });
+    expect(Object.keys(person).sort()).toEqual(
+      ['birthDate', 'email', 'gender', 'name', 'nik', 'npwp', 'phone', 'plate'].sort(),
+    );
+    expect('bpjs' in person).toBe(false);
+  });
+
+  it('AC-7: includeBPJS: true adds a valid Kesehatan BPJS number', () => {
+    const person = generateMockPerson({ seed: 42, includeBPJS: true });
+    expect(person.bpjs).toBeDefined();
+    expect(validateBPJS(person.bpjs!, 'kesehatan')).toBe(true);
+    expect(detectBPJSType(person.bpjs!)).toBe('kesehatan');
+  });
+
+  it('includeBPJS: true with bpjsScheme: ketenagakerjaan produces valid Ketenagakerjaan', () => {
+    const person = generateMockPerson({ seed: 7, includeBPJS: true, bpjsScheme: 'ketenagakerjaan' });
+    expect(person.bpjs).toBeDefined();
+    expect(validateBPJS(person.bpjs!, 'ketenagakerjaan')).toBe(true);
+    expect(detectBPJSType(person.bpjs!)).toBe('ketenagakerjaan');
+  });
+
+  it('AC-8: same seed same options produces same person-with-bpjs output', () => {
+    const a = generateMockPerson({ seed: 100, includeBPJS: true });
+    const b = generateMockPerson({ seed: 100, includeBPJS: true });
+    expect(a).toEqual(b);
+  });
 });
 
 describe('createMockFactory', () => {
@@ -106,5 +136,35 @@ describe('createMockFactory', () => {
     expect(nik.slice(6, 8)).toBe('90'); // year
     expect(nik.slice(8, 10)).toBe('05'); // month
     expect(nik.slice(10, 12)).toBe('15'); // day
+  });
+
+  it('factory.generateBPJS produces valid output for both schemes', () => {
+    const factory = createMockFactory(11);
+    const k = factory.generateBPJS();
+    expect(validateBPJS(k, 'kesehatan')).toBe(true);
+    const tk = factory.generateBPJS({ scheme: 'ketenagakerjaan' });
+    expect(validateBPJS(tk, 'ketenagakerjaan')).toBe(true);
+  });
+
+  it('factory.generateVIN produces a valid 17-char VIN', () => {
+    const factory = createMockFactory(22);
+    const vin = factory.generateVIN();
+    expect(vin).toHaveLength(17);
+    expect(vin).not.toMatch(/[IOQ]/);
+    expect(validateVIN(vin)).toBe(true);
+  });
+
+  it('factory.generateVIN with manufacturerPrefix honors the prefix', () => {
+    const factory = createMockFactory(33);
+    const vin = factory.generateVIN({ manufacturerPrefix: '1HG' });
+    expect(vin.startsWith('1HG')).toBe(true);
+    expect(validateVIN(vin)).toBe(true);
+  });
+
+  it('factory.generateMockPerson with includeBPJS produces a person with a valid bpjs field', () => {
+    const factory = createMockFactory(44);
+    const person = factory.generateMockPerson({ includeBPJS: true });
+    expect(person.bpjs).toBeDefined();
+    expect(validateBPJS(person.bpjs!, 'kesehatan')).toBe(true);
   });
 });

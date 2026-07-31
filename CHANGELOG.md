@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.1] - 2026-06-01
+
+### Added
+
+#### Mock Generator Parity
+
+The `mock` module now generates fixtures for every ID type the library can validate.
+
+- `generateBPJS(options?)` — generates a structurally valid BPJS number (Kesehatan 13-digit or Ketenagakerjaan 11-digit). Default scheme: Kesehatan. Output passes `validateBPJS()`. Supports `seed` for reproducibility.
+- `generateVIN(options?)` — generates a valid 17-character VIN including a correct check digit at position 9, no `I`/`O`/`Q` characters. Optional `manufacturerPrefix` (3-char WMI segment) supported. Output passes `validateVIN()`. Supports `seed`.
+- `generateMockPerson()` now accepts `includeBPJS: true` to attach a valid BPJS number to the composite person fixture. **Default off** — existing consumer snapshots preserved exactly.
+
+### Changed
+
+#### API Consistency
+
+Internal refactor for codebase uniformity. **Zero breaking changes** — every existing import resolves exactly as before.
+
+- `InvalidSplitError` moved from `src/currency/calc.ts` to `src/currency/types.ts` (the documented convention). Public re-export from `@indodev/toolkit` and `@indodev/toolkit/currency` unchanged.
+- The `pdp` (Privacy Engine) module now carries a module-level JSDoc header with `@module pdp`, matching the convention used by all other modules.
+- The acronym-vs-full-word naming rule is now documented in `architecture.md` for new contributors.
+
 ## [0.9.0] - 2026-06-01
 
 ### Added

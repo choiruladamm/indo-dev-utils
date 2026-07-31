@@ -3,12 +3,49 @@ import {
   FIRST_NAMES_MALE, FIRST_NAMES_FEMALE, LAST_NAMES, EMAIL_DOMAINS,
   PROVINCE_CODES, OPERATOR_SAMPLE_PREFIXES, PRIVATE_PLATE_PREFIXES,
 } from '../constants';
-import { MockGender, MockPerson, MockPersonOptions, MockFactory, PhoneOperator } from '../types';
+import { KESEHATAN_LENGTH, KETENAGAKERJAAN_LENGTH } from '../../bpjs/constants';
+import {
+  VIN_LENGTH as VIN_LENGTH_LOCAL,
+  VIN_CHECK_DIGIT_INDEX as VIN_CHECK_DIGIT_INDEX_LOCAL,
+  VIN_MODULUS as VIN_MODULUS_LOCAL,
+  VIN_CHECK_DIGIT_X as VIN_CHECK_DIGIT_X_LOCAL,
+  VIN_WEIGHTS as VIN_WEIGHTS_LOCAL,
+  VIN_CHAR_VALUES as VIN_CHAR_VALUES_LOCAL,
+  EXCLUDED_VIN_CHARS as EXCLUDED_VIN_CHARS_LOCAL,
+} from '../../vin/constants';
+import { MockGender, MockPerson, MockPersonOptions, MockFactory, PhoneOperator, BPJSScheme } from '../types';
 
 const OPERATOR_NAMES = Object.keys(OPERATOR_SAMPLE_PREFIXES) as PhoneOperator[];
 const PLATE_LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXY';
+const SCHEME_LENGTH: Record<BPJSScheme, number> = {
+  kesehatan: KESEHATAN_LENGTH,
+  ketenagakerjaan: KETENAGAKERJAAN_LENGTH,
+};
 
-function buildPerson(lcg: LCGInstance, genderOverride?: MockGender): MockPerson {
+const VIN_CHARS_LOCAL = Object.keys(VIN_CHAR_VALUES_LOCAL);
+const EXCLUDED_SET_LOCAL = new Set(EXCLUDED_VIN_CHARS_LOCAL);
+
+function computeCheckDigitLocal(chars: readonly string[]): string {
+  let sum = 0;
+  for (let i = 0; i < VIN_LENGTH_LOCAL; i++) {
+    if (i === VIN_CHECK_DIGIT_INDEX_LOCAL) continue;
+    const val = VIN_CHAR_VALUES_LOCAL[chars[i]];
+    sum += val * VIN_WEIGHTS_LOCAL[i];
+  }
+  const value = sum % VIN_MODULUS_LOCAL;
+  return value === 10 ? VIN_CHECK_DIGIT_X_LOCAL : value.toString();
+}
+
+function isValidVinCharLocal(c: string): boolean {
+  return c.length === 1 && !EXCLUDED_SET_LOCAL.has(c) && c in VIN_CHAR_VALUES_LOCAL;
+}
+
+function buildPerson(
+  lcg: LCGInstance,
+  genderOverride?: MockGender,
+  includeBPJS = false,
+  bpjsScheme: BPJSScheme = 'kesehatan',
+): MockPerson {
   // 1. Gender
   const gender: MockGender = genderOverride ?? (lcg.nextInt(2) === 0 ? 'M' : 'F');
 
@@ -63,6 +100,11 @@ function buildPerson(lcg: LCGInstance, genderOverride?: MockGender): MockPerson 
   }
   const plate = `${platePrefix} ${plateNumber} ${plateSuffix}`;
 
+  if (includeBPJS) {
+    const bpjs = lcg.nextDigits(SCHEME_LENGTH[bpjsScheme]);
+    return { name, gender, birthDate, nik, npwp, phone, email, plate, bpjs };
+  }
+
   return { name, gender, birthDate, nik, npwp, phone, email, plate };
 }
 
@@ -70,14 +112,17 @@ function buildPerson(lcg: LCGInstance, genderOverride?: MockGender): MockPerson 
  * Generates a complete consistent fake Indonesian person.
  * The NIK birth date and gender always match the birthDate and gender fields.
  *
+ * Set `includeBPJS: true` to add a valid BPJS number (default scheme: `kesehatan`).
+ * Default output matches the v0.9.0 shape — the `bpjs` field is omitted unless opted in.
+ *
  * @example
  * generateMockPerson({ seed: 42 })
  * // { name: '...', gender: 'M', birthDate: '1990-03-15', nik: '...', ... }
  */
 export function generateMockPerson(options: MockPersonOptions = {}): MockPerson {
-  const { gender, seed } = options;
+  const { gender, includeBPJS = false, bpjsScheme = 'kesehatan', seed } = options;
   const lcg = createLCG(seed);
-  return buildPerson(lcg, gender);
+  return buildPerson(lcg, gender, includeBPJS, bpjsScheme);
 }
 
 /**
@@ -171,7 +216,40 @@ export function createMockFactory(seed: number): MockFactory {
     },
 
     generateMockPerson(options = {}) {
-      return buildPerson(lcg, options.gender);
+      const { gender, includeBPJS = false, bpjsScheme = 'kesehatan' } = options;
+      return buildPerson(lcg, gender, includeBPJS, bpjsScheme);
+    },
+
+    generateBPJS(options = {}) {
+      const { scheme = 'kesehatan' } = options;
+      return lcg.nextDigits(SCHEME_LENGTH[scheme]);
+    },
+
+    generateVIN(options = {}) {
+      const { manufacturerPrefix } = options;
+      const usePrefix =
+        typeof manufacturerPrefix === 'string' &&
+        manufacturerPrefix.length === 3 &&
+        [...manufacturerPrefix].every(isValidVinCharLocal);
+
+      const chars: string[] = new Array(VIN_LENGTH_LOCAL);
+      if (usePrefix) {
+        for (let i = 0; i < 3; i++) {
+          chars[i] = (manufacturerPrefix as string)[i].toUpperCase();
+        }
+      } else {
+        for (let i = 0; i < 3; i++) {
+          chars[i] = lcg.nextElement(VIN_CHARS_LOCAL);
+        }
+      }
+
+      for (let i = 3; i < VIN_LENGTH_LOCAL; i++) {
+        if (i === VIN_CHECK_DIGIT_INDEX_LOCAL) continue;
+        chars[i] = lcg.nextElement(VIN_CHARS_LOCAL);
+      }
+
+      chars[VIN_CHECK_DIGIT_INDEX_LOCAL] = computeCheckDigitLocal(chars);
+      return chars.join('');
     },
   };
 }
