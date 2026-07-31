@@ -95,3 +95,48 @@ export interface AgeResult {
   /** Remaining days (0-30) */
   days: number;
 }
+
+/**
+ * The five-day Javanese market cycle (pancawara / pasaran).
+ *
+ * Listed in canonical order starting from the wetonan anchor (Legi).
+ */
+export type Pasaran =
+  | 'Legi'
+  | 'Pahing'
+  | 'Pon'
+  | 'Wage'
+  | 'Kliwon';
+
+/**
+ * Indonesian weekday name (saptawara).
+ *
+ * Listed in canonical Monday-first order. For indexing against the
+ * wetonan anchor (which starts on Jumat / Friday) use the
+ * `WETON_WEEKDAY_ORDER` constant exported from `weton.ts`.
+ */
+export type IndonesianWeekday =
+  | 'Senin'
+  | 'Selasa'
+  | 'Rabu'
+  | 'Kamis'
+  | 'Jumat'
+  | 'Sabtu'
+  | 'Minggu';
+
+/**
+ * Javanese market-day information for a given Gregorian date.
+ *
+ * The `neptu` value is the sum of the weekday neptu and the pasaran
+ * neptu and always lies in the inclusive range `[7, 18]`.
+ *
+ * @see getWeton
+ */
+export interface Weton {
+  /** The five-day market cycle position */
+  pasaran: Pasaran;
+  /** The Indonesian weekday name */
+  weekday: IndonesianWeekday;
+  /** Combined neptu value, integer in [7, 18] */
+  neptu: number;
+}

@@ -218,6 +218,7 @@ export {
   isValidDate,
   isWeekend,
   isWorkingDay,
+  addBusinessDays,
   // Parsing
   parseDate,
   // Formatting
@@ -229,9 +230,18 @@ export {
   getAge as getAgeFromDate,
   // Timezone
   getIndonesianTimezone,
+  // Weton (Javanese market day)
+  getWeton,
 } from './datetime';
 
-export type { DateStyle, AgeOptions, AgeResult } from './datetime';
+export type {
+  DateStyle,
+  AgeOptions,
+  AgeResult,
+  Pasaran,
+  IndonesianWeekday,
+  Weton,
+} from './datetime';
 
 // BPJS module
 export {

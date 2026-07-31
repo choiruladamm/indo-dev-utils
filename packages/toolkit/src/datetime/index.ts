@@ -61,7 +61,14 @@
 
 // Error types
 export { InvalidDateError, InvalidDateRangeError } from './types';
-export type { DateStyle, AgeOptions, AgeResult } from './types';
+export type {
+  DateStyle,
+  AgeOptions,
+  AgeResult,
+  Pasaran,
+  IndonesianWeekday,
+  Weton,
+} from './types';
 
 // Constants
 export {
@@ -81,6 +88,7 @@ export {
   isWeekend,
   isWorkingDay,
   getAge,
+  addBusinessDays,
 } from './calc';
 
 // Parsing
@@ -94,3 +102,6 @@ export { toRelativeTime } from './relative';
 
 // Timezone
 export { getIndonesianTimezone } from './timezone';
+
+// Weton (Javanese market day)
+export { getWeton } from './weton';
