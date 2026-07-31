@@ -115,6 +115,7 @@ export {
   formatCompact,
   formatPercentage,
   parseRupiah,
+  parseCompact,
   toWords,
   roundToClean,
   formatAccounting,
