@@ -490,6 +490,65 @@ function ChartLabel({ value }: { value: number }) {
 
 ---
 
+### parseCompact()
+
+Inverse of `formatCompact`. Parses an Indonesian compact amount string into a number.
+
+**Type Signature:**
+
+```typescript
+function parseCompact(input: string): number;
+```
+
+**Parameters:**
+
+| Name    | Type     | Description                       |
+| ------- | -------- | --------------------------------- |
+| `input` | `string` | The compact amount string to parse |
+
+**Returns:**
+
+`number` - The parsed value, or `NaN` if the input cannot be unambiguously parsed.
+
+**Recognised Multiplier Shorthands (case-insensitive):**
+
+| Shorthand           | Multiplier          |
+| ------------------- | ------------------- |
+| `rb`, `ribu`, `k`   | 1 000               |
+| `jt`, `juta`        | 1 000 000           |
+| `M`, `miliar`, `milyar` | 1 000 000 000   |
+| `T`, `triliun`      | 1 000 000 000 000   |
+
+Comma (`,`) is the decimal separator; dot (`.`) is the thousands separator. Both `miliar` and `milyar` (Indonesian spellings of "billion") are accepted.
+
+A multiplier MUST be present — bare numeric input like `"1.5"` or `"1500"` returns `NaN` because compact shorthand = number + multiplier.
+
+**Examples:**
+
+```typescript
+parseCompact('1,5jt');      // 1500000
+parseCompact('3 miliar');   // 3000000000
+parseCompact('500k');       // 500000
+parseCompact('2rb');        // 2000
+parseCompact('1M');         // 1000000000
+parseCompact('1,5JT');      // 1500000 (case-insensitive)
+parseCompact('  2jt  ');    // 2000000 (whitespace-tolerant)
+parseCompact('1,5jt + pajak'); // NaN (garbage text)
+
+// Bare numeric without multiplier → NaN
+parseCompact('1.5');        // NaN
+parseCompact('1500');       // NaN
+```
+
+<Callout type="info">
+`parseCompact` reads user-typed shorthand. The reverse direction
+(`formatCompact`) emits the long-form words (`"Rp 1,5 juta"`), so a
+perfect string round-trip is not expected — but the parsed number
+re-formats to the same value.
+</Callout>
+
+---
+
 ### formatPercentage()
 
 Formats a number as an Indonesian percentage string. Uses comma as decimal separator by default.

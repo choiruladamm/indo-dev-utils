@@ -17,10 +17,10 @@ Stop wrestling with NIK validation, Rupiah formatting, and phone normalization. 
 
 | Metric | Value |
 |--------|-------|
-| Test cases | 2088+ |
+| Test cases | 2148+ |
 | Coverage | 95%+ |
 | Dependencies | Zero |
-| [Bundle size](https://bundlephobia.com/package/@indodev/toolkit@0.9.1) | **53.5 KB** (19.2 KB gzipped) |
+| [Bundle size](https://bundlephobia.com/package/@indodev/toolkit@0.9.2) | **53.5 KB** (19.2 KB gzipped) |
 | Modules | 13 |
 
 ### Bundle Analysis
@@ -35,15 +35,15 @@ Tree-shakeable exports — import only what you need:
 | `plate` | 8 | `import { validatePlate } from '@indodev/toolkit/plate'` |
 | `vin` | 4 | `import { validateVIN } from '@indodev/toolkit/vin'` |
 | `email-validator` | 4 | `import { validateEmail } from '@indodev/toolkit/email-validator'` |
-| `currency` | 11 | `import { formatRupiah } from '@indodev/toolkit/currency'` |
+| `currency` | 12 | `import { formatRupiah } from '@indodev/toolkit/currency'` |
 | `text` | 27 | `import { slugify } from '@indodev/toolkit/text'` |
-| `datetime` | 19 | `import { formatDate } from '@indodev/toolkit/datetime'` |
+| `datetime` | 22 | `import { formatDate } from '@indodev/toolkit/datetime'` |
 | `nlp` | 6 | `import { stemText } from '@indodev/toolkit/nlp'` |
 | `pdp` | 4 | `import { scanPII } from '@indodev/toolkit/pdp'` |
 | `bpjs` | 5 | `import { validateBPJS } from '@indodev/toolkit/bpjs'` |
 | `mock` | 10 | `import { generateNIK } from '@indodev/toolkit/mock'` |
 
-> **Total: 135+ exports** across 13 modules. Each module is independent and tree-shakeable — your bundler will only include the functions you actually use.
+> **Total: 138+ exports** across 13 modules. Each module is independent and tree-shakeable — your bundler will only include the functions you actually use.
 
 ## Modules
 

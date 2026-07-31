@@ -927,6 +927,122 @@ isWorkingDay(new Date('2026-01-04')); // false (Sunday)
 
 ---
 
+### addBusinessDays()
+
+Adds or subtracts a number of working days from a date, skipping weekends.
+
+**Type Signature:**
+
+```typescript
+function addBusinessDays(date: Date, count: number): Date;
+```
+
+**Parameters:**
+
+| Name    | Type     | Default | Description                                            |
+| ------- | -------- | ------- | ------------------------------------------------------ |
+| `date`  | `Date`   | —       | The starting date                                      |
+| `count` | `number` | —       | Working days to add (positive) or subtract (negative). 0 returns a new Date equal to the input. |
+
+**Returns:**
+
+`Date` - A new `Date` representing the resulting working day. For non-zero count, the result is always a Monday-Friday.
+
+**Semantics (standard business-day):**
+
+- Wed + 1 = Thu
+- Wed + 2 = Fri
+- Wed + 3 = Mon (the count crosses the weekend)
+- Saturday/Sunday starts snap to the nearest weekday first, then the count is applied.
+
+**Examples:**
+
+```typescript
+import { addBusinessDays } from '@indodev/toolkit/datetime';
+
+// Forward
+addBusinessDays(new Date('2026-01-07'), 2);   // 2026-01-09 (Wed + 2 = Fri)
+addBusinessDays(new Date('2026-01-09'), 1);   // 2026-01-12 (Fri + 1 = Mon, skips weekend)
+addBusinessDays(new Date('2026-01-10'), 1);   // 2026-01-12 (Sat + 1 → next Mon)
+
+// Backward
+addBusinessDays(new Date('2026-01-12'), -1);  // 2026-01-09 (Mon - 1 = Fri)
+
+// Zero
+addBusinessDays(new Date('2026-01-07'), 0);   // 2026-01-07 (new Date, equal value)
+```
+
+<Callout type="warning">
+  **Note**: `addBusinessDays` is weekend-aware but **holiday-agnostic**. It does not skip national holidays (which would require a maintained holiday calendar). Use only when weekend-skipping is the requirement.
+</Callout>
+
+---
+
+### getWeton()
+
+Returns the Javanese market-day information (pasaran, weekday, neptu) for a given date.
+
+**Type Signature:**
+
+```typescript
+function getWeton(date: Date): Weton;
+
+interface Weton {
+  /** Pasaran: Legi, Pahing, Pon, Wage, or Kliwon */
+  pasaran: 'Legi' | 'Pahing' | 'Pon' | 'Wage' | 'Kliwon';
+  /** Indonesian weekday name */
+  weekday: 'Minggu' | 'Senin' | 'Selasa' | 'Rabu' | 'Kamis' | 'Jumat' | 'Sabtu';
+  /** Combined neptu value, always in [7, 18] */
+  neptu: number;
+}
+```
+
+**Parameters:**
+
+| Name   | Type   | Description           |
+| ------ | ------ | --------------------- |
+| `date` | `Date` | The date to look up   |
+
+**Returns:**
+
+`Weton` - An object with the pasaran, weekday, and neptu value.
+
+**Anchor:** 8 July 1633 CE (Jumat Legi) — the Javanese calendar epoch established by Sultan Agung of Mataram. The 35-day wetonan cycle (LCM of 5 and 7) is locked to this anchor.
+
+**Neptu values** (cross-verified from 7 independent Indonesian sources):
+
+| Hari | Neptu | | Pasaran | Neptu |
+|---|---|---|---|---|
+| Minggu | 5 | | Legi | 5 |
+| Senin | 4 | | Pahing | 9 |
+| Selasa | 3 | | Pon | 7 |
+| Rabu | 7 | | Wage | 4 |
+| Kamis | 8 | | Kliwon | 8 |
+| Jumat | 6 | | | |
+| Sabtu | 9 | | | |
+
+**Examples:**
+
+```typescript
+import { getWeton } from '@indodev/toolkit/datetime';
+
+// Indonesian independence day
+getWeton(new Date('1945-08-17'));
+// { weekday: 'Jumat', pasaran: 'Pahing', neptu: 15 }
+
+// Anchor date itself
+getWeton(new Date('1633-07-08'));
+// { weekday: 'Jumat', pasaran: 'Legi', neptu: 11 }
+```
+
+<Callout type="info">
+Dates before 8 July 1633 CE throw `InvalidDateError` because the
+Javanese calendar does not formally apply before Sultan Agung's
+inauguration.
+</Callout>
+
+---
+
 ## Type Reference
 
 ### DateStyle

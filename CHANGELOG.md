@@ -2,6 +2,47 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.2] - 2026-06-01
+
+### Added
+
+#### Currency — parseCompact
+
+Inverse of `formatCompact`. Parses Indonesian compact amount shorthand
+like `"1,5jt"`, `"500k"`, `"2rb"`, `"3 miliar"`, `"1M"`, `"1T"` into a
+number. Comma = decimal, dot = thousands (matches existing currency
+convention). Case-insensitive and whitespace-tolerant. Returns `NaN`
+for missing/unknown multiplier or garbage input. Bare numeric input
+(e.g. `"1.5"`, `"1500"`) returns `NaN` because compact = number + multiplier.
+
+Multiplier shorthands accepted:
+- `rb`, `ribu`, `k` → 1 000
+- `jt`, `juta` → 1 000 000
+- `M`, `miliar`, `milyar` → 1 000 000 000
+- `T`, `triliun` → 1 000 000 000 000
+
+#### DateTime — Weton
+
+`getWeton(date) → { pasaran, weekday, neptu }` returns the Javanese
+market-day information for a given date. Uses the canonical Javanese
+calendar anchor (8 July 1633 CE = Jumat Legi, Sultan Agung
+inauguration) and a pure day-count algorithm. Neptu values match the
+cross-verified table from 7 independent Indonesian sources and one
+academic paper (arXiv 2012.10064v1).
+
+- All 35 unique weton reachable in a single 35-day cycle
+- `neptu` always in `[7, 18]`
+- Pre-anchor dates (before 1633-07-08) throw `InvalidDateError`
+
+#### DateTime — Business-Day Arithmetic
+
+`addBusinessDays(date, count) → Date` adds or subtracts a number of
+working days, skipping weekends. Standard business-day semantics:
+Wed+1=Thu, Wed+2=Fri, Wed+3=Mon (weekend is only consumed when the
+count traverses it). Saturday/Sunday starts snap to the nearest weekday.
+Result is always a weekday for non-zero count. Holidays are NOT skipped
+(out of scope by design — would require a maintained holiday calendar).
+
 ## [0.9.1] - 2026-06-01
 
 ### Added
