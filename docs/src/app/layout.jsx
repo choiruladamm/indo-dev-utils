@@ -83,8 +83,8 @@ export default async function RootLayout({ children }) {
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head faviconGlyph="🇮🇩" />
       <body>
-        <Banner storageKey="v0.9.0">
-          v0.9.0 released — BPJS Module (Kesehatan & Ketenagakerjaan) + Mock Module for deterministic fake Indonesian data.{' '}
+        <Banner storageKey="v0.9.1">
+          v0.9.1 released — Mock Generator Parity (BPJS + VIN generators) and API consistency fixes.{' '}
           <a href="/docs/changelog" style={{ textDecoration: 'underline' }}>
             Read changelog
           </a>
