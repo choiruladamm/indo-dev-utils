@@ -83,8 +83,8 @@ export default async function RootLayout({ children }) {
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head faviconGlyph="🇮🇩" />
       <body>
-        <Banner storageKey="v0.9.1">
-          v0.9.1 released — Mock Generator Parity (BPJS + VIN generators) and API consistency fixes.{' '}
+        <Banner storageKey="v0.9.2">
+          v0.9.2 released — parseCompact (currency), getWeton (Javanese market day) and addBusinessDays (datetime).{' '}
           <a href="/docs/changelog" style={{ textDecoration: 'underline' }}>
             Read changelog
           </a>
