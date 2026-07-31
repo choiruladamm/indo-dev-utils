@@ -28,6 +28,7 @@ export { formatRupiah, formatCompact, formatPercentage } from './format';
 
 // Parsing functions
 export { parseRupiah } from './parse';
+export { parseCompact } from './parse-compact';
 
 // Word conversion
 export { toWords } from './words';
