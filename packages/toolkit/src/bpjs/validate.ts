@@ -13,7 +13,7 @@ import { cleanBPJS } from './clean';
  * @example
  * validateBPJS('0001234567890', 'kesehatan') // true
  * validateBPJS('0001-2345-67890', 'kesehatan') // true (cleans first)
- * validateBPJS('12345678901', 'ketenangan') // true
+ * validateBPJS('12345678901', 'ketenagakerjaan') // true
  * validateBPJS('123456789', 'kesehatan') // false
  */
 export function validateBPJS(number: string, type: BPJSType): boolean {

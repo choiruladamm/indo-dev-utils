@@ -14,7 +14,7 @@
  * validateBPJSKesehatan('0001234567890');    // true
  * formatBPJS('0001234567890', 'kesehatan');  // '0001-2345-67890'
  * parseBPJS('12345678901');
- * // { type: 'ketenangan', raw: '12345678901', formatted: '1234-567-8901' }
+ * // { type: 'ketenagakerjaan', raw: '12345678901', formatted: '1234-567-8901' }
  * ```
  *
  * @module bpjs
